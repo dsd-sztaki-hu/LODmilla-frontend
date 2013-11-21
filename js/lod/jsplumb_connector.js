@@ -1,3 +1,12 @@
+/*
+ * LODmilla-frontend
+ *
+ * https://github.com/dsd-sztaki-hu/LODmilla-frontend
+ *
+ * Copyright (c) 2013 Sandor Turbucz, Zoltan Toth - MTA SZTAKI DSD
+ *
+ */
+
 vis_get_visibleCanvasRandomPosition = function(aroundNode){    
     var top, left;
     if (!aroundNode){

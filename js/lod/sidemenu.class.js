@@ -1,4 +1,13 @@
 /*
+ * LODmilla-frontend
+ *
+ * https://github.com/dsd-sztaki-hu/LODmilla-frontend
+ *
+ * Copyright (c) 2013 Sandor Turbucz, Zoltan Toth - MTA SZTAKI DSD
+ *
+ */
+ 
+/*
  * Class:Sidemenu
  * Elements which are not parts of the graph structure.  
  */
