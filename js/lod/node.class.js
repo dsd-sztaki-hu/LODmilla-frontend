@@ -314,95 +314,97 @@ var Node = function(resource_id, label) {
                 // TODO: van, hogy tobb elemben is van label, ilyenkor bugos lehet, ha nincs self.resource_id nincs a JSONban..
                 // TODO: sometimes more items have
                 var trueResourceUri = '';
-                $.each(json, function(fromUrl, propertyList) {
-                    if (fromUrl === self.resource_id){                        
-                        trueResourceUri = self.resource_id;
-                        return false;
-                    }
-                });
-                if (trueResourceUri === ''){                    
-                    $.each(json, function(fromUrl, propertyList) {
-                        $.each(propertyList, function(property, toObjList) {
-                            // TODO: what if not this label? (http://www.w3.org/2000/01/rdf-schema#label)
-                            if (property === Profile.labelURIs[2]) {
-                                trueResourceUri = fromUrl;
-                                return false;
-                            }
-                        });
-                    });
-                }
+				if (json){				
+					$.each(json, function(fromUrl, propertyList) {
+						if (fromUrl === self.resource_id){                        
+							trueResourceUri = self.resource_id;
+							return false;
+						}
+					});
+					if (trueResourceUri === ''){                    
+						$.each(json, function(fromUrl, propertyList) {
+							$.each(propertyList, function(property, toObjList) {
+								// TODO: what if not this label? (http://www.w3.org/2000/01/rdf-schema#label)
+								if (property === Profile.labelURIs[2]) {
+									trueResourceUri = fromUrl;
+									return false;
+								}
+							});
+						});
+					}
 
-                // normal parsing
-                $.each(json, function(fromUrl, propertyList) {
-                    $.each(propertyList, function(property, toObjList) {
-                        $.each(toObjList, function(index2, toObj) {
-                            if (fromUrl === trueResourceUri || toObj.value === trueResourceUri){                                
-                                if (toObj.type === 'literal' || toObj.type === 'typed-literal') {
-                                    // label storing
-                                    if (fromUrl === trueResourceUri) {
-                                        // TODO put in function
-                                        if (!self.literals[property])
-                                            self.literals[property] = {};
+					// normal parsing
+					$.each(json, function(fromUrl, propertyList) {
+						$.each(propertyList, function(property, toObjList) {
+							$.each(toObjList, function(index2, toObj) {
+								if (fromUrl === trueResourceUri || toObj.value === trueResourceUri){                                
+									if (toObj.type === 'literal' || toObj.type === 'typed-literal') {
+										// label storing
+										if (fromUrl === trueResourceUri) {
+											// TODO put in function
+											if (!self.literals[property])
+												self.literals[property] = {};
 
-                                        if (toObj.lang === 'en' && !self.literals[property]['en']) {
-                                            self.literals[property] = {};
-                                            self.literals[property]['en'] = new Array();
-                                        } else if (!self.literals[property]['en']) {
-                                            if (!toObj.lang && !self.literals[property]['nolang']) {
-                                                self.literals[property] = {};
-                                                self.literals[property]['nolang'] = new Array();
-                                            }
-                                        }
+											if (toObj.lang === 'en' && !self.literals[property]['en']) {
+												self.literals[property] = {};
+												self.literals[property]['en'] = new Array();
+											} else if (!self.literals[property]['en']) {
+												if (!toObj.lang && !self.literals[property]['nolang']) {
+													self.literals[property] = {};
+													self.literals[property]['nolang'] = new Array();
+												}
+											}
 
-                                        if (toObj.lang && toObj.lang === 'en') {
-                                            self.literals[property]['en'].push(toObj.value);
+											if (toObj.lang && toObj.lang === 'en') {
+												self.literals[property]['en'].push(toObj.value);
 
-                                        } else if (self.literals[property]['nolang'] && !toObj.lang) {
-                                            self.literals[property]['nolang'].push(toObj.value);
-                                        } else if (!self.literals[property]['en'] && !self.literals[property]['nolang']) {
-                                            if (!self.literals[property][toObj.lang])
-                                                self.literals[property][toObj.lang] = new Array();
-                                            self.literals[property][toObj.lang].push(toObj.value);
-                                        }
-                                    }
-                                    else{
-                                        self.addConnection(fromUrl, property, 'in', toObj.value);
-                                    }
-                                }
-                                else if (toObj.type === 'uri') {
-                                    // set node type
-                                    if (property === Profile.commonURIs.propTypeURI) {
-                                        var val = decodeURIComponent(toObj.value);                                
-                                        $.each(Profile.nodeTypes, function(nodeType, uris) {
-                                            var pos = $.inArray(val, uris);
-                                            if (pos !== -1) {
-                                                // if changed once, dont change it again (duplicate types)
-                                                if (self.type === Profile.unloadedNodeType)
-                                                    self.type = nodeType;
-                                                return false;
-                                            }
-                                        });                                                                
-                                    }
-                                    // OUT connections
-                                    if (fromUrl === trueResourceUri) {
-                                        // store image in Node
-                                        self.storeImage(property, toObj.value);
+											} else if (self.literals[property]['nolang'] && !toObj.lang) {
+												self.literals[property]['nolang'].push(toObj.value);
+											} else if (!self.literals[property]['en'] && !self.literals[property]['nolang']) {
+												if (!self.literals[property][toObj.lang])
+													self.literals[property][toObj.lang] = new Array();
+												self.literals[property][toObj.lang].push(toObj.value);
+											}
+										}
+										else{
+											self.addConnection(fromUrl, property, 'in', toObj.value);
+										}
+									}
+									else if (toObj.type === 'uri') {
+										// set node type
+										if (property === Profile.commonURIs.propTypeURI) {
+											var val = decodeURIComponent(toObj.value);                                
+											$.each(Profile.nodeTypes, function(nodeType, uris) {
+												var pos = $.inArray(val, uris);
+												if (pos !== -1) {
+													// if changed once, dont change it again (duplicate types)
+													if (self.type === Profile.unloadedNodeType)
+														self.type = nodeType;
+													return false;
+												}
+											});                                                                
+										}
+										// OUT connections
+										if (fromUrl === trueResourceUri) {
+											// store image in Node
+											self.storeImage(property, toObj.value);
 
-                                        var endpointLabel = Profile.getShortTypeFromURL(toObj.value);
-                                        self.addConnection(toObj.value, property, 'out', endpointLabel);
-                                    }
-                                    // IN connections
-                                    else {
-                                        var endpointLabel = Profile.getShortTypeFromURL(fromUrl);
-                                        self.addConnection(fromUrl, property, 'in', endpointLabel);
-                                    }
-                                } else {
-                                    console.log('TODO: type not known yet');
-                                }
-                            }
-                        });
-                    });
-                });
+											var endpointLabel = Profile.getShortTypeFromURL(toObj.value);
+											self.addConnection(toObj.value, property, 'out', endpointLabel);
+										}
+										// IN connections
+										else {
+											var endpointLabel = Profile.getShortTypeFromURL(fromUrl);
+											self.addConnection(fromUrl, property, 'in', endpointLabel);
+										}
+									} else {
+										console.log('TODO: type not known yet');
+									}
+								}
+							});
+						});
+					});
+				}
             }
             
             // post-parseing, settings
