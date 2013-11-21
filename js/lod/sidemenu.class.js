@@ -30,7 +30,7 @@ var Sidemenu = new function() {
 
         self.addResBox = $('<div id="addResourcePalette" class="paletteItem opacityItem" title="Add new resource"></div>');
         self.addResForm = $('<form id="searchForm"></form>');
-        self.addResForm.append('<select><option value="sztaki" selected="selected">Sztaki</option><option value="dbpedia">DBpedia</option></select>');
+        self.addResForm.append('<select><option value="dbpedia" selected="selected">DBpedia</option><option value="sztaki">Sztaki</option></select>');
         self.addResForm.append('<div class="searchInput resourceLabelInput"><input type="text" value="" /></div>');
         self.addResForm.append('<div class="searchInput searchInputInactive resourceUriInput"><input type="text" value="" /></div>');
         self.addResForm.append('<div class="addResourceClearButton"><input type="button" value="Clear" /></div>');
@@ -136,7 +136,7 @@ var Sidemenu = new function() {
                         error: function(jqXHR, textStatus, errorThrown) {
                             console.log(jqXHR, textStatus, errorThrown);
                             self.addResForm.find('div.resourceLabelInput input').removeClass('ui-autocomplete-loading');
-                            alert(errorThrown);
+                            alert('DBpedia server offline');
                         }
                     });
                 }

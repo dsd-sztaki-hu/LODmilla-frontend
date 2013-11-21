@@ -1,4 +1,4 @@
-{
+services = {
     "http://lod.sztaki.hu/sztaki": {
         "shortDescription": {
             "en": "Sztaki"

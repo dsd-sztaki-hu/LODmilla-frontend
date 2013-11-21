@@ -346,19 +346,23 @@ var Profile = new function() {
 
     this.init = function() {
         var self = this;
-        var jqxhr = $.ajax({
-            type: "GET",
-            dataType: "json",
-            url: "js/lod/services.json",
-            async: false,
-            data: {}
-        }).done(function(json) {
-            $.each(json, function(key, value) {
-                self.addService(key, value.shortDescription.en, value.description.en, value.endpoint, value.prefix, value.graph, value.sparql);
-            });
-        });
-//        .fail(function() { alert("error"); })
-//        .always(function() { alert("complete"); });
+		// only working if runs on a server, wamp/lamp on localhostetc.
+        // var jqxhr = $.ajax({
+            // type: "GET",
+            // dataType: "json",
+            // url: "js/lod/services.json",
+            // async: false,
+            // data: {}
+        // }).done(function(json) {
+            // $.each(json, function(key, value) {
+                // self.addService(key, value.shortDescription.en, value.description.en, value.endpoint, value.prefix, value.graph, value.sparql);
+            // });
+        // });
+	
+		// made because of the easy testing without the need of running it on a server
+		$.each(services, function(key, value) {
+			self.addService(key, value.shortDescription.en, value.description.en, value.endpoint, value.prefix, value.graph, value.sparql);
+		}); 
     };
 
 };
