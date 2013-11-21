@@ -35,7 +35,8 @@ $(document).ready(function() {
         BackendCommunicator.load(Profile.QueryString.id, null, null, Graph.load, undoActionLabel);
     }
     if (Profile.QueryString.url !== undefined) {
-        var resource_id = decodeURIComponent(Profile.QueryString.url);
+        // var resource_id = decodeURIComponent(Profile.QueryString.url);
+        var resource_id = Profile.QueryString.url;
         Graph.addNode(resource_id,false,false,false,false,false);
         var undoActionLabel = 'action_httpParam_loadUri';
         var nodeList = [{resource_id:resource_id, action:'added',highlighted:false}];

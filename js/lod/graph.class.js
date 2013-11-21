@@ -53,7 +53,7 @@ var Graph = new function() {
      * @returns {undefined}
      */
     this.addNode = function(resource_id, label, top, left, highlight, undoActionLabel, aroundNode) {
-		// resource_id = decodeURIComponent(resource_id);
+		resource_id = decodeURIComponent(resource_id);
         if (typeof(aroundNode) === 'undefined')
             aroundNode = false;
         if (!(this.getNode(resource_id))) {
