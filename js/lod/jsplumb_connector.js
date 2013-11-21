@@ -522,12 +522,13 @@ Node.prototype.vis_repaintConnections = function() {
     
     for (var i = 0; i < length; i++) {
         var connection = this.connections[i];
-        if ($("[uri='" + connection.target + "']").length) {
+		var target = decodeURIComponent(connection.target);
+        if ($("[uri='" + target + "']").length) {
 
             var localsource = self.resource_id;
-            var localtarget = connection.target;
+            var localtarget = target;
             if (connection.direction === 'in') {
-                localsource = connection.target;
+                localsource = target;
                 localtarget = self.resource_id;
                 //arrowStyle = {location: 1, width: 10, length: 12};
             } else {
