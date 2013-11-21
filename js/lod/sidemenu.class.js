@@ -136,7 +136,7 @@ var Sidemenu = new function() {
                         error: function(jqXHR, textStatus, errorThrown) {
                             console.log(jqXHR, textStatus, errorThrown);
                             self.addResForm.find('div.resourceLabelInput input').removeClass('ui-autocomplete-loading');
-                            alert('DBpedia server offline');
+                            alert('DBpedia server error');
                         }
                     });
                 }
@@ -196,7 +196,7 @@ var Sidemenu = new function() {
                         error: function(jqXHR, textStatus, errorThrown) {
                             console.log(jqXHR, textStatus, errorThrown);
                             self.addResForm.find('div.resourceLabelInput input').removeClass('ui-autocomplete-loading');
-                            alert(errorThrown);
+                            alert("SZTAKI server error");
                         }
                     });
                 }
