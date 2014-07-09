@@ -24,6 +24,7 @@ var Sidemenu = new function() {
     this.selectBox = '';
     this.selectForm = '';
     this.findPathBox = '';
+    this.layoutBox = '';
 
     var self = this;
 
@@ -444,6 +445,13 @@ var Sidemenu = new function() {
             }
         });
 
+        // Layout box palette
+        self.layoutBox = $('<div id="layoutPalette" class="paletteItem opacityItem"></div>');
+
+        self.layoutBox.append('<div class="layoutButton"><input type="button" value="Apply layout" /></div>');
+        self.layoutBox.find('.layoutButton input').button();
+
+
         // LOAD button
         self.buttonLoad = $('<div class="buttonWrap"><button id="loadGraphButton" title="Load current graph">Load</button></div>');
         parent.append(self.buttonLoad);
@@ -522,6 +530,8 @@ var Sidemenu = new function() {
         self.paletteBox.append(self.searchConnectionBox);
         self.paletteBox.append('<h3>Find path between nodes</h3>');
         self.paletteBox.append(self.findPathBox);
+        self.paletteBox.append('<h3>Graph layout</h3>');
+        self.paletteBox.append(self.layoutBox);
         self.paletteBox.accordion({
             collapsible: true,
             heightStyle: "content",

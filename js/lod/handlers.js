@@ -381,6 +381,10 @@ addPaletteHandlers = function(){
         else
             Helper.alertDialog(Profile.alertTexts.findPathNodesIdle.title, Profile.alertTexts.findPathNodesIdle.text);
     });
+
+    $('body').on("click", '#main #paletteBox #layoutPalette div.layoutButton input', function(event) {
+        applyLayout(Graph);
+    });
 };
 
 addBottomMenuHandlers = function(){
