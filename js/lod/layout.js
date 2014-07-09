@@ -17,6 +17,7 @@ function applyLayout() {
     {
         sorted_nodes.push(Graph.nodes[index]);
     }
+    
     var node, minleft = sorted_nodes[0].left, mintop = sorted_nodes[0].top;
 
     for (index in sorted_nodes)
