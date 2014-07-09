@@ -3,18 +3,20 @@
  *
  * https://github.com/dsd-sztaki-hu/LODmilla-frontend
  *
- * Copyright (c) 2013 Sandor Turbucz, Zoltan Toth - MTA SZTAKI DSD
+ * Copyright (c) 2013 Sandor Turbucz, Zoltan Toth, Andras Micsik - MTA SZTAKI DSD
  *
  */
- 
+
 /*
  * Class:Sidemenu
  * Elements which are not parts of the graph structure.  
  */
 var Sidemenu = new function() {
     this.paletteBox = '';
-    this.addResBox = '';
-    this.addResForm = '';
+    this.openResBox = '';
+    this.openResForm = '';
+    this.addNewResBox = '';
+    this.addNewResForm = '';
     this.searchBox = '';
     this.searchRemoteBox = '';
     this.searchConnectionBox = '';
@@ -28,74 +30,101 @@ var Sidemenu = new function() {
     this.init = function(parent) {
         self.paletteBox = $('<div id="paletteBox"></div>');
 
-        self.addResBox = $('<div id="addResourcePalette" class="paletteItem opacityItem" title="Add new resource"></div>');
-        self.addResForm = $('<form id="searchForm"></form>');
-        self.addResForm.append('<select><option value="dbpedia" selected="selected">DBpedia</option><option value="sztaki">Sztaki</option></select>');
-        self.addResForm.append('<div class="searchInput resourceLabelInput"><input type="text" value="" /></div>');
-        self.addResForm.append('<div class="searchInput searchInputInactive resourceUriInput"><input type="text" value="" /></div>');
-        self.addResForm.append('<div class="addResourceClearButton"><input type="button" value="Clear" /></div>');
-        self.addResForm.append('<div class="addResourceHint">(or add URL from grey with enter)</div>');        
-
         // ADD NEW resource palette
-        self.addResForm.find('select').change(function() {
-            self.addResForm.find('div.resourceLabelInput input').removeClass('ui-autocomplete-loading');
+
+        self.addNewResBox = $('<div id="addNewResourcePalette" class="paletteItem opacityItem" title="Add new resource"></div>');
+        self.addNewResForm = $('<form id="addNewResForm"></form>');
+        self.addNewResForm.append('<div class="searchInput resourceLabelInput"><input type="text" placeholder="Enter new node label" value="" /></div>');
+        self.addNewResForm.append('<div class="searchInput uriPrefixInput"><input type="text" placeholder="Enter new node URI prefix" value="" /></div>');
+        self.addNewResForm.append('<select><option value="" selected="selected">-Select a type-</option><option value="'+ Profile.commonURIs.thingURI +'" title="'+ Profile.commonURIs.thingURI +'">Thing</option></select>');
+        self.addNewResForm.append('<div class="searchInput typeUriInput"><input type="text" placeholder="Enter new node type URI" value="" /></div>');
+//        self.addNewResForm.append('<div class="searchInput endpointUriInput"><input type="text" placeholder="Enter new node endpoint URI.." value="" /></div>');
+        self.addNewResForm.append('<div class="searchInput thumbnailUrlInput"><input type="text" placeholder="Enter thumbnail URL" value="" /></div>');
+        self.addNewResForm.append('<div class="addNewResourceAddButton"><input type="button" value="Add" /></div>');
+        self.addNewResBox.append(self.addNewResForm);
+
+        self.addNewResForm.find('select').change(function() {
+            var typeURI = $(this).find('option:selected').attr('value');
+            if (typeURI){
+                self.addNewResForm.find('div.typeUriInput input').val(typeURI);
+            }
+        });
+
+        // add button
+        self.addNewResForm.find('div input[type="button"]').button();
+
+        // OPEN resource palette
+
+        self.openResBox = $('<div id="addResourcePalette" class="paletteItem opacityItem" title="Open resource"></div>');
+        self.openResForm = $('<form id="searchForm"></form>');
+        var openNodeSearchOptions = '';
+        for (var searchProvider in Profile.searchURLs){
+            if (Profile.searchURLs.hasOwnProperty(searchProvider)){
+                openNodeSearchOptions += '<option value="'+searchProvider+'">'+searchProvider+'</option>';
+            }
+        }
+        self.openResForm.append('<select>' + openNodeSearchOptions + '</select>');
+        self.openResForm.append('<div class="searchInput resourceLabelInput"><input type="text" placeholder="Find node in store" value="" /></div>');
+        self.openResForm.append('<div class="searchInput resourceUriInput"><input type="text" placeholder="Or enter node URI" value="" /></div>');
+        self.openResForm.append('<div class="addResourceClearButton"><input type="button" value="Clear" /></div>');
+        self.openResForm.append('<div class="addResourceOpenButton"><input type="submit" value="Open" /></div>');
+        self.openResBox.append(self.openResForm);
+
+        self.openResForm.find('select').change(function() {
+            self.openResForm.find('div.resourceLabelInput input').removeClass('ui-autocomplete-loading');
             var lodServer = $(this).find('option:selected').attr('value');
-            var searchInput = self.addResForm.find('div.resourceLabelInput input');
+            var searchInput = self.openResForm.find('div.resourceLabelInput input');
             if (lodServer) {
-                self.addResForm.find('div.resourceLabelInput').removeClass('searchInputInactive');
+                self.openResForm.find('div.resourceLabelInput').removeClass('searchInputInactive');
                 searchInput.val('').removeAttr('readonly').focus();
             }
             else {
-                self.addResForm.find('div.resourceLabelInput').addClass('searchInputInactive');
+                self.openResForm.find('div.resourceLabelInput').addClass('searchInputInactive');
                 searchInput.val('').attr('readonly', 'readonly');
             }
-            self.addResForm.find('div.resourceUriInput input').val('');
+            self.openResForm.find('div.resourceUriInput input').val('');
         });
 
-        self.addResBox.append(self.addResForm);
-        
+        // open button
+        self.openResForm.find('div.addResourceOpenButton input').button();
+
         // clear button
-        self.addResForm.find('div input[type="button"]').button();
-        self.addResForm.find('div input[type="button"]').click(function() {
-            self.addResForm.find('div.resourceLabelInput input').val('');
-            self.addResForm.find('div.resourceUriInput input').val('');
-            self.addResForm.find('div.resourceLabelInput input').removeClass('ui-autocomplete-loading');
-            self.addResForm.find('div.resourceLabelInput input').focus();
-        });
+        self.openResForm.find('div.addResourceClearButton input').button();
         
-        // event for pressing enter in grey input aka adding resource from URI
-        self.addResForm.find('div.resourceUriInput input').keypress(function(e) {
+        // event for pressing enter in 2nd input aka adding resource from URI
+        self.openResForm.find('div.resourceUriInput input').keypress(function(e) {
             if (e.keyCode === 13) {
                 e.preventDefault();
                 var newURI = $(this).val();
-                var undoActionLabel = 'action_sidemenu_addNewNode';
-                self.addNewNode(newURI, undoActionLabel);
+                var undoActionLabel = 'action_sidemenu_openNode';
+                self.openNode(newURI, undoActionLabel);
                 return false;
             }
         });
 
         // event for submitting, aka clicking on a found resource
-        self.addResForm.bind('submit', function(e) {
+        self.openResForm.bind('submit', function(e) {
             e.preventDefault();
             var newURI = $(this).find('div.resourceUriInput input').val();
-            var undoActionLabel = 'action_sidemenu_addNewNode';
-            self.addNewNode(newURI, undoActionLabel);
+            var undoActionLabel = 'action_sidemenu_openNode';
+            self.openNode(newURI, undoActionLabel);
             return false;
         });
 
         // add new res search autocomplete        
-        self.addResForm.find('div.resourceLabelInput input').autocomplete({
+        self.openResForm.find('div.resourceLabelInput input').autocomplete({
             minLength: Profile.addNewResourceSearchMinLength,
             delay: Profile.addNewResourceSearchDelay,
             source: function(request, response) {
-                var lodServer = self.addResForm.find('select option:selected').val();
+                var lodServer = self.openResForm.find('select option:selected').val();
                 var searchResults = [];
+                var searchTerm, sparqlURL;
 
                 // search on dbpedia LOD
                 // TODO: success and complete functions to server_connectorba. DRY!
                 if (lodServer === 'dbpedia') {
-                    var searchTerm = request.term;
-                    var sparqlURL = Profile.searchURLs.dbpedia.replace('{SEARCH_TERM}', searchTerm);
+                    searchTerm = request.term;
+                    sparqlURL = Profile.searchURLs[lodServer].replace('MPAD_SEARCH_TERM', searchTerm);
                     $.ajax({
                         url: sparqlURL,
                         async: true,
@@ -112,14 +141,14 @@ var Sidemenu = new function() {
                             if (results.find('Result').length === 0) {
                             }
                             response(
-                                    $.map(searchResults, function(item) {
-                                return {
-                                    label: item.label,
-                                    value: item.label,
-                                    uri: item.uri
-                                };
-                            })
-                                    );
+                                $.map(searchResults, function(item) {
+                                    return {
+                                        label: item.label,
+                                        value: item.label,
+                                        uri: item.uri
+                                    };
+                                })
+                            );
                         },
                         complete: function(a, b) {
                             if (b === 'error' || b === 'parsererror' || b === 'timeout') {
@@ -135,7 +164,7 @@ var Sidemenu = new function() {
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
                             console.log(jqXHR, textStatus, errorThrown);
-                            self.addResForm.find('div.resourceLabelInput input').removeClass('ui-autocomplete-loading');
+                            self.openResForm.find('div.resourceLabelInput input').removeClass('ui-autocomplete-loading');
                             alert('DBpedia server error');
                         }
                     });
@@ -143,8 +172,7 @@ var Sidemenu = new function() {
                 // search in sztaki LOD
                 // TODO: search in different graphs separately in sztaki LOD
                 else if (lodServer === 'sztaki') {
-                    var searchTerm = request.term;
-                    var sparqlURL = Profile.searchURLs.sztaki[0];
+                    searchTerm = request.term;
                     searchTerm = searchTerm.split(' ');
                     for (var i = 0; i < searchTerm.length; i++) {
                         if (searchTerm[i].length > 3) {
@@ -152,7 +180,7 @@ var Sidemenu = new function() {
                         }
                     }
                     searchTerm = searchTerm.join(' ');
-                    sparqlURL += searchTerm + Profile.searchURLs.sztaki[1];
+                    sparqlURL = Profile.searchURLs[lodServer].replace('MPAD_SEARCH_TERM', searchTerm);
                     $.ajax({
                         url: sparqlURL,
                         async: true,
@@ -162,9 +190,9 @@ var Sidemenu = new function() {
                         success: function(data) {
                             var results = $(data);
                             results.find('result').each(function() {
-                                var label = $(this).children("binding[name='o1']").children('literal').text();
+                                var label = $(this).children("binding[name='label']").children('literal').text();
                                 searchResults.push({
-                                    uri: $(this).children("binding[name='s1']").children('uri').text(),
+                                    uri: $(this).children("binding[name='object']").children('uri').text(),
                                     label: label
                                 });
                             });
@@ -172,14 +200,14 @@ var Sidemenu = new function() {
                             if (results.find('result').length === 0) {
                             }
                             response(
-                                    $.map(searchResults, function(item) {
-                                return {
-                                    label: item.label,
-                                    value: item.label,
-                                    uri: item.uri
-                                };
-                            })
-                                    );
+                                $.map(searchResults, function(item) {
+                                    return {
+                                        label: item.label,
+                                        value: item.label,
+                                        uri: item.uri
+                                    };
+                                })
+                            );
                         },
                         complete: function(a, b) {
                             if (b === 'error' || b === 'parsererror' || b === 'timeout') {
@@ -195,8 +223,55 @@ var Sidemenu = new function() {
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
                             console.log(jqXHR, textStatus, errorThrown);
-                            self.addResForm.find('div.resourceLabelInput input').removeClass('ui-autocomplete-loading');
+                            self.openResForm.find('div.resourceLabelInput input').removeClass('ui-autocomplete-loading');
                             alert("SZTAKI server error");
+                        }
+                    });
+                }
+                else if (lodServer === 'britishmuseum' || lodServer === 'factforge' || lodServer === 'europeana') {
+                    searchTerm = request.term;
+                    sparqlURL = Profile.searchURLs[lodServer].replace('MPAD_SEARCH_TERM', searchTerm);
+                    $.ajax({
+                        url: sparqlURL,
+                        async: true,
+                        success: function(data) {
+                            var results = $(data);
+                            results.find('result').each(function() {
+                                var label = $(this).children('binding[name="label"]').children('literal').text();
+                                searchResults.push({
+                                    uri: $(this).children('binding[name="object"]').children('uri').text(),
+                                    label: label
+                                });
+                            });
+                            // if no results for search on LOD
+                            if (results.find('result').length === 0) {
+                            }
+                            response(
+                                $.map(searchResults, function(item) {
+                                    return {
+                                        label: item.label,
+                                        value: item.label,
+                                        uri: item.uri
+                                    };
+                                })
+                            );
+                        },
+                        complete: function(a, b) {
+                            if (b === 'error' || b === 'parsererror' || b === 'timeout') {
+                                if (a.status !== 500) {
+                                    alert('Endpoint not available or slow');
+                                }
+                                else {
+                                    // min 3 chars required
+                                    console.log(a.statusText);
+//                                    alert('Please enter at least ' + Profile.addNewResourceSearchMinLength.toString() + ' chars!');
+                                }
+                            }
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            console.log(jqXHR, textStatus, errorThrown);
+                            self.openResForm.find('div.resourceLabelInput input').removeClass('ui-autocomplete-loading');
+                            alert('DBpedia server error');
                         }
                     });
                 }
@@ -206,9 +281,9 @@ var Sidemenu = new function() {
                 }
             },
             select: function(event, ui) {
-                self.addResForm.find('div.resourceLabelInput input').val(ui.item.label);
-                self.addResForm.find('div.resourceUriInput input').val(ui.item.uri);
-                self.addResForm.submit();
+                self.openResForm.find('div.resourceLabelInput input').val(ui.item.label);
+                self.openResForm.find('div.resourceUriInput input').val(ui.item.uri);
+                self.openResForm.submit();
             // "Nothing selected, input was " + this.value;
             },
             close: function(event, ui) {
@@ -218,46 +293,25 @@ var Sidemenu = new function() {
 
         // SELECT box palette
         self.selectBox = $('<div id="selectPalette" class="paletteItem opacityItem"></div>');
-        self.selectBox.append('<span class="node-highlight-type"></span><span class="node-highlight-type-label"></span>');
-        self.selectBox.find('span.node-highlight-type-label').append('<form><label for="nodeType">type: </label><select name="nodeType"><option value="_all" selected="selected">*all nodes</option></select></form>');
+        self.selectBox.append('<span class="node-highlight-all"></span><span class="node-highlight-type-label"></span>');
+        self.selectBox.find('span.node-highlight-type-label').append('<form><select name="nodeType"></select></form>');
 
-        self.selectBox.find('.node-highlight-type').click(function() {
-            $(this).addClass('opened-half');
-            if ($(this).hasClass('opened')) {
-                Graph.removeAllHighlights();
-            }
-            else {
-                var selectedType = $('#paletteBox #selectPalette .node-highlight-type-label form select option').filter(":selected").val();
-                if (selectedType === '_all')
-                    Graph.highlightAll();
-                else
-                    Graph.highlight($('div.resourceNodeBox[nodetype="' + selectedType + '"]'), 2);
+        self.selectBox.find('select').change(function(){
+            var selectedTypeUri = $('#paletteBox #selectPalette .node-highlight-type-label form select option').filter(":selected").val();
+            var selNodes = Graph.getNodesByType(selectedTypeUri);
+            for (var i=0; i<selNodes.length; i++){
+                Graph.highlight($('div.resourceNodeBox[uri="' + selNodes[i].resource_id + '"]'), 2);
             }
         });
 
         // SEARCH box palette
         self.searchBox = $('<div id="searchPalette" class="paletteItem opacityItem"></div>');
         self.searchForm = $('<form id="searchForm"></form>');
-        self.searchForm.append('<div class="searchInput"><input type="text" value="" /></div>');
-        var buttonClearSearch = $('<div class="clearSearchButton"><input type="button" value="Clear results" /></div>');
-
-        buttonClearSearch.find('input').button();
-        buttonClearSearch.click(function() {
-            $('#nodeOpenedContentTabs .property-value-normal').removeClass('property-value-highlighted');
-        });
+        self.searchForm.append('<div class="searchInput"><input type="text" placeholder="Search text.." value="" /></div>');
 
         self.searchBox.append(self.searchForm);
-        self.searchBox.append(buttonClearSearch);
-
-        self.searchBox.find("#searchDepthSlider").slider({
-            value: 1,
-            min: 1,
-            max: 5,
-            step: 1,
-            slide: function(event, ui) {
-                self.searchBox.find("#searchDepthValue").empty().html("depth: " + ui.value);
-            }
-        });
+        self.searchBox.append('<div class="clearSearchButton"><input type="button" value="Clear results" /></div>');
+        self.searchBox.find('div.clearSearchButton input').button();
 
         self.searchForm.find('div.searchInput input').autocomplete({
             minLength: Profile.searchMinLength,
@@ -299,21 +353,17 @@ var Sidemenu = new function() {
             close: function(event, ui) {
             }
         });
-        self.searchForm.find('div.searchInput input').click(function() {
-            self.refreshSearchDatabase();
-        });
 
         // REMOTE Search nodes ii
         var searchIIPathDepthValueDefault = 2;
         var searchIINodeNumValueDefault = 10;
-        self.searchRemoteBox = $('<div id="searchIIPalette" class="paletteItem opacityItem"></div>');
+        self.searchRemoteBox = $('<div id="remoteSearchPalette" class="paletteItem opacityItem"></div>');
         self.searchRemoteBox.append('<div class="searchIIPathDepth"><div id="searchIIPathDepthSlider"></div><div id="searchIIPathDepthValue">max depth: ' + searchIIPathDepthValueDefault + '</div></div>');
         self.searchRemoteBox.append('<div class="serachIINodeNum"><div id="serachIINodeNumSlider"></div><div id="serachIINodeNumValue">max nodes: ' + searchIINodeNumValueDefault + '</div></div>');
-        self.searchRemoteBox.append('<div class="searchIIInput"><input type="text" value="" /></div>');
-        var buttonSearchRemote = $('<div class="searchIIButton"><input type="button" value="Search" /></div>');
+        self.searchRemoteBox.append('<div class="searchIIInput"><input type="text" placeholder="Search content.." value="" /></div>');
 
-        buttonSearchRemote.find('input').button();
-        self.searchRemoteBox.append(buttonSearchRemote);
+        self.searchRemoteBox.append('<div class="remoteSearchButton"><input type="button" value="Search" /></div>');
+        self.searchRemoteBox.find('.remoteSearchButton input').button();
 
         self.searchRemoteBox.find("#searchIIPathDepthSlider").slider({
             value: searchIIPathDepthValueDefault,
@@ -334,32 +384,6 @@ var Sidemenu = new function() {
             }
         });
 
-        buttonSearchRemote.click(function() {
-            if ($(this).attr('loading') !== 'true') {
-                var nodesHighlighted = $('.resourceNodeBox.highlighted');
-                if (nodesHighlighted.size() === 0) {
-                    Profile.alertDialog(Profile.alertTexts.searchRemoteSelected.title, Profile.alertTexts.searchRemoteSelected.text);
-                } else if ($('#searchIIPalette input').val().trim() === "") {
-                    Profile.alertDialog(Profile.alertTexts.searchRemoteSearchText.title, Profile.alertTexts.searchRemoteSearchText.text);
-                }
-                else {
-                    $(this).attr('loading', 'true');
-                    self.vis_add_load_progressbar($('#searchIIPalette'));
-                    var depth = $('#searchIIPalette #searchIIPathDepthSlider').slider('value');
-                    var nodesNum = $('#searchIIPalette #serachIINodeNumSlider').slider('value');
-                    var searchText = $('#searchIIPalette input').val().trim();
-                    var nodes = {'urls': []};
-                    $.each(nodesHighlighted, function(index, node) {
-                        nodes['urls'].push($(node).attr('uri'));
-                    });
-                    var undoActionLabel = 'action_sidemenu_searchRemote';
-                    BackendCommunicator.findContent(JSON.stringify(nodes), depth, nodesNum, searchText, Graph.searchRemote, undoActionLabel);
-                }
-            }
-            else
-                Profile.alertDialog(Profile.alertTexts.searchRemoteIdle.title, Profile.alertTexts.searchRemoteIdle.text);
-        });
-
 
         // REMOTE Connection Search
         var searchConnectionPathDepthValueDefault = 2;
@@ -367,11 +391,10 @@ var Sidemenu = new function() {
         self.searchConnectionBox = $('<div id="searchConnectionPalette" class="paletteItem opacityItem"></div>');
         self.searchConnectionBox.append('<div class="searchConnectionPathDepth"><div id="searchConnectionPathDepthSlider"></div><div id="searchConnectionPathDepthValue">max depth: ' + searchConnectionPathDepthValueDefault + '</div></div>');
         self.searchConnectionBox.append('<div class="serachConnectionNodeNum"><div id="serachConnectionNodeNumSlider"></div><div id="serachConnectionNodeNumValue">max nodes: ' + searchConnectionNodeNumValueDefault + '</div></div>');
-        self.searchConnectionBox.append('<div class="searchConnectionInput"><input type="text" value="" /></div>');
-        var buttonSearchConnection = $('<div class="searchConnectionButton"><input type="button" value="Search" /></div>');
+        self.searchConnectionBox.append('<div class="searchConnectionInput"><input type="text" placeholder="Search connection.." value="" /></div>');
 
-        buttonSearchConnection.find('input').button();
-        self.searchConnectionBox.append(buttonSearchConnection);
+        self.searchConnectionBox.append('<div class="searchConnectionButton"><input type="button" value="Search" /></div>');
+        self.searchConnectionBox.find('.searchConnectionButton input').button();
 
         self.searchConnectionBox.find("#searchConnectionPathDepthSlider").slider({
             value: searchConnectionPathDepthValueDefault,
@@ -392,42 +415,15 @@ var Sidemenu = new function() {
             }
         });
 
-        buttonSearchConnection.click(function() {
-            if ($(this).attr('loading') !== 'true') {
-                var nodesHighlighted = $('.resourceNodeBox.highlighted');
-                if (nodesHighlighted.size() === 0) {
-                    Profile.alertDialog(Profile.alertTexts.searchConnectionSelected.title, Profile.alertTexts.searchConnectionSelected.text);
-                } else if ($('#searchConnectionPalette input').val().trim() === "") {
-                    Profile.alertDialog(Profile.alertTexts.searchConnectionSearchText.title, Profile.alertTexts.searchConnectionSearchText.text);
-                }
-                else {
-                    $(this).attr('loading', 'true');
-                    self.vis_add_load_progressbar($('#searchConnectionPalette'));
-                    var depth = $('#searchConnectionPalette #searchConnectionPathDepthSlider').slider('value');
-                    var nodesNum = $('#searchConnectionPalette #serachConnectionNodeNumSlider').slider('value');
-                    var searchText = $('#searchConnectionPalette input').val().trim();
-                    var nodes = {'urls': []};
-                    $.each(nodesHighlighted, function(index, node) {
-                        nodes['urls'].push($(node).attr('uri'));
-                    });
-                    var undoActionLabel = 'action_sidemenu_searchConnection';
-                    BackendCommunicator.findConnections(JSON.stringify(nodes), depth, nodesNum, searchText, Graph.searchConnections, undoActionLabel);
-                }
-            }
-            else
-                Profile.alertDialog(Profile.alertTexts.searchConnectionIdle.title, Profile.alertTexts.searchConnectionIdle.text);
-        });
-
         // FIND PATH box palette
         var findPathDepthValueDefault = 2;
         var findPathNodeNumValueDefault = 10;
         self.findPathBox = $('<div id="findPathPalette" class="paletteItem opacityItem"></div>');
         self.findPathBox.append('<div class="findPathDepth"><div id="findPathDepthSlider"></div><div id="findPathDepthValue">max depth: ' + findPathDepthValueDefault + '</div></div>');
         self.findPathBox.append('<div class="findPathNodeNum"><div id="findPathNodeNumSlider"></div><div id="findPathNodeNumValue">max nodes: ' + findPathNodeNumValueDefault + '</div></div>');
-        var buttonFindPath = $('<div class="findPathButton"><input type="button" value="Find path" /></div>');
 
-        buttonFindPath.find('input').button();
-        self.findPathBox.append(buttonFindPath);
+        self.findPathBox.append('<div class="findPathButton"><input type="button" value="Find path" /></div>');
+        self.findPathBox.find('.findPathButton input').button();
 
         self.findPathBox.find("#findPathDepthSlider").slider({
             value: findPathDepthValueDefault,
@@ -448,253 +444,81 @@ var Sidemenu = new function() {
             }
         });
 
-        buttonFindPath.click(function() {
-            if ($(this).attr('loading') !== 'true') {
-                var nodesHighlighted = $('.resourceNodeBox.highlighted');
-                if (nodesHighlighted.size() !== 2) {
-                    Profile.alertDialog(Profile.alertTexts.findPathNodesSelected.title, Profile.alertTexts.findPathNodesSelected.text);
-                }
-                else {
-                    $(this).attr('loading', 'true');
-                    self.vis_add_load_progressbar($('#findPathPalette'));
-                    var depth = $('#findPathPalette #findPathDepthSlider').slider('value');
-                    var nodesNum = $('#findPathPalette #findPathNodeNumSlider').slider('value');
-                    var nodes = {'urls': []};
-                    $.each(nodesHighlighted, function(index, node) {
-                        nodes['urls'].push($(node).attr('uri'));
-                    });
-                    var undoActionLabel = 'action_sidemenu_findPath';
-                    BackendCommunicator.findPath(JSON.stringify(nodes), depth, nodesNum, Graph.findPath, undoActionLabel);
-                }
-            }
-            else
-                Profile.alertDialog(Profile.alertTexts.findPathNodesIdle.title, Profile.alertTexts.findPathNodesIdle.text);
-        });
-
         // LOAD button
-        self.buttonLoad = $('<div class="buttonWrap"><button id="loadGraphButton" title="Load">Load</button></div>');
+        self.buttonLoad = $('<div class="buttonWrap"><button id="loadGraphButton" title="Load current graph">Load</button></div>');
         parent.append(self.buttonLoad);
-        $("#loadGraphButton").button();
-        self.buttonLoad.position({my: "left bottom", at: "left+10 bottom-10", of: window});
 
-        $("#loadGraphButton").click(function() {
-            $('#main').append('<div id="dialog-form" title="Load a graph from the backend"><form><fieldset><label for="graphid">ID</label><input type="text" name="graphid" id="graphid" value="" class="text ui-widget-content ui-corner-all" /><p>Or</p><label for="user_name">Username</label><input type="text" name="user_name" id="user_name" class="text ui-widget-content ui-corner-all" /><label for="graph_name">Graph title</label><input type="text" name="graph_name" id="graph_name" class="text ui-widget-content ui-corner-all" /></fieldset></form><div id="dialog-confirm" title="Load the graph?"><p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>The actual content of the graph will be lost. Are you sure?</p></div></div>');
-
-            allFields = $([]).add($('#user_name')).add($('#graphid')).add($('#graph_name'));
-
-            $("#graphid").keyup(function() {
-                if ($("#graphid").val().length === 0) {
-                    $("#user_name").removeAttr('disabled');
-                    $("[for=user_name]").fadeTo(100, 1);
-                    $("#user_name").fadeTo(100, 1);
-                    $("#graph_name").removeAttr('disabled');
-                    $("[for=graph_name]").fadeTo(100, 1);
-                    $("#graph_name").fadeTo(100, 1);
-                } else {
-                    $("#user_name").attr('disabled', '');
-                    $("[for=user_name]").fadeTo(100, 0.5);
-                    $("#user_name").fadeTo(100, 0.5);
-                    $("#graph_name").attr('disabled', '');
-                    $("[for=graph_name]").fadeTo(100, 0.5);
-                    $("#graph_name").fadeTo(100, 0.5);
-                }
-            });
-
-            $("#graph_name").autocomplete({
-                source: BackendCommunicator.graphNameAutocomplete,
-                //appendTo: "#graph_name",
-                minLength: 0,
-                open: function() {
-//                    console.log("open");
-                },
-                close: function() {
-//                    console.log("close");
-                }
-            }).focus(function() {
-                $(this).autocomplete("search", "");
-            });
-
-            $("#dialog-form").dialog({
-                autoOpen: true,
-                height: 350,
-                width: 350,
-                modal: true,
-                draggable: false,
-                buttons: {
-                    "Load": function() {
-                        var bValid = true;
-                        allFields.removeClass("ui-state-error");
-                        if ($("#user_name").val().length === 0 && $("#graph_name").val().length !== 0 && $("#graphid").val().length === 0) {
-                            bValid = false;
-                            $("#user_name").addClass("ui-state-error");
-                        }
-                        else if ($("#graph_name").val().length === 0 && $("#user_name").val().length !== 0 && $("#graphid").val().length === 0) {
-                            bValid = false;
-                            $("#graph_name").addClass("ui-state-error");
-                        }
-                        else if ($("#graphid").val().length === 0 && $("#user_name").val().length === 0 && $("#graph_name").val().length === 0) {
-                            bValid = false;
-                            $("#graphid").addClass("ui-state-error");
-                            $("#user_name").addClass("ui-state-error");
-                            $("#graph_name").addClass("ui-state-error");
-                        }
-                        if (bValid) {
-                            var undoActionLabel = 'action_bottomMenu_loadGraph';
-                            BackendCommunicator.load($("#graphid").val(), $("#user_name").val(), $("#graph_name").val(), Graph.load, undoActionLabel);
-                            $(this).dialog("close");
-                        }
-                    },
-                    Cancel: {
-                        text: "Cancel",
-                        id: "loadgraphclosebtn",
-                        click: function() {
-                            $(this).dialog("close");
-                        }
-                    }
-                },
-                close: function() {
-                    $(this).remove();
-                }
-            });
-
-        });
 
         // SAVE button
-        self.buttonSave = $('<div class="buttonWrap"><button id="saveGraphButton" title="Save/Share">Save/Share</button></div>');
+        self.buttonSave = $('<div class="buttonWrap"><button id="saveGraphButton" title="Save/Share current graph">Save/Share</button></div>');
         parent.append(self.buttonSave);
-        $("#saveGraphButton").button();
-        self.buttonSave.position({my: "left bottom", at: "right bottom", of: self.buttonLoad});
 
-        $("#saveGraphButton").click(function() {
-            var lastsavedhandler = "";
-            if (Graph.lastsavedgraphid !== null) {
-                var locationport = (location.port === "") ? "" : ":" + location.port;
-                lastsavedhandler = '<fieldset><h3>Share</h3><label for="lastsavedlink">Link to the last saved/loaded version: </label><a href="' + location.protocol + '//' + location.hostname + locationport + location.pathname + '?id=' + Graph.lastsavedgraphid + '" target="_blank">' + Graph.lastsavedgraphname + '</a><p>If you have updated the graph, you have to save it first (below)!</p></fieldset>';
-            } else {
-                lastsavedhandler = '<fieldset><h3>Share</h3><p>Before sharing the graph you have to save it first (below)!</p></fieldset>';
-            }
-            $('#main').append('<div id="dialog-form" title="Save/Share the graph"><form>' + lastsavedhandler + '<fieldset><h3>Save</h3><label for="user_name">Your name</label><input type="text" name="user_name" id="user_name" class="text ui-widget-content ui-corner-all" value="' + Graph.lastsavedgraphusername + '" /><label for="graph_name">Graph title</label><input type="text" name="graph_name" id="graph_name" class="text ui-widget-content ui-corner-all" value="' + Graph.lastsavedgraphname + '" /></fieldset></form></div>');
-
-            allFields = $([]).add($('#user_name')).add($('#graph_name'));
-
-            $("#dialog-form").dialog({
-                autoOpen: true,
-                height: (Graph.lastsavedgraphid === null) ? 400 : 450,
-                width: 400,
-                modal: true,
-                buttons: {
-                    "Save": function() {
-                        var bValid = true;
-                        allFields.removeClass("ui-state-error");
-                        if ($("#user_name").val().length === 0) {
-                            bValid = false;
-                            $("#user_name").addClass("ui-state-error");
-                        }
-                        if ($("#graph_name").val().length === 0) {
-                            bValid = false;
-                            $("#graph_name").addClass("ui-state-error");
-                        }
-                        if (bValid) {
-//                            console.log(Graph.serialize_0());
-                            BackendCommunicator.save($("#user_name").val(), $("#graph_name").val(), Graph.serialize_0(), Sidemenu.graphSaveFinished);
-                            $(this).dialog("close");
-                        }
-                    },
-                    Cancel: function() {
-                        $(this).dialog("close");
-                    }
-                },
-                close: function() {
-                    $(this).remove();
-                }
-            });
-
-        });
+        // My Edits button
+        self.buttonMyEdits = $('<div class="buttonWrap"><button id="myEditsButton" title="My edits - inserted and deleted connections">My edits</button></div>');
+        parent.append(self.buttonMyEdits);
 
         // CLEAR button
-        self.buttonClear = $('<div class="buttonWrap"><button id="clearGraphButton" title="Clear">Clear</button></div>');
+        self.buttonClear = $('<div class="buttonWrap"><button id="clearGraphButton" title="Hide all nodes">Hide all</button></div>');
         parent.append(self.buttonClear);
-        $("#clearGraphButton").button();
-
-        self.buttonClear.position({my: "left bottom", at: "right bottom", of: self.buttonSave});
-        $("#clearGraphButton").click(function() {
-            var nodeList = [];
-            var highlighted;
-            $.each($('div.resourceNodeBox'), function() {
-                if ($(this).hasClass('highlighted'))
-                    highlighted = true;
-                else
-                    highlighted = false;
-                var top = Graph.getNode(this.getAttribute('uri')).top;
-                var left = Graph.getNode(this.getAttribute('uri')).left;
-                nodeList.push({resource_id: this.getAttribute('uri'), action: 'removed', highlighted: highlighted, top: top, left: left});
-            });
-            Graph.clear();
-            var undoActionLabel = 'action_bottomMenu_clearGraph';
-            Graph.logUndoAction(undoActionLabel, nodeList);
-        });
 
         // DELETE selected button        
-        self.buttonDeleteSelected = $('<div class="buttonWrap"><button id="deleteSelectedButton" title="Delete selected">Delete selected</button></div>');
+        self.buttonDeleteSelected = $('<div class="buttonWrap"><button id="deleteSelectedButton" title="Hide selected nodes">Hide selected</button></div>');
         parent.append(self.buttonDeleteSelected);
-        $("#deleteSelectedButton").button();
-
-        self.buttonDeleteSelected.position({my: "left bottom", at: "right bottom", of: self.buttonClear});
-        $("#deleteSelectedButton").click(function() {
-            var nodeList = [];
-            $.each($('div.resourceNodeBox.highlighted'), function() {
-                var top = Graph.getNode(this.getAttribute('uri')).top;
-                var left = Graph.getNode(this.getAttribute('uri')).left;
-                nodeList.push({resource_id: this.getAttribute('uri'), action: 'removed', highlighted: true, top: top, left: left});
-                Graph.deleteNode(this.getAttribute('uri'));
-            });
-            var undoActionLabel = 'action_bottomMenu_deleteSelected';
-            Graph.logUndoAction(undoActionLabel, nodeList);
-        });
 
         // UNDO selected button        
-        self.buttonUndo = $('<div class="buttonWrap"><button id="undoButton" title="Undo">Undo</button></div>');
+        self.buttonUndo = $('<div class="buttonWrap"><button id="undoButton" title="Undo last action">Undo</button></div>');
         parent.append(self.buttonUndo);
-        $("#undoButton").button();
 
-        self.buttonUndo.position({my: "left bottom", at: "right bottom", of: self.buttonDeleteSelected});
-        $("#undoButton").click(function() {
-            Graph.undo();
-        });
+        // edit mode button
+//        self.buttonEdit = $('<div class="buttonWrap"><button id="editButton" title="Edit mode">Edit mode</button></div>')
+//        parent.append(self.buttonEdit);
 
         // HELP button
         self.buttonHelp = $('<a href="help.html" id="helpButton" title="Help" target="_blank" width="32" height="32"><img src="img/system-help-3.png" width="32" height="32" /></button>').zIndex(1500);
         parent.append(self.buttonHelp);
 
-        self.buttonHelp.position({my: "right bottom", at: "right-5 bottom-5", of: window});
-
         // logo
         self.logoWrap = $('<div id="logowrap"><div id="logo"><a href="http://www.sztaki.hu" target="_blank"><img src="img/SZTAKI_logo_2012_small_RGB.png" width="94" height="50" /></a></div></div>');
         parent.append(self.logoWrap);
-        self.logoWrap.position({at: "left top", my: "left bottom", of: self.buttonLoad});
+
+        $("#loadGraphButton, #saveGraphButton, #myEditsButton, #clearGraphButton, #deleteSelectedButton, #undoButton, #editButton").button();
+
+        self.buttonLoad.position({my: "left bottom", at: "left+10 bottom-10", of: window});
+        self.buttonSave.position({my: "left bottom", at: "right bottom", of: self.buttonLoad});
+        self.buttonMyEdits.position({my: "left bottom", at: "right bottom", of: self.buttonSave});
+        self.buttonClear.position({my: "left bottom", at: "right bottom", of: self.buttonMyEdits});
+        self.buttonDeleteSelected.position({my: "left bottom", at: "right bottom", of: self.buttonClear});
+        self.buttonUndo.position({my: "left bottom", at: "right bottom", of: self.buttonDeleteSelected});
+//        self.buttonEdit.position({my: "left bottom", at: "right bottom", of: self.buttonUndo});
+        self.buttonHelp.position({my: "right bottom", at: "right-5 bottom-5", of: window});
+        self.logoWrap.position({my: "left bottom", at: "left top", of: self.buttonLoad});
 
         // window resize - fix the position of the buttom 3 buttons 
         $(window).resize(function() {
             self.buttonLoad.position({my: "left bottom", at: "left+10 bottom-10", of: window});
             self.buttonSave.position({my: "left bottom", at: "right bottom", of: self.buttonLoad});
-            self.buttonClear.position({my: "left bottom", at: "right bottom", of: self.buttonSave});
+            self.buttonMyEdits.position({my: "left bottom", at: "right bottom", of: self.buttonSave});
+            self.buttonClear.position({my: "left bottom", at: "right bottom", of: self.buttonMyEdits});
             self.buttonDeleteSelected.position({my: "left bottom", at: "right bottom", of: self.buttonClear});
             self.buttonUndo.position({my: "left bottom", at: "right bottom", of: self.buttonDeleteSelected});
+//            self.buttonEdit.position({my: "left bottom", at: "right bottom", of: self.buttonUndo});
             self.buttonHelp.position({my: "right bottom", at: "right-5 bottom-5", of: window});
-            self.logoWrap.position({at: "left top", my: "left bottom", of: self.buttonLoad});
+            self.logoWrap.position({my: "left bottom", at: "left top", of: self.buttonLoad});
         });
 
         // make paletteBox, Accordion for now
         parent.append(self.paletteBox);
+        self.paletteBox.append('<h3>Show node</h3>');
+        self.paletteBox.append(self.openResBox);
         self.paletteBox.append('<h3>Add new node</h3>');
-        self.paletteBox.append(self.addResBox);
+        self.paletteBox.append(self.addNewResBox);
         self.paletteBox.append('<h3>Select nodes</h3>');
         self.paletteBox.append(self.selectBox);
-        self.paletteBox.append('<h3>Search in nodes</h3>');
+        self.paletteBox.append('<h3>Find content in visible nodes</h3>');
         self.paletteBox.append(self.searchBox);
-        self.paletteBox.append('<h3>Remote content search</h3>');
+        self.paletteBox.append('<h3>Find content in neighbourhood</h3>');
         self.paletteBox.append(self.searchRemoteBox);
-        self.paletteBox.append('<h3>Remote connection search</h3>');
+        self.paletteBox.append('<h3>Find connections in neighbourhood</h3>');
         self.paletteBox.append(self.searchConnectionBox);
         self.paletteBox.append('<h3>Find path between nodes</h3>');
         self.paletteBox.append(self.findPathBox);
@@ -702,11 +526,44 @@ var Sidemenu = new function() {
             collapsible: true,
             heightStyle: "content",
             active: 0,
+            beforeActivate: function( event, ui ) {
+
+            },
             activate: function(event, ui) {
-                if (ui.newPanel.attr('id') === 'addResourcePalette')
-                    self.addResForm.find('div.resourceLabelInput input').focus();
-                else if (ui.newPanel.attr('id') === 'searchPalette')
+                if (ui.newPanel.attr('id') === 'addResourcePalette'){
+                    self.openResForm.find('div.resourceLabelInput input').focus();
+                }
+                else if (ui.newPanel.attr('id') === 'addNewResourcePalette'){
+                    self.addNewResForm.find('div.resourceLabelInput input').focus();
+                    var select = self.addNewResForm.find('select');
+                    select.empty();
+
+                    var nodeTypesListSorted = Helper.getDictionaryListSorted(Graph.nodeTypes);
+                    for (var i = 0; i < nodeTypesListSorted.length; i++) {
+                        if (nodeTypesListSorted[i].key.toLowerCase() !== 'thing'){
+                            select.append('<option value="' + nodeTypesListSorted[i].value + '" title="'+ nodeTypesListSorted[i].value +'">' + nodeTypesListSorted[i].key + '</option>');
+                        }
+                    }
+
+                    select.prepend('<option value="http://schema.org/Thing" title="http://schema.org/Thing">Thing</option>');
+                    select.prepend('<option value="" title="-Select a type-">-Select a type-</option>');
+                }
+                else if (ui.newPanel.attr('id') === 'searchPalette'){
                     self.searchForm.find('div.searchInput input').focus();
+                }
+                else if (ui.newPanel.attr('id') === 'selectPalette'){
+                    var select = self.selectBox.find('form select');
+                    select.empty();
+
+                    var nodeTypesListSorted = Helper.getDictionaryListSorted(Graph.nodeTypes);
+                    for (var i = 0; i < nodeTypesListSorted.length; i++) {
+                        if (nodeTypesListSorted[i].key.toLowerCase() !== 'thing'){
+                            select.append('<option value="' + nodeTypesListSorted[i].value + '" title="'+ nodeTypesListSorted[i].value +'">' + nodeTypesListSorted[i].key + '</option>');
+                        }
+                    }
+
+                    select.prepend('<option value="" selected="selected">-Select a type-</option>');
+                }
             }
         }).css({
             'position': 'fixed',
@@ -719,7 +576,7 @@ var Sidemenu = new function() {
 
     this.graphSaveFinished = function(json) {
         if (json.error !== undefined) {
-            Profile.alertDialog(Profile.alertTexts.loadGraph.title, Profile.alertTexts.loadGraph.text);
+            Helper.alertDialog(Profile.alertTexts.loadGraph.title, Profile.alertTexts.loadGraph.text);
         } else {
             Graph.lastsavedgraphid = json.graph_id;
             Graph.lastsavedgraphname = json.graph_name;
@@ -779,7 +636,7 @@ var Sidemenu = new function() {
                     label: connObj.endpointLabel,
                     value: node.resource_id,
                     node: node.label,
-                    property: connObj.connectionLabel,
+                    property: connObj.connectionUri,
                     target: connObj.target
                 });
             });
@@ -791,7 +648,7 @@ var Sidemenu = new function() {
     this.graphNameAutoComplete = function(json, response) {
         if (json.error !== undefined) {
             $("#loadgraphclosebtn").click();
-            Profile.alertDialog(Profile.alertTexts.loadGraph.title, Profile.alertTexts.loadGraph.text);
+            Helper.alertDialog(Profile.alertTexts.loadGraph.title, Profile.alertTexts.loadGraph.text);
         } else {
 
             var data = $.map(json.graph_names, function(item) {
@@ -804,20 +661,28 @@ var Sidemenu = new function() {
         }
     };
 
-    this.refreshSearchDatabase = function(header, text) {
+    this.refreshSearchDatabase = function() {
         self.searchForm.find('div.searchInput input').autocomplete('option', 'source', self.getSearchData());
     };
 
-    this.refreshTypeSelectList = function(type) {
-        var sel = self.selectBox.find('.node-highlight-type-label form select');
-        sel.append('<option value="' + type + '">' + type + '</option>');
-    };
-
-    this.addNewNode = function(newURI, undoActionLabel) {        
+    this.openNode = function(newURI, undoActionLabel) {
         if (newURI && newURI !== '') {
             Graph.addNode(newURI, false, false, false, false, undoActionLabel);
         }
-        self.addResForm.find('div.resourceLabelInput input').removeClass('ui-autocomplete-loading');
+        self.openResForm.find('div.resourceLabelInput input').removeClass('ui-autocomplete-loading');
+    };
+
+    this.addNewNode = function(uriPrefix, nodeLabel, typeLabel, typeUri, endpointUri, thumbnailURL, undoActionLabel) {
+        var newURI = uriPrefix + new Date().getTime();
+
+        var isNewNodeAdded = Graph.addNewNode(newURI, nodeLabel, typeLabel, typeUri, endpointUri, thumbnailURL, undoActionLabel);
+        if (isNewNodeAdded){
+            Graph.insertConnection(newURI, Profile.labelURIs[2], nodeLabel, "literalConnection");
+            Graph.insertConnection(newURI, Profile.commonURIs.propTypeURI, typeUri, "nodeConnection");
+            if (thumbnailURL && thumbnailURL !== 'undefined'){
+                Graph.insertConnection(newURI, Profile.commonURIs.propDepictionURI, thumbnailURL, "literalConnection");
+            }
+        }
     };
 
     this.vis_add_load_progressbar = function(selector) {

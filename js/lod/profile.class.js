@@ -3,7 +3,7 @@
  *
  * https://github.com/dsd-sztaki-hu/LODmilla-frontend
  *
- * Copyright (c) 2013 Sandor Turbucz, Zoltan Toth - MTA SZTAKI DSD
+ * Copyright (c) 2013 Sandor Turbucz, Zoltan Toth, Andras Micsik - MTA SZTAKI DSD
  *
  */
 
@@ -22,10 +22,15 @@ var Profile = new function() {
     
     this.serverProxyUrl = 'http://munkapad.sztaki.hu/lodback/';
 
+    this.defaultEndpointURI = "http://lod.sztaki.hu/sparql";
+    this.defaultEndpointLabel = "n/a";
+    this.defaultResourceURIprefix = "http://lod.sztaki.hu/edited/";
+    this.defaultConnectionURI = "[EMPTY]";
     this.defaultConnectionsColor = "#056";
     this.highlightedConnectionsColor = "#f00";
 
     this.nodeLabelMaxLength = 30;
+    this.nodeEndpointLabelMaxLength = 10;
 
     this.addNewResourceSearchDelay = 500;
 
@@ -37,7 +42,8 @@ var Profile = new function() {
     this.searchMaxTitleLen = 40;
     this.searchMinLength = 3;
 
-    this.propertyLabels = {};
+    this.propertyList = {};
+
 
     this.alertTexts = {
         'loadGraph': {
@@ -91,18 +97,41 @@ var Profile = new function() {
     };
 
     this.searchURLs = {
-        'dbpedia': 'http://lookup.dbpedia.org/api/search.asmx/PrefixSearch?QueryClass=&MaxHits=' + this.addNewResourceSearchMaxHits.toString() + '&QueryString={SEARCH_TERM}',
-        'sztaki': [
-            'http://lod.sztaki.hu/sparql?default-graph-uri=&should-sponge=&query=select+%3Fs1%2C+%3Fo1%2C+max%28%3Fsc%29+as+%3Frank%0D%0Awhere+{++%0D%0A++%3Fs1+rdfs%3Alabel+%3Fo1+.+%3Fo1+bif%3Acontains++%27%22',
-            '%22%27++option+%28score+%3Fsc%29++.+%0D%0AFILTER%28lang%28%3Fo1%29%3D%27%27%29.%0D%0A}+group+by+%3Fs1+%3Fo1+order+by+desc+%28%3Frank%29+%3Fo1+limit+' + this.addNewResourceSearchMaxHits.toString() + '++offset+0+%0D%0A&debug=on&timeout=&format=application%2Fsparql-results%2Bxml&save=display&fname='
-        ]
-    };
+        'dbpedia': 'http://lookup.dbpedia.org/api/search.asmx/PrefixSearch?QueryClass=&MaxHits=' + this.addNewResourceSearchMaxHits.toString() + '&QueryString=MPAD_SEARCH_TERM',
+
+        'sztaki': 'http://lod.sztaki.hu/sparql?default-graph-uri=&should-sponge=&query='
+            + encodeURIComponent('select ?object, ?label, max(?sc) as ?rank where { ?object rdfs:label ?label . '
+                + "?label bif:contains \'\"MPAD_SEARCH_TERM\"\' option (score ?sc) . "
+                + 'FILTER(lang(?label)=""). } group by ?object ?label order by desc (?rank) ?label limit '
+                + this.addNewResourceSearchMaxHits.toString()) 
+            +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
+
+        'europeana' : 'http://europeana.ontotext.com/sparql.xml?query='
+            + encodeURIComponent("PREFIX luc: <http://www.ontotext.com/owlim/lucene#>\n" 
+                + 'select ?object ?label { ?proxy ore:proxyFor ?object; dc:title ?label. ?label luc: "MPAD_SEARCH_TERM" } LIMIT '+ this.addNewResourceSearchMaxHits.toString() )
+            + '&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql',
+
+        'britishmuseum' : 'http://collection.britishmuseum.org/sparql.xml?query='
+            + encodeURIComponent("PREFIX crm: <http://erlangen-crm.org/current/>\n"
+                + "PREFIX fts: <http://www.ontotext.com/owlim/fts#>\n"
+                + 'SELECT DISTINCT ?object ?label { ?object crm:P102_has_title ?title . ?title rdfs:label ?label . FILTER(REGEX(?label, "MPAD_SEARCH_TERM")) } LIMIT '+ this.addNewResourceSearchMaxHits.toString() )
+            + '&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql'
+
+//        'factforge' : 'http://factforge.net/sparql.xml?query='
+//            + encodeURIComponent('SELECT distinct ?object ?label WHERE { ?object rdfs:label ?label; FILTER(regex(?label, "MPAD_SEARCH_TERM", "i")) } LIMIT '
+//                + this.addNewResourceSearchMaxHits.toString() )
+//            + '&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql',
+    }
 
     // props to get the label for nodes, with ascending priority
+    // DO NOT CHANGE THE ORDERING!!!
     this.labelURIs = {
         '0': 'http://rdf.freebase.com/ns/type.object.name',
         '1': 'http://xmlns.com/foaf/0.1/name',
-        '2': 'http://www.w3.org/2000/01/rdf-schema#label'
+        '2': 'http://www.w3.org/2000/01/rdf-schema#label',
+        '3': 'http://purl.org/dc/elements/1.1/title',
+        '4': 'http://purl.org/dc/terms/title',
+        '5': 'http://www.w3.org/2004/02/skos/core#prefLabel'
     };
     // wired property labels, somehow they dont get it automatically(?). Extend the list if needed :)
     this.labelsManual = {
@@ -128,7 +157,8 @@ var Profile = new function() {
         'propDepictionURI': "http://xmlns.com/foaf/0.1/depiction",
         'propTypeURI': "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
         'propOntologyURI': 'http://dbpedia.org/ontology/',
-        'propPropertyURI': 'http://dbpedia.org/property/'
+        'propPropertyURI': 'http://dbpedia.org/property/',
+        'thingURI': 'http://schema.org/Thing'
     };
 
     this.nodeTypesDefaultImages = {
@@ -184,50 +214,17 @@ var Profile = new function() {
         return query_string;
     }();
 
-    this.util_truncateString = function(str, maxlen) {
-        if (str && str.length > maxlen) {
-            str = str.substring(0, maxlen) + '..';
-        }
-        return str;
-    };
 
-    this.util_getCapitalizedString = function(str) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
-    };
-
-    this.getEndpointLabelOrUriEnd = function(item, direction) {
-        var label = decodeURIComponent(item[direction].value);
-        if (item.label && item.label.value) {
-            label = item.label.value;
-        }
-        else {
-            label = label.replace(/\/+$/, "").split('/');
-            label = label[(label.length) - 1];
-        }
-        return label;
-    };
-
-    this.getShortTypeFromURL = function(node_uri) {
-        while (node_uri.indexOf('/') > -1) {
-            node_uri = node_uri.substring(node_uri.indexOf('/') + 1);
-        }
-        while (node_uri.indexOf('#') > -1) {
-            node_uri = node_uri.substring(node_uri.indexOf('#') + 1);
-        }
-        return node_uri;
-    };
-
-    this.getLodServerBaseUrl = function(uri) {
-        var temp = uri.replace('http://', '');
-        return 'http://' + temp.substring(0, temp.indexOf('/'));
+    this.addPropertyToList = function(propURI, propLabel){
+        this.propertyList[propURI] = propLabel;
     };
 
     this.getPropertyLabel = function(propertyURI) {
         var propLabel = '';
-        if (this.propertyLabels[propertyURI] && this.propertyLabels[propertyURI] !== '')
-            propLabel = this.propertyLabels[propertyURI];
+        if (this.propertyList[propertyURI] && this.propertyList[propertyURI] !== '')
+            propLabel = this.propertyList[propertyURI];
         else
-            propLabel = this.getShortTypeFromURL(propertyURI);
+            propLabel = Helper.getShortTypeFromURL(propertyURI);
 
         if (this.labelsManual[propertyURI] !== undefined)
             propLabel = this.labelsManual[propertyURI];
@@ -275,23 +272,33 @@ var Profile = new function() {
             return false;
     };
 
-    this.getPropertyIfImage = function(target, label, connectionType, propertyUri) {
+    this.getPropertyIfImage = function(targetNodeURI, label, propertyUri, sourceNodeURI, connectionType) {
         var retval = "";
         var patt = new RegExp(this.findImagesRegexp, "i");
         var isImage = false;
-        if ((target !== null && patt.test(target)) || (target === null && label !== null && patt.test(label))) {
+        if ((targetNodeURI !== null && patt.test(targetNodeURI)) || (targetNodeURI === null && label !== null && patt.test(label))) {
             isImage = true;
         }
         if (connectionType === 'literals') {
         }
         else {
-            retval = $("<a refProp='" + propertyUri + "' refPropVal='" + target + "' class='property-value-normal' rel='group'></a>");
-            if (isImage === true && target !== null) {
+
+            var sourceNodeURI_hash = sourceNodeURI,
+                connectionURI_hash = propertyUri,
+                targetNodeURI_hash = targetNodeURI;
+            // ha befele jovo kapcsolat, akkor a source es target felcserelodik
+            if (connectionType === 'in'){
+                targetNodeURI_hash = [sourceNodeURI_hash, sourceNodeURI_hash = targetNodeURI_hash][0];
+            }
+            var hashedID = md5(sourceNodeURI_hash + connectionURI_hash + targetNodeURI_hash);
+
+            retval = $("<a title='"+ targetNodeURI +"'    refProp='" + propertyUri + "' refPropVal='" + targetNodeURI + "' class='property-value-normal' rel='group' direction="+connectionType+" id="+hashedID+"></a>");
+            if (isImage === true && targetNodeURI !== null) {
                 // Image
                 retval
                         .addClass('fancybox')
-                        .attr('href', target)
-                        .append("<img src='" + target + "' alt=\"\" />");
+                        .attr('href', targetNodeURI)
+                        .append("<img src='" + targetNodeURI + "' alt=\"\" />");
             } else if (isImage === true && label !== null) {
                 // Image
                 retval
@@ -301,14 +308,14 @@ var Profile = new function() {
             } else if (this.isPropertyExternalLink(propertyUri)) {
                 // External link
                 retval
-                        .attr('href', target)
+                        .attr('href', targetNodeURI)
                         .attr('target', '_blank')
                         .append(label.replace(/_/g, " "));
             } else if (!isImage) {
                 retval
-                        .addClass('handlehere')
-                        .attr('href', target)
-                        .append(label.replace(/_/g, " "));
+                        .addClass('showableNodeUri')
+                        .attr('href', targetNodeURI)
+                        .append(decodeURI(label.replace(/_/g, " ")));
             } else if (!isImage && label !== null) {
                 retval = label.replace(/_/g, " ");
                 return retval;
@@ -318,51 +325,26 @@ var Profile = new function() {
         return retval.prop('outerHTML');
     };
 
-    this.addService = function(name, shortDescription, description, endpoint, prefix, graph, sparqlTemplates) {
-        var s = new Service(name, shortDescription, description, endpoint, prefix, graph, sparqlTemplates);
+    this.addService = function(name, shortDescription, description, endpoint, prefix, graph, sparqlTemplates, disabled) {
+        var s = new Service(name, shortDescription, description, endpoint, prefix, graph, sparqlTemplates, disabled);
         this.services.push(s);
-    };
-
-    this.alertDialog = function(title, text) {
-        if ($("#alert-dialog").length) {
-            return;
-        }
-        $('#main').append('<div id="alert-dialog" title="' + title + '"><p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>' + text + '</p></div>');
-        $("#alert-dialog").dialog({
-            autoOpen: true,
-            height: 200,
-            width: 400,
-            modal: true,
-            buttons: {
-                "Close": function() {
-                    $(this).dialog("close");
-                }
-            },
-            close: function() {
-                $(this).remove();
-            }
-        });
     };
 
     this.init = function() {
         var self = this;
-		// only working if runs on a server, wamp/lamp on localhostetc.
-        // var jqxhr = $.ajax({
-            // type: "GET",
-            // dataType: "json",
-            // url: "js/lod/services.json",
-            // async: false,
-            // data: {}
-        // }).done(function(json) {
-            // $.each(json, function(key, value) {
-                // self.addService(key, value.shortDescription.en, value.description.en, value.endpoint, value.prefix, value.graph, value.sparql);
-            // });
-        // });
-	
-		// made because of the easy testing without the need of running it on a server
-		$.each(services, function(key, value) {
-			self.addService(key, value.shortDescription.en, value.description.en, value.endpoint, value.prefix, value.graph, value.sparql);
-		}); 
+        var jqxhr = $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: "js/lod/services.json",
+            async: false,
+            data: {}
+        }).done(function(json) {
+            $.each(json, function(key, value) {
+                self.addService(key, value.shortDescription.en, value.description.en, value.endpoint, value.prefix, value.graph, value.sparql, value.disabled);
+            });
+        });
+//        .fail(function() { alert("error"); })
+//        .always(function() { alert("complete"); });
     };
 
 };

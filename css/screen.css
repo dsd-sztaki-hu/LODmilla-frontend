@@ -10,22 +10,6 @@ body {
     -khtml-opacity: 0.9;
     opacity: 0.9;
 }
-
-.resourceNodeBox .endpointLink{
-    position: absolute;
-    top: 3px;
-    left: 22px;
-    width: 65px;
-    text-align: center;
-}
-.resourceNodeBox .resourceLabel{
-    font-weight: bold;
-    margin-top: 4px;
-    font-size: 12px;
-    max-height: 30px;
-    overflow: hidden;
-    text-align: center;
-}
     
 .resourceNodeBox, .connectionBox{
     background-color:white;
@@ -42,19 +26,19 @@ body {
     font-size:0.8em;
     border-radius:10px;
 
-    width:100px; 
-    height:90px; 
+    width:95px;
+    height:75px;
     box-shadow: 10px 10px 5px #888888;    
     
     /*display: inline-table;*/
 }
 
 .resourceNodeBox .progressbar .progress-label,
-#searchIIPalette .progressbar .progress-label,
+#remoteSearchPalette .progressbar .progress-label,
 #findPathPalette .progressbar .progress-label{
     text-align: center;
 }
-#searchIIPalette .progressbar,
+#remoteSearchPalette .progressbar,
 #findPathPalette .progressbar{    
     position: absolute;
     bottom: 11px;
@@ -68,10 +52,17 @@ body {
     width: auto;
     height: auto;
 }
+.connectionBox.label:hover {
+    cursor: pointer;
+}
 
 #graph {
     width: 3000px;
     height: 3000px;
+}
+
+#addNewConnectionDialogForm form input[type="text"]{
+    width: 98%;
 }
 
 .resourceNodeBox .node-button{
@@ -85,6 +76,9 @@ body {
     left: 2px;
     top: 2px;
     background-image:url('../img/help-about-2-deactivated.png');
+}
+.resourceNodeBox .node-highlight:hover {
+    cursor: pointer;
 }
 .resourceNodeBox .node-highlight.opened {  
     background-image:url('../img/help-about-2.png');
@@ -100,36 +94,93 @@ body {
     user-select: none;
 }
 
-.my_tooltip{
-    /*width: 100px;*/
+
+.resourceNodeBox .endpointLink{
+    position: absolute;
+    bottom: 2px;
+    left: 4px;
+    width: 65px;
+    text-align: left;
+}
+.resourceNodeBox .resourceLabel{
+    font-weight: bold;
+    /*margin-top: 4px;*/
+    font-size: 12px;
+    max-height: 30px;
+    overflow: hidden;
+    text-align: center;
 }
 
-.resourceNodeBox .node-delete {    
+.resourceNodeBox .node-hide{
     right: 2px;
     top: 2px;
+    background-image:url('../img/edit-hide.png');
+}
+.resourceNodeBox .node-hide:hover {
+    cursor: pointer;
+}
+.resourceNodeBox .node-delete {
+    right: 22px;
+    bottom: 2px;
     background-image:url('../img/edit-delete.png');
 }
+.resourceNodeBox .node-delete:hover {
+    cursor: pointer;
+}
 
-.resourceNodeBox .node-open {    
-    right: 2px;
+.resourceNodeBox .node-connection-source{
+    width: 16px;
+    height: 16px;
+    background-image: url('../img/edit-add.png');
+    cursor: pointer;
     bottom: 2px;
-    background-image:url('../img/document-properties-deactivated.png');
-}
-.resourceNodeBox .node-open.opened {    
-    background-image:url('../img/document-properties.png');    
+    position: absolute;
+    right: 2px;
 }
 
-.resourceNodeBox .sumConnections{    
+.resourceNodeBox .node-open span.resourceLinksNum,
+.resourceNodeBox .node-open span.resourcePropertiesNum{
+    position: relative;
+    bottom: 3px;
+}
+.resourceNodeBox .node-open {
     position: absolute;
-    bottom: 0px;
-    left: 3px;
-    width: 85px;
+    top: 2px;
     overflow: hidden;
     font-size: 11px;
+    text-align: center;
+    width: 70px;
+    left: 19px;
+}
+.resourceNodeBox .node-open:hover {
+    cursor: pointer;
 }
 
 #nodeOpenedContent {
     display: block;
+}
+#nodeOpenedContent .conncollapsetoggle{
+    cursor: pointer;
+}
+#nodeOpenedContent ul li form{
+    display: inline-block;
+}
+#nodeOpenedContent .inspectorBtn{
+    cursor: pointer;
+    margin-right: 5px;
+}
+#nodeOpenedContent .deleteConnectionBtn:hover,
+#nodeOpenedContent .deletePropertyBtn:hover{
+    background-color: red;
+    color: #ffffff;
+}
+#nodeOpenedContent .conncollapsetoggle:hover,
+#nodeOpenedContent .addNewConnectionBtn:hover,
+#nodeOpenedContent .addConnectionBtn:hover,
+#nodeOpenedContent .addNewPropertyBtn:hover,
+#nodeOpenedContent .addPropertyBtn:hover{
+    background-color: #4c8db2;
+    color: #ffffff;
 }
 
 .buttonWrap{
@@ -153,7 +204,8 @@ div#paletteBox div.paletteItem{
 #searchForm{
     font-size: 0.8em;
 }
-#searchForm select, #searchForm .searchInput input{
+#paletteBox form select,
+#paletteBox form .searchInput input{
     width: 100%;
 }
 div#addResourcePalette{
@@ -166,7 +218,6 @@ div#addResourcePalette form div.searchInput.searchInputInactive input{
     background-color: #ccc;
 }
 
-
 div#searchPalette #searchDepth, div#searchPalette #searchForm{
     float: left;
     position: relative;
@@ -174,21 +225,20 @@ div#searchPalette #searchDepth, div#searchPalette #searchForm{
 div#searchPalette .clearSearchButton,
 div#addResourcePalette .addResourceClearButton,
 div#findPathPalette .findPathButton,
-div#searchIIPalette .searchIIButton{
+div#remoteSearchPalette .remoteSearchButton{
     float: left;    
 }
-div#addResourcePalette .addResourceHint{    
+
+div#addNewResourcePalette form div.addNewResourceAddButton input{
     float: right;
-    top: 4px;
-    width: 100px;
-    position: relative;
 }
+
 
 div#searchPalette #searchDepthSlider, 
 div#findPathPalette #findPathDepthSlider,
 div#findPathPalette #findPathNodeNumSlider,
-div#searchIIPalette #serachIINodeNumSlider,
-div#searchIIPalette #searchIIPathDepthSlider,
+div#remoteSearchPalette #serachIINodeNumSlider,
+div#remoteSearchPalette #searchIIPathDepthSlider,
 div#searchConnectionPalette #searchConnectionPathDepthSlider,
 div#searchConnectionPalette #serachConnectionNodeNumSlider{
 /*    float: left;
@@ -203,38 +253,44 @@ div#searchPalette #searchForm{
 div#searchPalette #searchDepthValue,
 div#findPathPalette #findPathDepthValue,
 div#findPathPalette #findPathNodeNumValue,
-div#searchIIPalette #serachIINodeNumValue,
-div#searchIIPalette #searchIIPathDepthValue,
+div#remoteSearchPalette #serachIINodeNumValue,
+div#remoteSearchPalette #searchIIPathDepthValue,
 div#searchConnectionPalette #searchConnectionPathDepthSlider,
 div#searchConnectionPalette #serachConnectionNodeNumSlider{
     /*float: right;*/
     margin-top: 3px;
     margin-bottom: 3px;
 }
-div#searchIIPalette .searchIIInput{
+div#remoteSearchPalette .searchIIInput{
     float: left;
     display: block;
 }
 
-div#selectPalette .node-highlight-type {    
+div#selectPalette form  {
+    display: inherit;
+}
+div#selectPalette form select {
+    width: 140px;
+    display: inherit;
+    margin: 0px 0px 0px 10px;
+}
+
+div#selectPalette .node-highlight-all {
     background-image:url('../img/help-about-2-deactivated.png');
-    display: block;
+    display: inline-block;
     width: 16px;
     height: 16px;
-    float: left;
-    position: relative;
-    top: 4px;
 }
-div#selectPalette .node-highlight-type-label {    
-    float: right;
+div#selectPalette .node-highlight-type-label {
+    display: inline;
 }
 div#selectPalette .node-highlight-type-label form label{    
     display: inline;
 }
-div#selectPalette .node-highlight-type.opened {  
+div#selectPalette .node-highlight-all.opened {
     background-image:url('../img/help-about-2.png');
 }
-div#selectPalette .node-highlight-type.opened-half {  
+div#selectPalette .node-highlight-all.opened-half {
     background-image:url('../img/help-about-2-half.png');
 }
 
@@ -346,12 +402,13 @@ a:hover {
     /*border-color: #dcc8a9;*/
     border-color: #c8c8c8;
 }
-#loadGraphButton, #saveGraphButton, #clearGraphButton, #deleteSelectedButton, #undoButton{
+.buttonWrap button{
     background-color: #4C8DB2;
     color: #fff;
 }
-#loadGraphButton:hover, #saveGraphButton:hover, #clearGraphButton:hover{    
+.buttonWrap button:hover{
     border-color: #FFAA3D;
+    color: #000;
 }
 
 .ui-tabs-nav .ui-state-active {
@@ -368,7 +425,7 @@ a:hover {
 .ui-widget-shadow {
     margin: 4px 0 0 4px;
     padding: 0px;
-    background: #aaaaaa url(images/ui-bg_diagonals-small_0_aaaaaa_40x40.png) 50% 50% repeat;
+    /*background: #aaaaaa url(images/ui-bg_diagonals-small_0_aaaaaa_40x40.png) 50% 50% repeat;*/
     opacity: .3;
     filter: Alpha(Opacity=30);
     border-radius: 4px;
@@ -444,9 +501,11 @@ h3.ui-accordion-header, .ui-widget-header {
     bottom: 14px;
     left: 34px;
 }
-.nodeImage img {
+.resourceNodeBox .nodeImage img {
     display: block;
     margin: 3px auto;
+    width:40px;
+    height:50px;
 }
 
 /* Node types colors */
@@ -498,4 +557,8 @@ h3.ui-accordion-header, .ui-widget-header {
 .highlighted{
     border-color: red;
     box-shadow: 0px 0px 5px 5px #FFFFBE;
+}
+
+#myedits-list .myedits-parent span{
+    cursor: pointer;
 }

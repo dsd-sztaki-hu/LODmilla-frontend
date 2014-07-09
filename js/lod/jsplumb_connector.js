@@ -3,11 +3,13 @@
  *
  * https://github.com/dsd-sztaki-hu/LODmilla-frontend
  *
- * Copyright (c) 2013 Sandor Turbucz, Zoltan Toth - MTA SZTAKI DSD
+ * Copyright (c) 2013 Sandor Turbucz, Zoltan Toth, Andras Micsik - MTA SZTAKI DSD
  *
  */
 
-vis_get_visibleCanvasRandomPosition = function(aroundNode){    
+// TODO: attenni a nem ide illo fv-eket, nem jsPlumb related..plusz kodot rendezni refactor
+
+vis_get_visibleCanvasRandomPosition = function(aroundNode){
     var top, left;
     if (!aroundNode){
         top = ($(document).scrollTop()) + (Math.floor(Math.random() * ($(window).height() - Profile.buttonsHeight - Profile.nodeHeight)));
@@ -64,44 +66,89 @@ Graph.vis_getDistance = function(node1, node2){
 };
 
 Node.prototype.vis_show = function(highlight, aroundNode) {
-    var self = this;    
-    
+    var self = this;
+
+    // connections num in the Node
+    var litLen = self.getLiteralsNum();
+    var connLen = self.connections.length;
+
     if (this.loaded) {
         self.setImageURL();
     }
-    var nodeHighlightBtn = $('<div class="node-button node-highlight"></div>');    
-    var nodeDeleteBtn = '<div class="node-button node-delete"></div>';
-    var nodeOpenBtn = '<div class="node-button node-open"></div>';     
+    var nodeHighlightBtn = $('<div class="node-button node-highlight" title="Highlight node"></div>'),
+        nodeHideBtn = '<div class="node-button node-hide" title="Hide node"></div>',
+        nodeDeleteBtn = '<div class="node-button node-delete" title="Delete all connections of node"></div>',
+        nodeConnectionSource = '<div title="Drag to make new connection" class="node-connection-source id="'+ this.resource_id +'"></div>',
+//        nodeConnectionSource = '<div class="node-connection-source"></div>',
+        nodeOpenBtn = '<div class="node-button node-open"><span class="resourcePropertiesNum" title="Properties - show details">'+litLen+'</span><img class="resourceDetailsIcon" src="img/document-properties-deactivated.png" title="Show details" /><span class="resourceLinksNum" title="Links - show details">'+connLen+'</span></div>',
     
-    var existing = $("div.resourceNodeBox[uri='" + this.resource_id + "']");
+        existing = $("div.resourceNodeBox[uri='" + this.resource_id + "']"),
+        nodeLabel = this.label,
+        nodeLabelShort = Helper.truncateString(nodeLabel, Profile.nodeLabelMaxLength),
+    
+        toHighlight = false,
 
-    var nodeLabel = this.label;
-        
-    var nodeLabelShort = Profile.util_truncateString(nodeLabel, Profile.nodeLabelMaxLength);
-    
-    var toHighlight = false;
+        resourceLabel = $('<div class="resourceLabel">' + nodeLabelShort + '</div>');
+
+    if (!(nodeLabel.length === nodeLabelShort.length)){
+        resourceLabel.attr('title', nodeLabel);
+    }
+
     if (existing.length === 0) {
         var node = $('<div class="resourceNodeBox opacityItem" uri="' + this.resource_id + '"></div>');
         if (highlight){
             nodeHighlightBtn.addClass('opened');
         }
+
         node.append(nodeHighlightBtn);
-        node.append('<div class="resourceLabel" title="' + nodeLabel + '">' + nodeLabelShort + '</div>' + nodeDeleteBtn + nodeOpenBtn);
+        node.append(resourceLabel.prop('outerHTML') + nodeHideBtn + nodeDeleteBtn  + nodeOpenBtn + nodeConnectionSource);
+
         Graph.canvas.append(node);
         
         if (self.loaded === false) {
             self.vis_add_load_progressbar();
         }
+
+        jsPlumbInstance.draggable(node);
     } else {
         if (existing.find('.node-highlight').hasClass('opened')){
             toHighlight = true;
         }
         existing.empty();
+
         existing.append(nodeHighlightBtn);
-        existing.append('<div class="resourceLabel" title="' + nodeLabel + '">' + nodeLabelShort + '</div>'+ nodeDeleteBtn + nodeOpenBtn);
+        existing.append(resourceLabel.prop('outerHTML') + nodeHideBtn + nodeDeleteBtn  + nodeOpenBtn + nodeConnectionSource);
+
+        jsPlumbInstance.makeSource(existing, {
+            filter:".node-connection-source",
+            deleteEndpointsOnDetach:true,
+            isSource:true,
+            connector: "StateMachine",
+            overlays:  [ ],
+            endpoint:[ "Rectangle", {
+//            cssClass:"myEndpoint",
+                width:30,
+                height:30
+            }],
+            connectorStyle:{ strokeStyle:"#5c96bc", lineWidth:2, outlineColor:"transparent", outlineWidth:4 }
+//            maxConnections:5
+        });
+        jsPlumbInstance.makeTarget(existing, {
+            deleteEndpointsOnDetach:true,
+            isTarget:true,
+            connector: "StateMachine",
+            overlays:  [ ],
+            endpoint:[ "Rectangle", {
+//            cssClass:"myEndpoint",
+                width:30,
+                height:30
+            }]
+//            maxConnections:5
+        });
+
+        jsPlumbInstance.draggable(existing);
     }
 
-    jsPlumb.draggable(jsPlumb.getSelector("[uri='" + this.resource_id + "']"));
 
     if (this.top === null && this.left === null) {       
         var thisNode = this;
@@ -146,43 +193,12 @@ Node.prototype.vis_show = function(highlight, aroundNode) {
         node.top = position.top;
         node.left = position.left;
     };
-    
-    $("[uri='" + this.resource_id + "'] .node-highlight")[0].onclick = function(event) {        
-        if ($(this).hasClass('opened'))
-            Graph.removeHighlight($(this).parent());
-        else
-            Graph.highlight($(this).parent(), 2);
-    };
-    
-    $("[uri='" + this.resource_id + "'] .node-delete")[0].onclick = function(event) {
-        var resource_id = this.parentNode.getAttribute('uri');
-        var highlighted;
-        if ($('div.resourceNodeBox[uri="' + resource_id + '"]').hasClass('highlighted'))
-            highlighted = true;
-        else
-            highlighted = false;
-        
-        var undoActionLabel = 'action_node_deleteNode';
-        var top = Graph.getNode(resource_id).top;
-        var left = Graph.getNode(resource_id).left;
-        Graph.deleteNode(resource_id);
-        var nodeList = [{resource_id:resource_id, action:'removed',highlighted:highlighted,top:top,left:left}];
-        Graph.logUndoAction(undoActionLabel, nodeList);
-    };
-
-    $("[uri='" + this.resource_id + "'] .node-open")[0].onclick = function(event) {
-        var node = Graph.getNode(this.parentNode.getAttribute('uri'));
-        if($(this).parent().hasClass('opened'))
-            node.vis_closeNode();
-        else
-            node.vis_openNode(false, false, false);
-    };
 
     var selfDiv = $('div.resourceNodeBox[uri="' + self.resource_id + '"]');
 
     if (self.type !== ""){
         selfDiv.removeClass("nodetype_" + Profile.unloadedNodeType).addClass("nodetype_" + self.type);
-        selfDiv.attr('nodetype', self.type);
+        selfDiv.attr('nodetype', self.type.toLowerCase());
     }
 
     // default image for placeholder
@@ -193,28 +209,33 @@ Node.prototype.vis_show = function(highlight, aroundNode) {
     selfDiv.append(nodeImageDiv);
 
     if (this.loaded) {
-        // if it has its own image, from external DB or store
-        if (self.nodeImageURL) {
-            imgBox = $('<a class="fancybox" href="' + self.nodeImageURL + '"></a>');
-            imgBox.append('<img src="' + self.nodeImageURL + '" style="width:32px;height:32px;" />');
-            nodeImageDiv.empty().append(imgBox);
+        // Node image comes from SZTAKI LOD (default endpoint URL)
+        if (self.endpoint.endpointURL === Profile.defaultEndpointURI) {
+            if (self.type === 'person' || self.type === 'work') {
+                $('<img src="' + self.nodeImageURL + '" style="width:32px;height:42px;" />').on({
+                    error: function (e){
+                        self.vis_showImageDefaultImage(nodeImageDiv, imgBox);
+                    },
+                    load: function(e){
+                        self.vis_showImageDefaultEndpoint(imgBox);
+                    }
+                });
+            }
         }
-        
-        // predefined images, for some types
-        if (self.type === 'person' || self.type === 'agent') {
-            imgBox = $('<a class="fancybox" target="_blank" href="' + Profile.nodeTypesDefaultImages.person + '"></a>');
-            imgBox.append('<img src="' + Profile.nodeTypesDefaultImages.person + '" style="width:32px;height:32px;" />');
-            nodeImageDiv.empty().append(imgBox);
-        }
-        else if (self.type === 'work') {
-            imgBox = $('<a class="fancybox" target="_blank" href="' + Profile.nodeTypesDefaultImages.work + '"></a>');
-            imgBox.append('<img src="' + Profile.nodeTypesDefaultImages.work + '" style="width:32px;height:32px;" />');
-            nodeImageDiv.empty().append(imgBox);
-        }
-        else if (self.type === 'group') {
-            imgBox = $('<a class="fancybox" target="_blank" href="' + Profile.nodeTypesDefaultImages.group + '"></a>');
-            imgBox.append('<img src="' + Profile.nodeTypesDefaultImages.group + '" style="width:32px;height:32px;" />');
-            nodeImageDiv.empty().append(imgBox);
+        else{
+            if (self.nodeImageURL) {
+                $('<img src="' + self.nodeImageURL + '" style="width:32px;height:32px;" />').on({
+                    error: function (e){
+                        self.vis_showImageDefaultImage(nodeImageDiv, imgBox);
+                    },
+                    load: function(e){
+                        self.vis_showImageOwnImage(nodeImageDiv, imgBox);
+                    }
+                });
+            }
+            else{
+                self.vis_showImageDefaultImage(nodeImageDiv, imgBox);
+            }
         }
 
         var endpointURL = '';
@@ -222,58 +243,83 @@ Node.prototype.vis_show = function(highlight, aroundNode) {
 
         // Node comes from a known LOD
         if (self.endpoint.shortDescription && self.endpoint.endpointURL) {
-            endpointShortDescription = Profile.util_truncateString(self.endpoint.shortDescription, Profile.nodeLabelMaxLength);
+            endpointShortDescription = Helper.truncateString(self.endpoint.shortDescription, Profile.nodeLabelMaxLength);
             endpointURL = self.endpoint.endpointURL;
-
-            // Node image comes from SZTAKI LOD
-            if (self.endpoint.endpointURL === "http://lod.sztaki.hu/sparql") {
-                if (self.type === 'person') {
-                    $("<img />").attr('src', self.nodeImageURL).load(function() {
-                        imgBox.empty().attr('href', self.nodeImageURL).append('<img src="' + self.nodeImageURL + '" style="width:40px;height:50px;" />');
-                    });
-                }
-                else if (self.type === 'work') {
-                    $("<img />").attr('src', self.nodeImageURL).load(function() {
-                        imgBox.empty().attr('href', self.nodeImageURL).append('<img src="' + self.nodeImageURL + '" style="width:40px;height:50px;" />');
-                    });
-                }
-                else if (self.type === 'group') {
-                }
-            }
         }
         // Node comes from a not known external LOD (not present in the Profile)
         // does not have an image
         else {
-            endpointShortDescription = Profile.util_truncateString(Profile.getLodServerBaseUrl(self.resource_id), Profile.nodeLabelMaxLength);
-            endpointURL = Profile.getLodServerBaseUrl(self.resource_id);            
-        }        
-        // connections num in the Node
-        var connLen = self.connections.length;
-        var litLen = self.getLiteralsNum();
-        selfDiv.append('<div class="sumConnections">' + litLen + '&nbsp;|&nbsp;' + connLen + '</div>');
+            endpointShortDescription = Helper.truncateString(Helper.getLodServerBaseUrl(self.resource_id), Profile.nodeEndpointLabelMaxLength);
+            endpointURL = Helper.getLodServerBaseUrl(self.resource_id);
+        }
+
+
+//        selfDiv.append('<div class="sumConnections">' + litLen + '&nbsp;|&nbsp;' + connLen + '</div>');
         
     }
     // if still not loaded
     else {
-        endpointShortDescription = Profile.util_truncateString(Profile.getLodServerBaseUrl(self.resource_id), Profile.nodeLabelMaxLength);
-        endpointURL = Profile.getLodServerBaseUrl(self.resource_id);
+        endpointShortDescription = Helper.truncateString(Helper.getLodServerBaseUrl(self.resource_id), Profile.nodeLabelMaxLength);
+        endpointURL = Helper.getLodServerBaseUrl(self.resource_id);
         
         imgBox = $('<a class="fancybox" href="' + Profile.nodeTypesDefaultImages.noEndpoint + '"></a>');
         imgBox.append('<img src="' + Profile.nodeTypesDefaultImages.noEndpoint + '" style="width:32px;height:32px;" />');
         nodeImageDiv.empty().append(imgBox);
     }
-    
-    selfDiv.prepend('<div class="endpointLink"><a target="_blank" href="' + endpointURL + '" class="endpoint">' + endpointShortDescription + '</a></div>');
-    
-    $('div.resourceNodeBox div.resourceLabel').tooltip({
-        position: { my: "right center"},
-        tooltipClass: "my_tooltip"
-    });
+
+    var endpointLink = $('<div class="endpointLink"></div>');
+    // ha rendes endpointbol nyitott node
+    if (self.endpoint.shortDescription !== Profile.defaultEndpointLabel ){
+        endpointLink.attr('title', endpointURL);
+        endpointLink.append('<a target="_blank" href="' + endpointURL + '" class="endpoint">' + endpointShortDescription + '</a>');
+    }
+    // ha ujonnan hozzaadott node, azaz Profile-ban megadott default endpoint-ja van
+    else{
+//        endpointLink.attr('title', Profile.defaultEndpointURI);
+        endpointLink.append(Profile.defaultEndpointLabel);
+    }
+    selfDiv.prepend(endpointLink);
     
     if (existing.length !== 0 && toHighlight){
         // order is important!! 1) Node.repaintConnections 2) Graph.highlight
         self.vis_repaintConnections();
         Graph.highlight($("div.resourceNodeBox[uri='" + this.resource_id + "']"), 2);
+    }
+};
+
+Node.prototype.vis_showImageOwnImage = function(nodeImageDiv, imgBox){
+    var self = this;
+    imgBox = $('<a class="fancybox" href="' + self.nodeImageURL + '"></a>');
+    imgBox.append('<img src="' + self.nodeImageURL + '" style="width:32px;height:32px;" />');
+    nodeImageDiv.empty().append(imgBox);
+};
+
+Node.prototype.vis_showImageDefaultEndpoint = function(imgBox){
+    var self = this;
+    $("<img />").attr('src', self.nodeImageURL).load(function() {
+        var imgBox2 = $('<a class="fancybox" target="_blank" href="' + self.nodeImageURL + '"></a>');
+        imgBox2.append('<img src="' + self.nodeImageURL + '" style="width:32px;height:42px;" />');
+        imgBox.empty().attr('href', self.nodeImageURL).append(imgBox2);
+    });
+};
+
+Node.prototype.vis_showImageDefaultImage = function(nodeImageDiv, imgBox){
+    var self = this;
+    // predefined images, for some types
+    if (self.type === 'person' || self.type === 'agent') {
+        imgBox = $('<a class="fancybox" target="_blank" href="' + Profile.nodeTypesDefaultImages.person + '"></a>');
+        imgBox.append('<img src="' + Profile.nodeTypesDefaultImages.person + '" style="width:32px;height:32px;" />');
+        nodeImageDiv.empty().append(imgBox);
+    }
+    else if (self.type === 'work') {
+        imgBox = $('<a class="fancybox" target="_blank" href="' + Profile.nodeTypesDefaultImages.work + '"></a>');
+        imgBox.append('<img src="' + Profile.nodeTypesDefaultImages.work + '" style="width:32px;height:32px;" />');
+        nodeImageDiv.empty().append(imgBox);
+    }
+    else if (self.type === 'group') {
+        imgBox = $('<a class="fancybox" target="_blank" href="' + Profile.nodeTypesDefaultImages.group + '"></a>');
+        imgBox.append('<img src="' + Profile.nodeTypesDefaultImages.group + '" style="width:32px;height:32px;" />');
+        nodeImageDiv.empty().append(imgBox);
     }
 };
        
@@ -283,9 +329,11 @@ Node.prototype.vis_refresh = function(highlight, aroundNode) {
 
 Node.prototype.vis_openNode = function(targetTabName, property, target) {
     $('.node-open').removeClass('opened');
+    $('.node-open').find('img').attr('src', "img/document-properties-deactivated.png");
     $(".resourceNodeBox").removeClass('opened');
     
     $("[uri='" + this.resource_id + "'] .node-open").addClass('opened');
+    $("[uri='" + this.resource_id + "'] .node-open").find('img').attr('src', "img/document-properties.png");
     $("[uri='" + this.resource_id + "']").addClass('opened');
     
     this.vis_showOpenedContent(targetTabName, property, target);
@@ -294,6 +342,7 @@ Node.prototype.vis_openNode = function(targetTabName, property, target) {
 
 Node.prototype.vis_closeNode = function() {
     $("[uri='" + this.resource_id + "'] .node-open").removeClass('opened');
+    $("[uri='" + this.resource_id + "'] .node-open").find('img').attr('src', "img/document-properties-deactivated.png");
     $('#nodeOpenedContent').remove();
     $(".resourceNodeBox").removeClass('opened');
 
@@ -302,12 +351,21 @@ Node.prototype.vis_closeNode = function() {
 Node.prototype.scrollToResult = function(tab, panel) {
     var property = tab.attr('property');
     var target = tab.attr('target');
-    if (property && target) {
-        var targetObj = panel.find('.property-value-normal[refProp="' + property + '"][refPropVal="' + target + '"]');
-        targetObj.addClass('property-value-highlighted');
+    try{
+//        if (property && target) {
+            var targetObj = panel.find('.property-value-normal[refProp="' + property + '"][refPropVal="' + target + '"]');
 
-        panel.stop().animate({scrollTop: (targetObj.position().top - 40)}, 800);
-        tab.removeAttr('target');
+            var targetObjList = targetObj.parent('ul');
+            targetObjList.filter(":hidden").prev('p').find('.conncollapsetoggle').click();
+
+            targetObj.addClass('property-value-highlighted');
+
+            panel.stop().animate({scrollTop: (targetObj.position().top - 40)}, 800);
+            tab.removeAttr('target');
+//        }
+    }
+    catch (ex) {
+
     }
 };
 
@@ -317,21 +375,34 @@ Node.prototype.vis_switchTab = function(targetTabName, property, target) {
     if (resBox && resBox.length !== 0) {
         // res box of another node was opened, close it, then open the result node's box
         if (resBox.attr('resourceuri') !== this.resource_id) {
-            Graph.getNode(resBox.attr('resourceuri')).vis_closeNode();
+            var node = Graph.getNode(resBox.attr('resourceuri'));
+            if (node){
+                node.vis_closeNode();
+            }
             this.vis_openNode(targetTabName, property, target);
         }
         // result node's res box opened, switch tab and scroll there
         else {
             var tab = $("#nodeOpenedContentTabs ul[role='tablist'] li." + targetTabName);
             var tabId = tab.attr('aria-controls');
-            var targetTabId = parseInt(tabId.replace("itemtab-", ""));
+
+            var targetTabId;
+            try{
+                targetTabId = parseInt(tabId.replace("itemtab-", ""));
+            }
+            catch (ex){
+                targetTabId = 0;
+            }
+            $("#nodeOpenedContentTabs").tabs("option", "active", targetTabId);
 
             var panel = $("#nodeOpenedContentTabs div#" + tabId);
 
-            $("#nodeOpenedContentTabs").tabs("option", "active", targetTabId);
-
             var list = $('#' + tabId);
             var targetObj = list.find('.property-value-normal[refProp="' + property + '"][refPropVal="' + target + '"]');
+
+            var targetObjList = targetObj.parent('ul');
+            targetObjList.filter(":hidden").prev('p').find('.conncollapsetoggle').click();
+
             targetObj.addClass('property-value-highlighted');
 
             panel.stop().animate({scrollTop: (targetObj.position().top - 40)}, 800);
@@ -360,65 +431,100 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
     $('#nodeOpenedContent').remove();
     var nodeContent = this.getContent();
 
-    var str_content = '';
-    var str_header = '';
-    var tabcounter = 0;
+    var str_content = '',
+        str_header = '',
+        tabcounter = 0,
+        deletePropertyBtn = '<span class="inspectorBtn deletePropertyBtn" title="Delete property">[x]</span>',
+        deleteConnectionBtn = '<span class="inspectorBtn deleteConnectionBtn" title="Delete connection">[x]</span>',
+        addPropertyBtn = '<span class="inspectorBtn addPropertyBtn" title="Add property">[add]</span>',
+        addConnectionBtn = '<span class="inspectorBtn addConnectionBtn" title="Add connection">[add]</span>',
+        addNewConnectionBtn = '<span class="inspectorBtn addNewConnectionBtn" title="Add new connection type">[add]</span>',
+        addNewPropertyBtn = '<span class="inspectorBtn addNewPropertyBtn" title="Add new property type">[add]</span>';
 
     $.each(nodeContent, function(idx, elem) {
-        $.each(elem, function(index, item) {
-            if (targetTabName && targetTabName !== '' && targetTabName === index && property && property !== '' && target && target !== '')
-                str_header += '<li class="' + index + '" property="' + property + '" target="' + target + '">';
+        $.each(elem, function(type, item) {
+//            if (targetTabName && targetTabName !== '' && targetTabName === type && property && property !== '' && target && target !== '')
+            if (targetTabName && targetTabName === type && property && target )
+                str_header += '<li class="' + type + '" property="' + property + '" target="' + target + '">';
             else
-                str_header += '<li class="' + index + '">';
-            str_header += '<a href="#itemtab-' + tabcounter + '">' + index + '</a></li>';
-            str_content += '<div id="itemtab-' + tabcounter + '">';
+                str_header += '<li class="' + type + '">';
+
+            var tabName;
+            switch (type){
+                case 'literals':
+                    tabName = 'Properties';
+                    break;
+                case 'out':
+                    tabName = 'Links out';
+                    break;
+                case 'in':
+                    tabName = 'Links in';
+                    break;
+            }
+
+
+            str_header += '<a href="#itemtab-' + tabcounter + '">' + tabName + '</a></li>';
+            str_content += '<div direction="'+type+'" id="itemtab-' + tabcounter + '">';
             var propertyName;
-            // description tab, aka. literals values in the right panel
-            if (index === 'literals') {
-                $.each(item, function(sub_index, sub_item) {
-                    propertyName = Profile.getPropertyLabel(sub_index);
-                    propertyName = Profile.util_getCapitalizedString(propertyName);
-                    
+
+            // literals, aka. description tab,  values in the right panel
+            if (type === 'literals') {
+                str_content += addNewPropertyBtn;
+                $.each(item, function(connectionURI, connectionItems) {
+                    propertyName = Profile.getPropertyLabel(connectionURI);
+                    propertyName = Helper.getCapitalizedString(propertyName);
+
                     var propValue = $('');
-                    if (sub_item.length === 1) {
-                        propValue = sub_item[0];
-                        if (Profile.isPropertyExternalLink(sub_index))
-                            propValue = '<a href="' + propValue + '" target="_blank">' + propValue.replace(/_/g , " ") + '</a>';
-                        else if (Profile.getPropertyIfGeo(sub_index, propValue, item, self.label)){
-                            propValue = propValue + '<a href="' + Profile.getPropertyIfGeo(sub_index, propValue, item, self.label) + '" target="_blank"><img src="' + Profile.getPropertyIfGeo(sub_index, propValue, item, self.label) + '"></a>';
+                    // 1 elem van ebbol a propertybol
+                    if (connectionItems.length === 1) {
+                        propValue = connectionItems[0];
+                        if (Profile.isPropertyExternalLink(connectionURI)){
+//                            propValue = '<a href="' + propValue + '" target="_blank">' + propValue.replace(/_/g , " ") + '</a>';
+                            propValue = '<a href="' + propValue + '" target="_blank">' + propValue + '</a>';
                         }
-                        
-                        str_content += "<p><b title='" + sub_index + "'>" + propertyName + ": </b><span refProp='" + sub_index + "' refPropVal='" + sub_item[0] + "' class='property-value-normal'>" + propValue + "</span></p>";
+                        else if (Profile.getPropertyIfGeo(connectionURI, propValue, item, self.label)){
+                            propValue = propValue + '<a href="' + Profile.getPropertyIfGeo(connectionURI, propValue, item, self.label) + '" target="_blank"><img src="' + Profile.getPropertyIfGeo(connectionURI, propValue, item, self.label) + '"></a>';
+                        }
+
+                        str_content += "<p class='conncollapse'><b class='conncollapsetoggle' title='" + connectionURI + "'>" + propertyName + " (" + "<span class='propNum'>1</span>" + ")</b> "+addPropertyBtn+"</p>";
+                        str_content += "<ul><li refProp='" + connectionURI + "' refPropVal='" + connectionItems[0] + "' class='property-value-normal'>" + deletePropertyBtn + propValue +"</li></ul>";
                     }
-                    else {                        
-                        str_content += "<p class='conncollapse'><b title='" + sub_index + "'>" + propertyName + " (" + sub_item.length + ") <span class='conncollapsetoggle'></span></b></p><ul>";
-                        $.each(sub_item, function(sub_sub_index, sub_sub_item) {
-                            propValue = sub_sub_item;
-                            if (Profile.isPropertyExternalLink(sub_index))
-                                propValue = '<a href="' + propValue + '" target="_blank">' + propValue.replace(/_/g , " ") + '</a>';
-                            
-                            str_content += "<li refProp='" + sub_index + "' refPropVal='" + sub_sub_item + "' class='property-value-normal'>" + propValue + "</li>";
+                    // tobb, mint 1 elem van ebbol a propertybol
+                    else {
+                        str_content += "<p class='conncollapse'><b class='conncollapsetoggle'" + connectionURI + "'>" + propertyName + " (" + "<span class='propNum'>"+connectionItems.length+ "</span>" + ")</b> "+ addPropertyBtn +"</p><ul>";
+                        $.each(connectionItems, function(connectionItemIndex, connectionItem) {
+                            propValue = connectionItem;
+                            if (Profile.isPropertyExternalLink(connectionURI)){
+//                                propValue = '<a href="' + propValue + '" target="_blank">' + propValue.replace(/_/g , " ") + '</a>';
+                                propValue = '<a href="' + propValue + '" target="_blank">' + propValue + '</a>';
+                            }
+
+                            str_content += "<li refProp='" + connectionURI + "' refPropVal='" + connectionItem + "' class='property-value-normal'>" + deletePropertyBtn + propValue + "</li>";
                         });
                         str_content += "</ul>";
                     }
                 });
-                // out and in tabs, aka. connections in the right panel
-            } else {
-                $.each(item, function(sub_index, sub_item) {
-                    propertyName = Profile.getPropertyLabel(sub_index);
-                    propertyName = Profile.util_getCapitalizedString(propertyName);
 
-                    if (sub_item.length === 1) {
-                        str_content += "<p class='conncollapse'><b title='" + sub_index + "'>" + propertyName + "</b></p>";
-                        str_content += Profile.getPropertyIfImage(sub_item[0].target, sub_item[0].label, index, sub_index);
+            // out and in tabs, aka. connections in the right panel
+            } else {
+                str_content += addNewConnectionBtn;
+                $.each(item, function(connectionURI, connectionItems) {
+                    propertyName = Helper.getCapitalizedString(Profile.getPropertyLabel(connectionURI));
+
+                    // 1 elem van ebbol a propertybol
+                    if (connectionItems.length === 1) {
+                        str_content += "<p class='conncollapse'><b class='conncollapsetoggle' title='" + connectionURI + "'>" + propertyName + " (" + "<span class='propNum'>1</span>" + ")</b> "+ addConnectionBtn +"</p>";
+                        str_content += "<ul><li>" + deleteConnectionBtn + Profile.getPropertyIfImage(connectionItems[0].target, connectionItems[0].label, connectionURI, self.resource_id, type) + "</li></ul>";
                     }
+                    // tobb, mint 1 elem van ebbol a propertybol
                     else {
-                        str_content += "<p class='conncollapse'><b title='" + sub_index + "'>" + propertyName + " (" + sub_item.length + ") <span class='conncollapsetoggle'></span></b></p><ul>";
-                        $.each(sub_item, function(sub_sub_index, sub_sub_item) {
-                            str_content += "<li>" + Profile.getPropertyIfImage(sub_sub_item.target, sub_sub_item.label, index, sub_index) + "</li>";
+                        str_content += "<p class='conncollapse'><b class='conncollapsetoggle' title='" + connectionURI + "'>" + propertyName + " (" + "<span class='propNum'>"+connectionItems.length+ "</span>" + ")</b> "+ addConnectionBtn +"</p><ul>";
+                        $.each(connectionItems, function(connectionItemIndex, connectionItem) {
+                            str_content += "<li>" + deleteConnectionBtn + Profile.getPropertyIfImage(connectionItem.target, connectionItem.label, connectionURI, self.resource_id, type) + "</li>";
                         });
                         str_content += "</ul>";
                     }
+
                 });
             }
 
@@ -443,6 +549,7 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
         close: function(event, ui) {
             $('.node-open.opened').each(function(index) {
                 var node = Graph.getNode($(this).parent()[0].getAttribute('uri'));
+//                $(this).find('img').attr('src', "img/document-properties-deactivated.png");
                 node.vis_closeNode();
             });
         },
@@ -477,42 +584,28 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
           $("#nodeOpenedContentTabs").tabs('refresh');
     });
     
-    if (targetTabName && targetTabName !== '' && target && target !== '') {
+    if (targetTabName && targetTabName !== '') {
         var tabId = $("#nodeOpenedContentTabs ul[role='tablist'] li." + targetTabName).attr('aria-controls');
-        var targetTabId = parseInt(tabId.replace("itemtab-", ""));
+
+        var targetTabId;
+        try{
+            targetTabId = parseInt(tabId.replace("itemtab-", ""));
+        }
+        // ha nincs ilyen ID-ju tab az inspectorban (azaz pl. nincs out, vagy in kapcsolata a megnyitni kivant nodenak)
+        catch (ex){
+            targetTabId = 0;
+        }
         $("#nodeOpenedContentTabs").tabs("option", "active", targetTabId);
     }
 
-    $("#nodeOpenedContentTabs a.handlehere").click(function(event) {
-        event.preventDefault();
-        var resource_id = $(this).attr("refpropval");
-        if (!(Graph.getNode(resource_id))){
-            var undoActionLabel = 'action_resourceBox_addNewNodeConnection';
-            var aroundNode = Graph.getAroundNode();
-            Graph.addNode($(this).attr("refpropval"),false,false,false,false, undoActionLabel, aroundNode);            
-        }
-        else
-            $('div[uri="'+resource_id+'"]').effect( "shake" );
-        return false;
-    });
 
     $('div#nodeOpenedContent').parent().addClass('opacityItem');
 
-    // collapsible props
-//    $('.conncollapse').next("ul").slideToggle("medium");
+    // by default collapse props
+    $('.conncollapse').next("ul").slideToggle("medium");
 //    $('.conncollapse').find('.conncollapsetoggle').empty().append('+');
-//    $(".conncollapse").click(function() {
-//        $(this).next("ul").slideToggle("medium");
-//        $.each($(this).find('.conncollapsetoggle'), function() {
-//            var actval = $(this)[0].innerHTML;
-//            var newval = '+';
-//            if (actval === '+')
-//                newval = '-';
-//            $(this).empty().append(newval);
-//        });
-//    });
 
-    $('p.conncollapse b').tooltip();
+    addInspectorHandlers();
 };
 
 
@@ -521,8 +614,8 @@ Node.prototype.vis_repaintConnections = function() {
     var self = this;    
     
     for (var i = 0; i < length; i++) {
-        var connection = this.connections[i];
-		var target = decodeURIComponent(connection.target);
+        var connection = this.connections[i],
+            target = decodeURIComponent(connection.target);
         if ($("[uri='" + target + "']").length) {
 
             var localsource = self.resource_id;
@@ -535,88 +628,104 @@ Node.prototype.vis_repaintConnections = function() {
                 //arrowStyle = {location: 0, width: 10, length: 12, direction: -1};
             }
 
-            vis_jsplumb_connect_uri(localsource, localtarget, connection.getConnectionLabelShort());
+            vis_jsPlumbInstance_connect_uri(localsource, localtarget, connection);
         }
     }
     // Iterate through the connections of all nodes in the graph to find
     // the not reflexive connections
+    // DONE? .length property on undefined errors in console
     $.each(Graph.nodes, function(index, node) {
         $.each(node.connections, function(nodeconnid, nodeconn) {
             if (nodeconn.target === self.resource_id && nodeconn.direction === 'out') {
                 var foundbefore = false;
-                var localconns = jsPlumb.getConnections({source: $("[uri='" + node.resource_id + "']"), target: $("[uri='" + self.resource_id + "']")});
+                var localconns = jsPlumbInstance.getConnections({source: $("[uri='" + node.resource_id + "']"), target: $("[uri='" + self.resource_id + "']")});
                 if (localconns.length) {
+
                     $.each(localconns, function(conn_id, l_conn) {
-                        $.each(l_conn.overlays, function(overlay_id, overlay) {
-                            if (overlay.type === 'Label') {
-                                if (overlay.getLabel() === nodeconn.getConnectionLabelShort()) {
-                                    //console.log('already placed connection');
-                                    foundbefore = true;
-                                    return false;
+//                        if(l_conn.overlays){
+                            $.each(l_conn.getOverlays(), function(overlay_id, overlay) {
+                                if (overlay.type === 'Label') {
+                                    if (overlay.getLabel() === nodeconn.getConnectionLabelShort()) {
+                                        //console.log('already placed connection');
+                                        foundbefore = true;
+                                        return false;
+                                    }
                                 }
-                            }
-                        });
+                            });
+//                        }
                     });
+
                 }
+
                 if (!foundbefore) {
-                    vis_jsplumb_connect_uri(node.resource_id, self.resource_id, nodeconn.getConnectionLabelShort());
+                    vis_jsPlumbInstance_connect_uri(node.resource_id, self.resource_id, nodeconn);
                 }
             }
         });
     });
 };
 
-vis_jsplumb_connect_uri = function(uri1, uri2, label) {
-    var localconns = jsPlumb.getConnections({source: $("[uri='" + uri1 + "']"), target: $("[uri='" + uri2 + "']")});
+vis_jsPlumbInstance_connect_uri = function(uri1, uri2, connection) {
+    var labelShort = connection.getConnectionLabelShort();
+    var sourceNode = $("[uri='" + uri1 + "']").attr('id', md5(uri1));
+    var targetNode = $("[uri='" + uri2 + "']").attr('id', md5(uri2));
+
+    var localconns = jsPlumbInstance.getConnections({source: sourceNode, target: targetNode});
     var foundbefore = false;
+    // DONE? .length property of undefined errors in console
     if (localconns.length) {
         $.each(localconns, function(conn_id, l_conn) {
-            $.each(l_conn.overlays, function(overlay_id, overlay) {
-                if (overlay.type === 'Label') {
-                    if (overlay.getLabel() === label) {
-                        foundbefore = true;
-                        return false;
+//            if(l_conn.overlays){
+                $.each(l_conn.getOverlays(), function(overlay_id, overlay) {
+                    if (overlay.type === 'Label') {
+                        if (overlay.getLabel() === labelShort) {
+                            foundbefore = true;
+                            return false;
+                        }
                     }
-                }
-            });
+                });
+//            }
         });
+
     }
     if (foundbefore) {
         return;
     }
 
-    var arrowStyle = {location: 1, width: 10, length: 12, direction: 1};
-
-    var aConnection = jsPlumb.connect({
-        source: $("[uri='" + uri1 + "']"),
-        target: $("[uri='" + uri2 + "']"),
+    var aConnection = jsPlumbInstance.connect({
+        source: sourceNode,
+        target: targetNode,
+        type:"basicConnection",
+        deleteEndpointsOnDetach:true,
         connector: "StateMachine",
-        overlays: [["Label", {
-                    cssClass: "connectionBox label opacityItem",
-                    label: label,
-                    location: 0.5
-                }],
-            ["PlainArrow", arrowStyle]
-        ],
-        endpoint: "Blank",
-        anchor: "Continuous",
-        paintStyle: {lineWidth: 1, strokeStyle: "#056"},
-        hoverPaintStyle: {strokeStyle: Profile.defaultConnectionsColor},
-        ConnectorZIndex: 100
+        overlays: [ ],
+        endpoint:[ "Rectangle", {
+//            cssClass:"myEndpoint",
+            width:30,
+            height:30
+        }],
+        parameters:{
+            'sourceNodeURI': uri1,
+            'connectionURI': connection.connectionUri,
+            'targetNodeURI': uri2
+        }
     });
+    aConnection.addOverlay(["Label", {
+        cssClass: "connectionBox label opacityItem",
+        label: labelShort,
+        location: 0.5
+    }]);
+    aConnection.addOverlay(["PlainArrow", {
+            location: 0.8,
+            width: 14,
+            length: 20,
+            direction: 1
+//            foldback:0.2
+//            id:"myArrow"
+    }]);
 
-    aConnection.bind("mouseenter", function(c) {
-        $.each(c.overlays, function(index, item) {
-            $(item.canvas).css('border-color', '#f00').zIndex(101);
-        });
-    });
 
-    aConnection.bind("mouseexit", function(c) {
-        $.each(c.overlays, function(index, item) {
-            $(item.canvas).css('border-color', '#000').zIndex(100);
-        });
-    });
-
+    // kapcsolat labeljet hoverre kiemeli
     $('.connectionBox.label').hover(
             function() {
                 $(this).css('border-color', '#f00');
@@ -632,7 +741,7 @@ vis_jsplumb_connect_uri = function(uri1, uri2, label) {
 
 Node.prototype.vis_delete = function() {
     $('#nodeOpenedContent[resourceUri="' + this.resource_id + '"]').remove();
-    jsPlumb.removeAllEndpoints($("[uri='" + this.resource_id + "']"));
+    jsPlumbInstance.removeAllEndpoints($("[uri='" + this.resource_id + "']"));
     $("[uri='" + this.resource_id + "']").detach();
 };
 
@@ -650,20 +759,34 @@ Node.prototype.vis_remove_load_progressbar = function() {
 
 
 Graph.vis_clear = function() {
-    jsPlumb.detachEveryConnection();
-    jsPlumb.removeAllEndpoints();
+    jsPlumbInstance.detachEveryConnection();
+    jsPlumbInstance.removeAllEndpoints();
 };
 
 Graph.vis_engineInit = function() {
-    jsPlumb.importDefaults({
+    jsPlumbInstance.importDefaults({
         DragOptions: {cursor: "move", zIndex: 2000},
         HoverClass: "connector-hover"
     });
 
     window.scrollTo((3000 - $(window).width()) / 2, (3000 - $(window).height()) / 2);
 
-    /** Pan and zoom **/
+    /** Pan **/
     Graph.canvas[0].onmousedown = function(event) {
+//        console.log(event.target)
+        // if node connection label is dragged
+        if ($(event.target).is('.connectionBox.label *, .connectionBox.label')) {
+            return false;
+        }
+        // if node endpoint is dragged
+        if ($(event.target).is('rect *, rect')) {
+            return false;
+        }
+        // if node source endpoint is dragged
+        if ($(event.target).is('circle *, circle')) {
+            return false;
+        }
+        // if node is dragged
         if ($(event.target).is('.resourceNodeBox *, .resourceNodeBox')) {
             return false;
         }
@@ -684,19 +807,19 @@ Graph.vis_engineInit = function() {
             $('.resourceNodeBox').each(function() {
 
                 var position = $(this).position();
-                node = Graph.getNode(this.getAttribute('uri'));
+                var node = Graph.getNode(this.getAttribute('uri'));
                 node.top = position['top'] - yoffset;
                 node.left = position['left'] - xoffset;
 
                 $(this).animate({'top': node.top + 'px', 'left': node.left + 'px'}, 0, function() {
-                    jsPlumb.repaint($(this));
+                    jsPlumbInstance.repaint($(this));
                 });
             });
         }
         //console.log("UP");
         return false;
     };
-
+    /* zoom */
     Graph.canvas.bind('mousewheel', function(event, delta) {
         var dir = delta > 0 ? 'Up' : 'Down';
         var vel = Math.abs(delta);
@@ -705,12 +828,12 @@ Graph.vis_engineInit = function() {
 
         $('.resourceNodeBox').each(function() {
             var position = $(this).position();
-            node = Graph.getNode(this.getAttribute('uri'));
+            var node = Graph.getNode(this.getAttribute('uri'));
             node.top = $(document).scrollTop() + event.clientY + (position['top'] - $(document).scrollTop() - event.clientY) * zoomRatio;
             node.left = $(document).scrollLeft() + event.clientX + (position['left'] - $(document).scrollLeft() - event.clientX) * zoomRatio;
 
             $(this).animate({'top': node.top + 'px', 'left': node.left + 'px'}, 0, function() {
-                jsPlumb.repaint($(this));
+                jsPlumbInstance.repaint($(this));
             });
         });
         return false;
@@ -721,28 +844,26 @@ Graph.vis_highlight = function(selector, edgehl) {
     $(selector).addClass("highlighted");
     $(selector).find('.node-highlight').addClass("opened");
     
-    $("#selectPalette .node-highlight-type").addClass("opened-half");
-    
     // if every nodes are highlighted, highlight the main star on the left palette
     if ($('.resourceNodeBox').size() === $('.resourceNodeBox.highlighted').size())
-        $("#selectPalette .node-highlight-type").removeClass("opened-half").addClass("opened");    
+        $("#selectPalette .node-highlight-all").addClass("opened");
     
     if (edgehl === 0) {
         // do not highlight the edges at all
     } else if (edgehl === 1) {
         // highlight all edges attached to the highlighted nodes
 
-        var localconns = jsPlumb.getConnections({source: $(".highlighted.resourceNodeBox"), target: $(".resourceNodeBox")});
+        var localconns = jsPlumbInstance.getConnections({source: $(".highlighted.resourceNodeBox"), target: $(".resourceNodeBox")});
         $.each(localconns, function() {
             this.setPaintStyle({strokeStyle: Profile.highlightedConnectionsColor});
         });
-        localconns = jsPlumb.getConnections({source: $(".resourceNodeBox"), target: $(".highlighted.resourceNodeBox")});
+        localconns = jsPlumbInstance.getConnections({source: $(".resourceNodeBox"), target: $(".highlighted.resourceNodeBox")});
         $.each(localconns, function() {
             this.setPaintStyle({strokeStyle: Profile.highlightedConnectionsColor});
         });
     } else if (edgehl === 2) {
         // highlight all edges which both end is connected to highlighted nodes
-        var localconns = jsPlumb.getConnections({source: $(".resourceNodeBox.highlighted"), target: $(".resourceNodeBox.highlighted")});        
+        var localconns = jsPlumbInstance.getConnections({source: $(".resourceNodeBox.highlighted"), target: $(".resourceNodeBox.highlighted")});        
         
         $.each(localconns, function() {
             this.setPaintStyle({strokeStyle: Profile.highlightedConnectionsColor});
@@ -758,20 +879,20 @@ Graph.vis_removeHighlight = function(selector) {
         self.highlight(this, 2);
     });
     if ($('.resourceNodeBox.highlighted').size() === 0)
-        $("#selectPalette .node-highlight-type").removeClass("opened-half").removeClass("opened");
+        $("#selectPalette .node-highlight-all").removeClass("opened");
 };
 
 Graph.vis_removeAllHighlights = function() {
     $(".resourceNodeBox").removeClass("highlighted");
     $(".resourceNodeBox .node-highlight").removeClass("opened");
-    $("#selectPalette .node-highlight-type").removeClass("opened").removeClass("opened-half");
+    $("#selectPalette .node-highlight-all").removeClass("opened");
     
-    var localconns = jsPlumb.getAllConnections();
-    if (localconns.jsPlumb_DefaultScope !== undefined) {
-        $.each(localconns.jsPlumb_DefaultScope, function() {
+    var localconns = jsPlumbInstance.getAllConnections();
+//    if (localconns.jsPlumbInstance_DefaultScope !== undefined) {
+        $.each(localconns, function() {
             this.setPaintStyle({strokeStyle: Profile.defaultConnectionsColor});
         });
-    }
+//    }
 };
 
 Graph.vis_highlightAll = function() {

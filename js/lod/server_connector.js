@@ -3,21 +3,34 @@
  *
  * https://github.com/dsd-sztaki-hu/LODmilla-frontend
  *
- * Copyright (c) 2013 Sandor Turbucz, Zoltan Toth - MTA SZTAKI DSD
+ * Copyright (c) 2013 Sandor Turbucz, Zoltan Toth, Andras Micsik - MTA SZTAKI DSD
  *
  */
- 
+
 Profile.data_getService = function(resourceURI) {
     var service = '';
+    // TODO: meg jobb matching a services_json-bol a prefixekre...van amelyik lod itemnel generalt, uh kitalalando hogy legyen ez
+    try{
+        $.each(this.services, function(key, value) {
+            var resourcePath = resourceURI.split('//')[1];
+//            var resourcePrefix = resourceURI.split('//')[0] + '//' + resourcePath.split('/', resourcePath.split('/').length-1).join('/');
+            var resourcePrefix = resourceURI.split('//')[0] + '//' + resourcePath.split('/')[0];
 
-    $.each(this.services, function(key, value) {
-        var path = resourceURI.split('//')[1];
-        var prefix = resourceURI.split('//')[0] + '//' + path.split('/')[0] + '/' + path.split('/')[1];
-
-        if (prefix === value.prefix) {
-            service = value;
-        }
-    });
+            var isPrefixFound = false;
+            for (var prefix in value.prefix){
+                if (value.prefix.hasOwnProperty(prefix)){
+//                    if (value.prefix[prefix] === resourcePrefix){
+                    if (value.prefix[prefix].indexOf(resourcePrefix) !== -1){
+                        isPrefixFound = true;
+                    }
+                }
+            }
+            if (value.disabled !== 'true' && isPrefixFound) {
+                service = value;
+            }
+        });
+    }
+    catch (e){ }
 
     return service;
 };
@@ -25,7 +38,7 @@ Profile.data_getService = function(resourceURI) {
 Profile.data_makeSparql = function(service, sparqlTemplate, resourceURI) {
     var sparql = "";
 
-    var s = encodeURIComponent(service.sparqlTemplates[sparqlTemplate].replace(/\{URI\}/ig, resourceURI));
+    var s = encodeURIComponent(service.sparqlTemplates[sparqlTemplate].replace(/\{URI\}/ig, encodeURI(resourceURI)));
     sparql = service.endpoint + '?';
     sparql += 'output=json';
     sparql += '&format=application/json';

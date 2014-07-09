@@ -1,13 +1,4 @@
 /*
- * LODmilla-frontend
- *
- * https://github.com/dsd-sztaki-hu/LODmilla-frontend
- *
- * Copyright (c) 2013 Sandor Turbucz, Zoltan Toth - MTA SZTAKI DSD
- *
- */
- 
-/*
  * Class:Graph
  */
 var Graph = new function() {
@@ -18,6 +9,9 @@ var Graph = new function() {
     this.nodeTypes = {};
 
     this.undoActionList = [];
+
+    this.deletedConnectionsList = {};
+    this.insertedConnectionsList = {};
 
     this.canvas = null;
 
@@ -37,15 +31,36 @@ var Graph = new function() {
         console.log('initiated');
     };
 
-    this.addNodeType = function(type) {
-        var ret = false;
-        if (!this.nodeTypes[type]) {
-            this.nodeTypes[type] = 0;
-            ret = true;
-        }
-        this.nodeTypes[type] = this.nodeTypes[type] + 1;
-        return ret;
+    this.addNodeType = function(typeURI, typeLabel) {
+        this.nodeTypes[typeURI] = typeLabel;
     };
+
+    this.removeNodeType = function(typeURI) {
+        delete this.nodeTypes[typeURI];
+    };
+
+    this.getNodesByType = function(typeURI){
+        var nodes = [],
+            tempNode;
+        $.each(this.nodes, function(index, node){
+            tempNode = node['typeUris'][typeURI];
+            if (tempNode && tempNode !== 'undefined'){
+                nodes.push(node);
+            }
+        });
+        return nodes;
+    };
+
+    // DEPRECATED
+//    this.addNodeType = function(type) {
+//        var ret = false;
+//        if (!this.nodeTypes[type]) {
+//            this.nodeTypes[type] = 0;
+//            ret = true;
+//        }
+//        this.nodeTypes[type] = this.nodeTypes[type] + 1;
+//        return ret;
+//    };
 
     /**
      * Adds a new node to the graph
@@ -53,16 +68,17 @@ var Graph = new function() {
      * @returns {undefined}
      */
     this.addNode = function(resource_id, label, top, left, highlight, undoActionLabel, aroundNode) {
-		resource_id = decodeURIComponent(resource_id);
+        resource_id = decodeURIComponent(resource_id);
         if (typeof(aroundNode) === 'undefined')
             aroundNode = false;
         if (!(this.getNode(resource_id))) {
-            new_node = new Node(resource_id, label);
+            var new_node = new Node(resource_id, label);
             if (top && left) {
                 new_node.top = top;
                 new_node.left = left;
             }
             this.nodes[resource_id] = new_node;
+
             new_node.collectData(highlight, undoActionLabel);
             new_node.vis_show(highlight, aroundNode);
 //            new_node.vis_repaintConnections();
@@ -72,20 +88,91 @@ var Graph = new function() {
         }
     };
 
-    this.getNode = function(resource_id) {
-        return this.nodes[resource_id];
+    this.addNewNode = function(newURI, nodeLabel, typeLabel, typeUri, endpointUri, thumbnailURL, undoActionLabel) {
+        newURI = decodeURIComponent(newURI);
+        if (!(this.getNode(newURI))) {
+            var new_node = new Node(newURI, nodeLabel);
+//            if (top && left) {
+//                new_node.top = top;
+//                new_node.left = left;
+//            }
+            this.nodes[newURI] = new_node;
+
+            var item = {
+                out: {
+                    type: "literal",
+                    value: nodeLabel
+//                    "xml:lang": "en"
+                },
+                prop: {
+                    type: "uri",
+                    value: Profile.labelURIs[2]
+                },
+                proplabel: {
+                    type: "literal",
+                    value: "label"
+                }
+            };
+            Profile.addPropertyToList(item.prop.value, item.proplabel.value);
+            Profile.propertyList[item.prop.value] = item.proplabel.value;
+
+            new_node.addLiteral(item);
+            new_node.addConnection(typeUri, Profile.commonURIs.propTypeURI, "out", typeLabel);
+
+            new_node.endpoint = {
+                'shortDescription': endpointUri ? endpointUri : Profile.defaultEndpointLabel,
+                'endpointURL': endpointUri ? endpointUri : Profile.defaultEndpointURI
+            };
+
+            if (thumbnailURL && thumbnailURL !== 'undefined'){
+//                item = {
+//                    out: {
+//                        type: "literal",
+//                        value: thumbnailURL
+////                    "xml:lang": "en"
+//                    },
+//                    prop: {
+//                        type: "uri",
+//                        value: Profile.commonURIs.propDepictionURI
+//                    },
+//                    proplabel: {
+//                        type: "literal",
+//                        value: "depiction"
+//                    }
+//                };
+//                new_node.addLiteral(item);
+                new_node.addConnection(thumbnailURL, Profile.commonURIs.propDepictionURI, "out", "");
+                new_node.storeImage(Profile.commonURIs.propDepictionURI, thumbnailURL);
+                new_node.setImageURL();
+            }
+
+            new_node.collectData(false, undoActionLabel);
+            new_node.vis_show(false, false);
+//            new_node.vis_repaintConnections();
+            return true;
+        } else {
+            return false;
+        }
     };
 
-    /**
-     * Removes a resource from the graph
-     * @param {String} resource_id 
-     * @returns {undefined}
-     */
-    this.deleteNode = function(resource_id) {
+    this.hideNode = function(resource_id) {
+        var self = this;
         var node = this.nodes[resource_id];
+        $.each(node.typeUris, function(uri, label){
+             self.removeNodeType(uri);
+        });
         delete this.nodes[resource_id];
         node.vis_delete();
     };
+
+    this.getNode = function(resource_id) {
+        var node = this.nodes[resource_id];
+        if (node && node !== 'undefined')
+            return node;
+        else
+            return false;
+    };
+
 
     /**
      * Clears the graph and removes all nodes and connections.
@@ -120,7 +207,7 @@ var Graph = new function() {
 
     this.findPath = function(jsonobject, undoActionLabel) {
         if (jsonobject && jsonobject.error !== undefined) {
-            Profile.alertDialog(Profile.alertTexts.findPathResult.title, Profile.alertTexts.findPathResult.text);
+            Helper.alertDialog(Profile.alertTexts.findPathResult.title, Profile.alertTexts.findPathResult.text);
         }
         else {
             if (jsonobject.graph.nodes !== undefined) {
@@ -135,16 +222,16 @@ var Graph = new function() {
                 Graph.logUndoAction(undoActionLabel, nodeList);
             }
         }
-        $('#findPathPalette .findPathButton').attr('loading', 'false');
+        $('#findPathPalette .findPathButton input').attr('loading', 'false');
     };
 
     this.searchRemote = function(jsonobject, undoActionLabel) {
         if (jsonobject && jsonobject.error !== undefined) {
-            Profile.alertDialog(Profile.alertTexts.searchRemoteResult.title, Profile.alertTexts.searchRemoteResult.text);
+            Helper.alertDialog(Profile.alertTexts.searchRemoteResult.title, Profile.alertTexts.searchRemoteResult.text);
         }
         else {
             if (jsonobject.graph.nodes !== undefined) {
-                Sidemenu.vis_remove_load_progressbar($('#searchIIPalette'));
+                Sidemenu.vis_remove_load_progressbar($('#remoteSearchPalette'));
                 Graph.vis_removeAllHighlights();
                 var nodeList = [];                
                 
@@ -168,12 +255,12 @@ var Graph = new function() {
                 Graph.logUndoAction(undoActionLabel, nodeList);
             }
         }
-        $('#searchIIPalette .searchIIButton').attr('loading', 'false');
+        $('#remoteSearchPalette .remoteSearchButton input').attr('loading', 'false');
     };
 
     this.searchConnections = function(jsonobject, undoActionLabel) {
         if (jsonobject && jsonobject.error !== undefined) {
-            Profile.alertDialog(Profile.alertTexts.searchConnectionResult.title, Profile.alertTexts.searchConnectionResult.text);
+            Helper.alertDialog(Profile.alertTexts.searchConnectionResult.title, Profile.alertTexts.searchConnectionResult.text);
         }
         else {
             if (jsonobject.graph.nodes !== undefined) {
@@ -190,7 +277,7 @@ var Graph = new function() {
                 Graph.logUndoAction(undoActionLabel, nodeList);
             }
         }
-        $('#searchConnectionPalette .searchConnectionButton').attr('loading', 'false');
+        $('#searchConnectionPalette .searchConnectionButton input').attr('loading', 'false');
     };
 
     /**
@@ -200,7 +287,7 @@ var Graph = new function() {
      */
     this.load = function(jsonobject, undoActionLabel) {
         if (jsonobject.error !== undefined) {
-            Profile.alertDialog(Profile.alertTexts.loadGraph.title, Profile.alertTexts.loadGraph.text);
+            Helper.alertDialog(Profile.alertTexts.loadGraph.title, Profile.alertTexts.loadGraph.text);
         } else {
             Graph.clear();
             if (jsonobject.graph.nodes !== undefined) {
@@ -265,7 +352,7 @@ var Graph = new function() {
         if (undoAction && undoAction['nodeList']) {
             $.each(undoAction['nodeList'], function(index, node) {
                 if (node.action === 'added')
-                    Graph.deleteNode(node.resource_id);
+                    Graph.hideNode(node.resource_id);
                 else if (node.action === 'removed') {
                     var top = false;
                     var left = false;
@@ -316,5 +403,78 @@ var Graph = new function() {
         return aroundNode;
     };
 
+    this.insertConnection = function(sourceNodeURI, connectionURI, targetNodeURI, type){
+        this.insertedConnectionsList[md5(sourceNodeURI + connectionURI + targetNodeURI)] = {
+            'sourceNodeURI': sourceNodeURI,
+            'connectionURI': connectionURI,
+            'targetNodeURI': targetNodeURI,
+            'type': type,
+
+            "dateTime": new Date().toUTCString()
+        };
+        if (connectionURI === Profile.commonURIs.propTypeURI){
+            this.addNodeType(targetNodeURI, Helper.getShortTypeFromURL(targetNodeURI));
+        }
+    };
+
+    this.deleteConnection = function(sourceNodeURI, connectionURI, targetNodeURI, type){
+        this.deletedConnectionsList[md5(sourceNodeURI + connectionURI + targetNodeURI)] = {
+            'sourceNodeURI': sourceNodeURI,
+            'connectionURI': connectionURI,
+            'targetNodeURI': targetNodeURI,
+            'type': type,
+
+            "dateTime": new Date().toUTCString()
+        };
+        if (connectionURI === Profile.commonURIs.propTypeURI){
+            this.removeNodeType(targetNodeURI);
+        }
+    };
+
+    this.getVisibleConnection = function(sourceNodeURI, connectionURI, targetNodeURI){
+        var connections = jsPlumbInstance.getAllConnections();
+        var connection;
+        for (var i= 0; i < connections.length; i++){
+            var conn = connections[i];
+            if (conn.getParameter('sourceNodeURI') === sourceNodeURI && conn.getParameter('connectionURI') === connectionURI && conn.getParameter('targetNodeURI') === targetNodeURI){
+                connection = conn;
+                break;
+            }
+        }
+        return connection;
+    };
+
+    this.isAnyConnection = function(sourceNodeURI, connectionURI, targetNodeURI){
+        var connection = this.getVisibleConnection(sourceNodeURI, connectionURI, targetNodeURI),
+            connections;
+        if (!connection){
+            connections = this.insertedConnectionsList;
+            for (var id in connections) {
+                if (connections.hasOwnProperty(id)) {
+                    var conn = connections[id];
+                    if (conn['sourceNodeURI'] === sourceNodeURI && conn['connectionURI'] === connectionURI && conn['targetNodeURI'] === targetNodeURI){
+                        connection = conn;
+                        break;
+                    }
+                }
+            }
+        }
+        if (connection){
+            connections = this.deletedConnectionsList;
+            for (var id in connections) {
+                if (connections.hasOwnProperty(id)) {
+                    var conn = connections[id];
+                    if (conn['sourceNodeURI'] === sourceNodeURI && conn['connectionURI'] === connectionURI && conn['targetNodeURI'] === targetNodeURI){
+                        connection = false;
+                        break;
+                    }
+                }
+            }
+        }
+        if (connection && connection !== 'undefined')
+            return true
+        else
+            return false;
+    }
 
 };

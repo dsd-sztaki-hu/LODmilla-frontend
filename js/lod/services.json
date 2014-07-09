@@ -1,4 +1,4 @@
-services = {
+{
     "http://lod.sztaki.hu/sztaki": {
         "shortDescription": {
             "en": "Sztaki"
@@ -7,19 +7,15 @@ services = {
             "en": "LOD at Sztaki (/sztaki)"
         },
         "sparql": {
-            "resourceConnectionsLabels": "select distinct * where { { <{URI}> ?prop ?out. FILTER(!isLiteral(?out) || lang(?out)=\"\" || lang(?out)=\"en\") OPTIONAL { ?out rdfs:label ?label. FILTER(lang(?label)=\"en\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } UNION { ?in ?prop  <{URI}> OPTIONAL { ?in rdfs:label ?label. FILTER(lang(?label)=\"en\"||lang(?label)=\"\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } }",
-            "describe": "DESCRIBE <{URI}>",
-            "allClasses": "SELECT DISTINCT ?object  WHERE {[] a ?object} ORDER BY ?object  LIMIT 50  ",
-            "findSubject": "SELECT DISTINCT ?subject WHERE { {?subject a <{CLASS}>;<http://purl.org/dc/elements/1.1/title> ?object. FILTER(regex(str(?object),\"{VALUE}\",\"i\"))} UNION {?subject a <{CLASS}>;<http://www.w3.org/2000/01/rdf-schema#label> ?object. FILTER(regex(str(?object),\"{VALUE}\",\"i\"))} UNION {?subject a <{CLASS}>;<http://www.w3.org/2004/02/skos/core#prefLabel> ?object. FILTER(regex(str(?object),\"{VALUE}\",\"i\"))} } LIMIT 1",
-            "documentUri": "SELECT DISTINCT * WHERE {<{URI}> ?property ?object.FILTER ((( isIRI(?object) && ?property != <http://xmlns.com/foaf/0.1/depiction> )|| ?property = <http://www.w3.org/2000/01/rdf-schema#label>  || ?property = <http://www.georss.org/georss/point> || ?property = <http://xmlns.com/foaf/0.1/surname> || ?property = <http://xmlns.com/foaf/0.1/name> || ?property = <http://purl.org/dc/elements/1.1/title>))}  ORDER BY ?property",
-            "document": "SELECT DISTINCT *  WHERE  {{<{URI}> ?property ?object. FILTER(!isLiteral(?object))} UNION {<{URI}> ?property ?object. FILTER(isLiteral(?object)). FILTER(lang(?object) =\"hu\")} UNION {<{URI}> ?property ?object. FILTER(isLiteral(?object)). }}  ORDER BY ?property",
-            "bnode": "SELECT DISTINCT *  WHERE {<{URI}> ?property ?object}",
-            "inverse": "SELECT DISTINCT * WHERE {?object ?property <{URI}>.FILTER(isIRI(?object))}",
-            "inverseSameAs": "SELECT DISTINCT * WHERE {?object <http://www.w3.org/2002/07/owl#sameAs> <{URI}>}"
+            "resourceConnectionsLabels": "select distinct * where { { <{URI}> ?prop ?out. FILTER(!isLiteral(?out) || lang(?out)=\"\" || lang(?out)=\"en\") OPTIONAL { ?out rdfs:label ?label. FILTER(lang(?label)=\"en\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } UNION { ?in ?prop  <{URI}> OPTIONAL { ?in rdfs:label ?label. FILTER(lang(?label)=\"en\"||lang(?label)=\"\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } }"
         },
         "endpoint": "http://lod.sztaki.hu/sparql",
-        "prefix": "http://lod.sztaki.hu/sztaki",
-        "graph": "http://lod.sztaki.hu/sztaki"
+        "prefix": {
+            "author": "http://lod.sztaki.hu/sztaki/auth",
+            "item": "http://lod.sztaki.hu/sztaki/item"
+        },
+        "graph": "http://lod.sztaki.hu/sztaki",
+        "disabled": "false"
     },
     "http://lod.sztaki.hu/nda": {
         "shortDescription": {
@@ -29,19 +25,14 @@ services = {
             "en": "LOD at Sztaki (/nda)"
         },
         "sparql": {
-            "resourceConnectionsLabels": "select distinct * where { { <{URI}> ?prop ?out. FILTER(!isLiteral(?out) || lang(?out)=\"\" || lang(?out)=\"en\") OPTIONAL { ?out rdfs:label ?label. FILTER(lang(?label)=\"en\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } UNION { ?in ?prop  <{URI}> OPTIONAL { ?in rdfs:label ?label. FILTER(lang(?label)=\"en\"||lang(?label)=\"\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } }",
-            "describe": "DESCRIBE <{URI}>",            
-            "allClasses": "SELECT DISTINCT ?object  WHERE {[] a ?object} ORDER BY ?object  LIMIT 50  ",
-            "findSubject": "SELECT DISTINCT ?subject WHERE { {?subject a <{CLASS}>;<http://purl.org/dc/elements/1.1/title> ?object. FILTER(regex(str(?object),\"{VALUE}\",\"i\"))} UNION {?subject a <{CLASS}>;<http://www.w3.org/2000/01/rdf-schema#label> ?object. FILTER(regex(str(?object),\"{VALUE}\",\"i\"))} UNION {?subject a <{CLASS}>;<http://www.w3.org/2004/02/skos/core#prefLabel> ?object. FILTER(regex(str(?object),\"{VALUE}\",\"i\"))} } LIMIT 1",
-            "documentUri": "SELECT DISTINCT * WHERE {<{URI}> ?property ?object.FILTER ((( isIRI(?object) && ?property != <http://xmlns.com/foaf/0.1/depiction> )|| ?property = <http://www.w3.org/2000/01/rdf-schema#label>  || ?property = <http://www.georss.org/georss/point> || ?property = <http://xmlns.com/foaf/0.1/surname> || ?property = <http://xmlns.com/foaf/0.1/name> || ?property = <http://purl.org/dc/elements/1.1/title>))}  ORDER BY ?property",
-            "document": "SELECT DISTINCT *  WHERE  {{<{URI}> ?property ?object. FILTER(!isLiteral(?object))} UNION {<{URI}> ?property ?object. FILTER(isLiteral(?object)). FILTER(lang(?object) =\"hu\")} UNION {<{URI}> ?property ?object. FILTER(isLiteral(?object)). }}  ORDER BY ?property",
-            "bnode": "SELECT DISTINCT *  WHERE {<{URI}> ?property ?object}",
-            "inverse": "SELECT DISTINCT * WHERE {?object ?property <{URI}>.FILTER(isIRI(?object))}",
-            "inverseSameAs": "SELECT DISTINCT * WHERE {?object <http://www.w3.org/2002/07/owl#sameAs> <{URI}>}"
+            "resourceConnectionsLabels": "select distinct * where { { <{URI}> ?prop ?out. FILTER(!isLiteral(?out) || lang(?out)=\"\" || lang(?out)=\"en\") OPTIONAL { ?out rdfs:label ?label. FILTER(lang(?label)=\"en\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } UNION { ?in ?prop  <{URI}> OPTIONAL { ?in rdfs:label ?label. FILTER(lang(?label)=\"en\"||lang(?label)=\"\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } }"
         },
         "endpoint": "http://lod.sztaki.hu/sparql",
-        "prefix": "http://lod.sztaki.hu/data",
-        "graph": "http://lod.sztaki.hu/nda"
+        "prefix": {
+            "default": "http://lod.sztaki.hu/data"
+        },
+        "graph": "http://lod.sztaki.hu/nda",
+        "disabled": "false"
     },
     "http://dbpedia.org": {
         "shortDescription": {
@@ -51,18 +42,67 @@ services = {
             "en": "DBpedia is a community effort to extract structured information from Wikipedia and to make this information available on the Web. DBpedia allows you to ask sophisticated queries against Wikipedia, and to link other data sets on the Web to Wikipedia data."
         },
         "sparql": {
-            "resourceConnectionsLabels": "select distinct * where { { <{URI}> ?prop ?out. FILTER(!isLiteral(?out) || lang(?out)=\"\" || lang(?out)=\"en\") OPTIONAL { ?out rdfs:label ?label. FILTER(lang(?label)=\"en\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } UNION { ?in ?prop  <{URI}> OPTIONAL { ?in rdfs:label ?label. FILTER(lang(?label)=\"en\"||lang(?label)=\"\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } }",
-            "describe": "DESCRIBE <{URI}>",
-            "allClasses": "SELECT DISTINCT ?object  WHERE {[] a ?object} ORDER BY ?object  LIMIT 50  ",
-            "findSubject": "SELECT DISTINCT ?subject WHERE { {?subject a <{CLASS}>;<http://purl.org/dc/elements/1.1/title> ?object. FILTER(regex(str(?object),\"{VALUE}\",\"i\"))} UNION {?subject a <{CLASS}>;<http://www.w3.org/2000/01/rdf-schema#label> ?object. FILTER(regex(str(?object),\"{VALUE}\",\"i\"))} UNION {?subject a <{CLASS}>;<http://www.w3.org/2004/02/skos/core#prefLabel> ?object. FILTER(regex(str(?object),\"{VALUE}\",\"i\"))} } LIMIT 1",
-            "documentUri": "SELECT DISTINCT * WHERE {<{URI}> ?property ?object.FILTER ((( isIRI(?object) && ?property != <http://xmlns.com/foaf/0.1/depiction> )|| ?property = <http://www.w3.org/2000/01/rdf-schema#label>  || ?property = <http://www.georss.org/georss/point> || ?property = <http://xmlns.com/foaf/0.1/surname> || ?property = <http://xmlns.com/foaf/0.1/name> || ?property = <http://purl.org/dc/elements/1.1/title>))}  ORDER BY ?property",
-            "document": "SELECT DISTINCT *  WHERE  {{<{URI}> ?property ?object. FILTER(!isLiteral(?object))} UNION {<{URI}> ?property ?object. FILTER(isLiteral(?object)). FILTER(lang(?object) =\"hu\")} UNION {<{URI}> ?property ?object. FILTER(isLiteral(?object)). FILTER(lang(?object) =\"en\")}} ORDER BY ?property",
-            "bnode": "SELECT DISTINCT *  WHERE {<{URI}> ?property ?object}",
-            "inverse": "SELECT DISTINCT * WHERE {?object ?property <{URI}>.FILTER(isIRI(?object))} LIMIT 100",
-            "inverseSameAs": "SELECT DISTINCT * WHERE {?object <http://www.w3.org/2002/07/owl#sameAs> <{URI}>}"
+            "resourceConnectionsLabels": "select distinct * where { { <{URI}> ?prop ?out. FILTER(!isLiteral(?out) || lang(?out)=\"\" || lang(?out)=\"en\") OPTIONAL { ?out rdfs:label ?label. FILTER(lang(?label)=\"en\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } UNION { ?in ?prop  <{URI}> OPTIONAL { ?in rdfs:label ?label. FILTER(lang(?label)=\"en\"||lang(?label)=\"\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } }"
         },
         "endpoint": "http://dbpedia.org/sparql",
-        "prefix": "http://dbpedia.org/resource",
-        "graph": "http://dbpedia.org"
+        "prefix": {
+            "default": "http://dbpedia.org/resource"
+        },
+        "graph": "http://dbpedia.org",
+        "disabled": "false"
+    },
+    "http://europeana.ontotext.com/": {
+        "shortDescription": {
+            "en": "Europeana"
+        },
+        "description": {
+            "en": "Europeana"
+        },
+        "sparql": {
+            "resourceConnectionsLabels": "select distinct * where { { <{URI}> ?prop ?out. FILTER(!isLiteral(?out) || lang(?out)=\"\" || lang(?out)=\"en\") OPTIONAL { ?out rdfs:label ?label. FILTER(lang(?label)=\"en\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } UNION { ?in ?prop  <{URI}> OPTIONAL { ?in rdfs:label ?label. FILTER(lang(?label)=\"en\"||lang(?label)=\"\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } }"
+        },
+        "endpoint": "http://europeana.ontotext.com/sparql.json",
+        "prefix": {
+            "default": "http://data.europeana.eu"
+        },
+        "graph": "http://data.europeana.eu",
+        "disabled": "true"
+    },
+    "http://collection.britishmuseum.org/": {
+        "shortDescription": {
+            "en": "British Museum"
+        },
+        "description": {
+            "en": "British Museum's collection"
+        },
+        "sparql": {
+            "resourceConnectionsLabels": "select distinct * where { { <{URI}> ?prop ?out. FILTER(!isLiteral(?out) || lang(?out)=\"\" || lang(?out)=\"en\") OPTIONAL { ?out rdfs:label ?label. FILTER(lang(?label)=\"en\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } UNION { ?in ?prop  <{URI}> OPTIONAL { ?in rdfs:label ?label. FILTER(lang(?label)=\"en\"||lang(?label)=\"\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } }"
+        },
+        "endpoint": "http://collection.britishmuseum.org/sparql.json",
+        "prefix": {
+            "default": "http://collection.britishmuseum.org"
+        },
+        "graph": "http://collection.britishmuseum.org/",
+        "disabled": "true"
+    },
+    "http://factforge.net/": {
+        "shortDescription": {
+            "en": "FactForge"
+        },
+        "description": {
+            "en": "FactForge"
+        },
+        "sparql": {
+            "resourceConnectionsLabels": "select distinct * where { { <{URI}> ?prop ?out. FILTER(!isLiteral(?out) || lang(?out)=\"\" || lang(?out)=\"en\") OPTIONAL { ?out rdfs:label ?label. FILTER(lang(?label)=\"en\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } UNION { ?in ?prop  <{URI}> OPTIONAL { ?in rdfs:label ?label. FILTER(lang(?label)=\"en\"||lang(?label)=\"\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } }"
+        },
+        "endpoint": "http://factforge.net/sparql",
+        "prefix": {
+            "default": "http://factforge.net/",
+            "resource": "http://factforge.net/resource",
+            "dbpedia": "http://factforge.net/resource/dbpedia"
+        },
+        "graph": "http://factforge.net/",
+        "disabled": "true"
     }
+    
 }
