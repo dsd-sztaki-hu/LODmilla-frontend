@@ -382,8 +382,16 @@ addPaletteHandlers = function(){
             Helper.alertDialog(Profile.alertTexts.findPathNodesIdle.title, Profile.alertTexts.findPathNodesIdle.text);
     });
 
-    $('body').on("click", '#main #paletteBox #layoutPalette div.layoutButton input', function(event) {
-        applyLayout(Graph);
+    //Layout palette handlers
+
+    //Grid layout buttton
+    $('body').on("click", '#main #paletteBox #layoutPalette div.layoutGridButton input', function(event) {
+        applyGridLayout();
+    });
+
+    //Spring layout button
+    $('body').on("click", '#main #paletteBox #layoutPalette div.layoutSpringButton input', function(event) {
+        applySpringLayout();
     });
 };
 
