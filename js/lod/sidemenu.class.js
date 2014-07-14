@@ -448,11 +448,15 @@ var Sidemenu = new function() {
         // Layout box palette
         self.layoutBox = $('<div id="layoutPalette" class="paletteItem opacityItem"></div>');
 
+        self.layoutBox.append('<label for="layoutCheckBox">Predict</label><input type="checkbox" id="layoutCheckBox"></input>');
+
         self.layoutBox.append('<div class="layoutGridButton"><input type="button" value="Grid" /></div>');
         self.layoutBox.find('.layoutGridButton input').button();
 
         self.layoutBox.append('<div class="layoutSpringButton"><input type="button" value="Spring" /></div>');
         self.layoutBox.find('.layoutSpringButton input').button();
+
+
 
 
         // LOAD button
