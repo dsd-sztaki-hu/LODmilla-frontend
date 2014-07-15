@@ -43,6 +43,4 @@ function gridLayout() {
             y++;
         }
     }
-    animateMovement("slow");
-    console.log("Grid layout finished");
 }

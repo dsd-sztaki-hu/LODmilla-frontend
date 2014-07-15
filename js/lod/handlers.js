@@ -386,13 +386,12 @@ addPaletteHandlers = function(){
 
     //Grid layout buttton
     $('body').on("click", '#main #paletteBox #layoutPalette div.layoutGridButton input', function(event) {
-        applyGridLayout();
+        applyLayout(LayoutEnum.GRID);
     });
 
     //Spring layout button
     $('body').on("click", '#main #paletteBox #layoutPalette div.layoutSpringButton input', function(event) {
-        //steps, min_distance, spring_strain, spring_length, spring_gravitation, visible node weight, virtual node W, use virtual
-        applySpringLayout();
+        applyLayout(LayoutEnum.SPRING);
     });
 };
 

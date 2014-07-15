@@ -7,17 +7,70 @@
  *
  */
 
-function applyGridLayout() {
-    gridLayout(document.getElementById('layoutCheckBox').checked);
+var LayoutEnum = {
+    GRID : "Grid",
+    SPRING : "Spring"
 }
 
-function applySpringLayout() {
-    springLayout(20000, 100, 1, 1, 200000, 1, 1, document.getElementById('layoutCheckBox').checked);
+function applyLayout(layoutType)
+{
+    var buffer = new Buffer();
+    var name = layoutType;
+    var useVirtual = document.getElementById('layoutCheckBox').checked;
+    var weight = 1;
+    var virtualWeight = 1;
+    initLayout(name, buffer, useVirtual, weight, virtualWeight);
+    switch(layoutType)
+    {
+        case LayoutEnum.GRID:
+            gridLayout();
+            break;
+        case LayoutEnum.SPRING:
+            springLayout(buffer, 10000, 100, 150, 3, 1, 100000);
+            break;
+        default :
+            console.log("Wrong layout type.");
+    }
+    finishLayout(name);
 }
-
 
 //TODO undo function
 
+function initLayout(name, buffer, useVirtual, weight, virtualWeight)
+{
+    console.time("Loading nodes to buffer");
+    //loading nodes to buffer
+    for (var index in Graph.nodes)
+    {
+        var act = Graph.nodes[index];
+        buffer.addVertex(act.resource_id, act.label, weight, false, act.left, act.top);
+    }
+    console.timeEnd("Loading nodes to buffer");
+    console.time("Loading edges to buffer");
+    //loading edges to buffer
+    var conns = jsPlumbInstance.getAllConnections();
+    $.each(conns, function() {
+        var source = $(this.source).attr('uri');
+        var target = $(this.target).attr('uri');
+        buffer.addConnection(source, target);
+    });
+    console.timeEnd("Loading edges to buffer");
+    if (useVirtual) {
+        console.time("Loading virtual nodes to buffer");
+        addVirtualNodes(buffer, virtualWeight);
+        console.timeEnd("Loading virtual nodes to buffer");
+    }
+
+    console.time(name + " layout");
+}
+
+function finishLayout(name)
+{
+    console.timeEnd(name + " layout");
+    console.time("Animate");
+    animateMovementIterative("slow",1);
+    console.timeEnd("Animate");
+}
 
 /**
  * Moves the nodes to their new position with animation. With each step only a part of the movement is animated.
