@@ -160,11 +160,12 @@ var BackendCommunicator = new function() {
     };
 
     this.save = function(user_name, graph_name, graph, callbackfunc) {
-        $.jsonp({
+        $.ajax({
             url: Profile.serverProxyUrl + "graph_save.jsp",
             cache: false,
             callbackParameter: 'callback',
             callback: 'mpadCB',
+            type: "POST",
             data: {'user_name': user_name, 'graph_name': graph_name, 'graph': graph},
             beforeSend: function() {
             },

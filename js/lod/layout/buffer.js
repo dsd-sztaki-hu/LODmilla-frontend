@@ -9,6 +9,7 @@ function Vertex(id, label, weight, isVirtual, left, top) {
     this.weight = weight;
     this.isvVirtual = isVirtual;
     this.targets = [];
+    this.sources = [];
     this.top = top;
     this.left = left;
     this.diffTop = 0;
@@ -23,7 +24,7 @@ function Buffer() {
     this.vertexes = [];
 }
 
-Vertex.prototype.addConnection = function(index)
+Vertex.prototype.addConnection = function(target_index, source_index)
 {
     if (this.targets.indexOf(index) < 0) this.targets.push(index);
 }
@@ -53,7 +54,8 @@ Buffer.prototype.addConnection = function(sourceID, targetID)
     var source = this.getVertexById(sourceID);
     var target = this.getVertexById(targetID);
     var targetIndex = this.getVertexIndex(target);
-    if (targetIndex >= 0) source.addConnection(targetIndex);
+    var sourceIndex = this.getVertexIndex(source);
+    if (targetIndex >= 0 && sourceIndex >= 0) source.addConnection(targetIndex, sourceIndex);
 }
 
 Buffer.prototype.clear = function()

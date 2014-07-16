@@ -26,7 +26,7 @@ function applyLayout(layoutType)
             gridLayout();
             break;
         case LayoutEnum.SPRING:
-            springLayout(buffer, 1000, 150, 100, 1, 1, 1);
+            springLayout(buffer, 20000, 100, 100, 1, 1, 1);
             break;
         default :
             console.log("Wrong layout type.");

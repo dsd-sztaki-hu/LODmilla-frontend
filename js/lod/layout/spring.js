@@ -13,11 +13,15 @@
  * @param spring_gravitation Increases the repulsive force's strength linearly.
  */
 function springLayout(buffer, steps, min_distance, grid_distance, spring_strain, spring_length, spring_gravitation) {
-    var max_distance = 1;
-    var min = spring_gravitation;
+    var max = 1;
+    var min = spring_gravitation, min0 = spring_gravitation;
+    max = iterativeMaxDistance(max, spring_strain, spring_length, min) * min_distance;
     for (var i = 0; i < steps; i++) {
-        max_distance = iterativeMaxDistance(max_distance, spring_strain, spring_length, min) * min_distance;
-        min = calculateSpringStep(buffer, min_distance , spring_strain, spring_length, min, max_distance);
+        if (Math.abs(min - min0) > min_distance) {
+            min0 = min;
+            max = iterativeMaxDistance(max, spring_strain, spring_length, min) * min_distance;
+        }
+        min = calculateSpringStep(buffer, min_distance , spring_strain, spring_length, min, max);
         setNewPosition(buffer, grid_distance, spring_strain, spring_length, min);
     }
     setVisiblePosition(buffer);
@@ -69,7 +73,8 @@ function calculateSpringStep(buffer, min_distance, spring_strain, spring_length,
             if (i_node.targets.indexOf(j) > -1 || j_node.targets.indexOf(i) > -1)
             {
                 // pull
-                F = spring_strain * Math.log(distance / spring_length) - (spring_gravitation / distance2);
+                F = spring_strain * Math.log(distance / spring_length) / (i_node.targets.length + j_node.targets.length)
+                    - (spring_gravitation * (i_node.targets.length + j_node.targets.length) / distance2);
                 F /= distance;
                 F_left = F * d_left;
                 F_top = F * d_top;
@@ -102,7 +107,7 @@ function calculateSpringStep(buffer, min_distance, spring_strain, spring_length,
             {
             // push
             if (distance > max_distance) {max_count++; continue;}
-            F = spring_gravitation / (distance2 * distance);
+            F = spring_gravitation * (i_node.targets.length + j_node.targets.length) / (distance2 * distance);
             F_left = F * d_left;
             F_top = F * d_top;
             F_i = F_left / i_node.weight;
