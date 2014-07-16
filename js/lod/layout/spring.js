@@ -13,15 +13,17 @@
  * @param spring_gravitation Increases the repulsive force's strength linearly.
  */
 function springLayout(buffer, steps, min_distance, grid_distance, spring_strain, spring_length, spring_gravitation) {
-    var max_distance = iterativeMaxDistance(spring_strain, spring_length, spring_gravitation);
+    var max_distance = 1;
+    var min = spring_gravitation;
     for (var i = 0; i < steps; i++) {
-        calculateSpringStep(buffer, min_distance, spring_strain, spring_length, spring_gravitation, max_distance);
-        setNewPosition(buffer, grid_distance, spring_strain, spring_length, spring_gravitation);
+        max_distance = iterativeMaxDistance(max_distance, spring_strain, spring_length, min) * min_distance;
+        min = calculateSpringStep(buffer, min_distance , spring_strain, spring_length, min, max_distance);
+        setNewPosition(buffer, grid_distance, spring_strain, spring_length, min);
     }
     setVisiblePosition(buffer);
 }
 
-function iterativeMaxDistance(spring_strain, spring_length, spring_gravitation)
+function iterativeMaxDistance(prev, spring_strain, spring_length, spring_gravitation)
 {
     //Newton's method
     var i = 1, diff = 1;
@@ -47,18 +49,22 @@ function calculateSpringStep(buffer, min_distance, spring_strain, spring_length,
     var i_node, j_node;
     var d_top, d_left, F, F_left, F_top, F_i, F_j;
     var distance, distance2;
+    var min_count = 0, max_count = 0, count = 0;
     for (i = 0; i < i_length; i++)
     {
         i_node = buffer.getVertexByIndex(i);
         for (j = i + 1; j < j_length; j++ )
         {
+            count++;
             j_node = buffer.getVertexByIndex(j);
             d_left = Math.abs(i_node.left - j_node.left);
             d_top = Math.abs(i_node.top - j_node.top);
             distance2 = d_left * d_left + d_top * d_top;
             distance = Math.sqrt(distance2);
-
-            if (distance < min_distance) distance = min_distance;
+            if (distance < min_distance) {
+                distance = min_distance;
+                min_count++;
+            }
             //log(d+1)/log(d) = 1.01, d~30, so if distance is more than 30 the power only increases less than 1%
             if (i_node.targets.indexOf(j) > -1 || j_node.targets.indexOf(i) > -1)
             {
@@ -95,7 +101,7 @@ function calculateSpringStep(buffer, min_distance, spring_strain, spring_length,
             else
             {
             // push
-            if (distance > max_distance) continue;
+            if (distance > max_distance) {max_count++; continue;}
             F = spring_gravitation / (distance2 * distance);
             F_left = F * d_left;
             F_top = F * d_top;
@@ -126,6 +132,9 @@ function calculateSpringStep(buffer, min_distance, spring_strain, spring_length,
             }
         }
     }
+    var ret = 1 + (min_count - max_count) / count;
+    //if (ret < 1) return spring_gravitation;
+    return spring_gravitation * ret;
 }
 
 function setNewPosition(buffer, min_distance, spring_strain, spring_length, spring_gravitation)
