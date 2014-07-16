@@ -24,9 +24,14 @@ function Buffer() {
     this.vertexes = [];
 }
 
-Vertex.prototype.addConnection = function(target_index, source_index)
+Vertex.prototype.addTargetConnection = function(target_index)
 {
-    if (this.targets.indexOf(index) < 0) this.targets.push(index);
+    if (this.targets.indexOf(target_index) < 0) this.targets.push(target_index);
+}
+
+Vertex.prototype.addSourceConnection = function(source_index)
+{
+    if (this.sources.indexOf(source_index) < 0) this.sources.push(source_index);
 }
 
 Vertex.prototype.clearConnections = function()
@@ -55,7 +60,8 @@ Buffer.prototype.addConnection = function(sourceID, targetID)
     var target = this.getVertexById(targetID);
     var targetIndex = this.getVertexIndex(target);
     var sourceIndex = this.getVertexIndex(source);
-    if (targetIndex >= 0 && sourceIndex >= 0) source.addConnection(targetIndex, sourceIndex);
+    if (targetIndex >= 0) source.addTargetConnection(targetIndex);
+    if (sourceIndex >= 0) target.addSourceConnection(sourceIndex);
 }
 
 Buffer.prototype.clear = function()
