@@ -22,9 +22,9 @@ function springLayout(buffer, steps, max_time,  min_distance, grid_distance, spr
         var a_node = buffer.getVertexByIndex(i);
         a_cc +=a_node.targets.length + a_node.sources.length;
     }
-    if (a_cc < 1) a_cc = 1;
+    a_cc++;
     a_cc /= buffer.vertexes.length;
-    a_cc = a_cc * a_cc;
+//    a_cc = a_cc * a_cc;
     max = iterativeMaxDistance(max, spring_strain, spring_length, min, a_cc) * min_distance;
     for (var i = 0; i < steps; i++) {
         if (Date.now() - start_time > max_time) break;
@@ -66,37 +66,47 @@ function calculateSpringStep(buffer, min_distance, spring_strain, spring_length,
     var d_top, d_left, F, F_left, F_top, F_i, F_j;
     var distance, distance2;
     var min_count = 0, max_count = 0, count = 0;
+    var force_pull;
+//    var neighbour_factor = 1;
     for (i = 0; i < i_length; i++)
     {
         i_node = buffer.getVertexByIndex(i);
-        i_cc = i_node.targets.length + i_node.sources.length;
-        if (i_cc < 1) i_cc = 1;
+        i_cc = i_node.targets.length + i_node.sources.length + 1;
+//        if (i_cc < 1) i_cc = 1;
 //        i_cc = 1 / i_cc;
         for (j = i + 1; j < j_length; j++ )
         {
             count++;
+//            neighbour_factor = 1;
             j_node = buffer.getVertexByIndex(j);
-            j_cc = j_node.targets.length + j_node.sources.length;
+            j_cc = j_node.targets.length + j_node.sources.length + 1;
+            force_pull = i_cc == j_cc && buffer.areNeighbours(i, j);
+//            if (force_pull) {
+//                neighbour_factor += i_cc;
+////                neighbour_factor = Math.sqrt(i_cc);
+//            }
             d_cc = i_cc + j_cc;
-            if (j_cc < 1) j_cc = 1;
+            //if (j_cc < 1) j_cc = 1;
 //            j_cc = 1 / j_cc;
-            if (d_cc < 1) d_cc = 1;
-            else d_cc = d_cc * d_cc;
+            //if (d_cc < 1) d_cc = 1;
+            //else d_cc = d_cc * d_cc;
+//            d_cc = d_cc * d_cc;
                 //d_cc = (d_cc + Math.sqrt(d_cc)) * Math.sqrt(d_cc);
             d_left = Math.abs(i_node.left - j_node.left);
             d_top = Math.abs(i_node.top - j_node.top);
             distance2 = d_left * d_left + d_top * d_top;
-            distance = Math.sqrt(distance2);
-            if (distance < min_distance) {
+            if (distance2 < min_distance * min_distance) {
                 distance = min_distance;
                 min_count++;
             }
-            if (i_node.targets.indexOf(j) > -1 || j_node.targets.indexOf(i) > -1)
+            distance = Math.sqrt(distance2);
+            if (i_node.targets.indexOf(j) > -1 || j_node.targets.indexOf(i) > -1 || force_pull)
             {
                 // pull
                 F = spring_strain * Math.log(distance / spring_length)
                     - spring_gravitation * d_cc / distance2;
                 F /= distance;
+//                F *= neighbour_factor;
                 F_left = F * d_left;
                 F_top = F * d_top;
                 F_i = F_left / i_node.weight / i_cc;
@@ -163,6 +173,8 @@ function calculateSpringStep(buffer, min_distance, spring_strain, spring_length,
         }
     }
     var ret = 1 + (min_count - max_count) / count;
+//    if (spring_gravitation > 100000)
+//        ret = ret;
     //if (ret < 1) return spring_gravitation;
     return spring_gravitation * ret;
 }
@@ -171,22 +183,24 @@ function setNewPosition(buffer, min_distance, spring_strain, spring_length, spri
 {
     for (var index in buffer.vertexes) {
         var act = buffer.vertexes[index];
-
         act.left += act.diffLeft;
         act.top += act.diffTop;
         act.diffLeft = 0;
         act.diffTop = 0;
 
         //pull to grid center
-/*
+        /*
         var to_top = min_distance * Math.floor((act.top) / min_distance) + (min_distance/2);
         var to_left = min_distance * Math.floor((act.left) / min_distance) + (min_distance/2);
         d_left = Math.abs(act.left - to_left);
         d_top = Math.abs(act.top - to_top);
         distance2 = d_left * d_left + d_top * d_top;
         distance = Math.sqrt(distance2);
-        if (distance < 10) continue;
-        F = spring_strain * Math.log(distance / spring_length) - (spring_gravitation / distance2);
+        if (distance < min_distance) continue;
+        var act_cc = act.targets.length + act.sources.length;
+        if (act_cc < 1) act_cc = 1;
+        else act_cc *= act_cc;
+        F = spring_strain * Math.log(distance * act_cc / spring_length) - (spring_gravitation / distance2);
         F /= distance;
         F_left = F * d_left;
         F_top = F * d_top;

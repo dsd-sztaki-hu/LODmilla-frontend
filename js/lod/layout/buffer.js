@@ -104,3 +104,35 @@ Buffer.prototype.getVertexIndexById = function(id)
     }
     return -1;
 }
+
+Buffer.prototype.areNeighbours = function(index1, index2)
+{
+    var v1 = this.getVertexByIndex(index1);
+    var v2 = this.getVertexByIndex(index2);
+    var i, j;
+    var count = 0;
+    for (i in v1.targets)
+    {
+        for (j in v2.targets)
+        {
+            if (v1.targets[i] == v2.targets[j]) count++;
+        }
+        for (j in v2.sources)
+        {
+            if (v1.targets[i] == v2.sources[j]) count++;
+        }
+    }
+    for (i in v1.sources)
+    {
+        for (j in v2.targets)
+        {
+            if (v1.sources[i] == v2.targets[j]) count++;
+        }
+        for (j in v2.sources)
+        {
+            if (v1.sources[i] == v2.sources[j]) count++;
+        }
+    }
+    if (count == v1.targets.length + v1.sources.length) return true;
+    return false;
+}
