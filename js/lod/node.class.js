@@ -33,6 +33,8 @@ var Node = function(resource_id, label) {
     this.literals = {};
     this.top = null;
     this.left = null;
+    this.width = Profile.nodeWidth;
+    this.height = Profile.nodeHeight;
 
     this.loaded = false;
     var self = this;

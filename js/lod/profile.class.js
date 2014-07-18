@@ -11,11 +11,15 @@
  * Class:Profile
  */
 var Profile = new function() {
+
+    this.zoomRatio = 1;
+    this.graphSize = 5000;
+
     this.minNodeDistance = 150;
     this.maxRadiusAroundNode = 250;
     this.maxNodePlaceIter = 50;
-    this.nodeHeight = 135;
-    this.nodeWidth = 125;
+    this.nodeHeight = 75;
+    this.nodeWidth = 95;
     this.panelWidth = 300;
     this.sidemenuWidth = 200;
     this.buttonsHeight = 50;
@@ -25,9 +29,25 @@ var Profile = new function() {
     this.defaultEndpointURI = "http://lod.sztaki.hu/sparql";
     this.defaultEndpointLabel = "n/a";
     this.defaultResourceURIprefix = "http://lod.sztaki.hu/edited/";
+
+
     this.defaultConnectionURI = "[EMPTY]";
     this.defaultConnectionsColor = "#056";
     this.highlightedConnectionsColor = "#f00";
+    this.connectorType = "Straight";
+    this.connectorStrokeStyle = "#5c96bc";
+    this.connectorLineWidth = 2;
+    this.connectorOutlineWidth = 4;
+    this.connectorGap = 5;
+
+    this.connectionLabelLocation = 0.5;
+    this.connectionArrowLocation = 0.75;
+    this.connectionArrowWidth = 10;
+    this.connectionArrowLength = 12;
+
+    this.endpointForm = "Rectangle";
+    this.endPointWidth = 10;
+    this.endPointHeight = 10;
 
     this.nodeLabelMaxLength = 30;
     this.nodeEndpointLabelMaxLength = 10;

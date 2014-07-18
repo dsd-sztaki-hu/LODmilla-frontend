@@ -26,10 +26,16 @@ body {
     font-size:0.8em;
     border-radius:10px;
 
-    width:95px;
+    width:95px; /*95,75*/
     height:75px;
-    box-shadow: 10px 10px 5px #888888;    
+    box-shadow: 3px 3px 3px #888888;
     
+    /*display: inline-table;*/
+}
+
+.resourceNodeBox:hover {
+    width: 95px;
+    height: 75px;
     /*display: inline-table;*/
 }
 
@@ -48,7 +54,7 @@ body {
 
 .connectionBox.label {
     border:1px solid #346789; 
-    padding:3px;
+    padding:2px;
     width: auto;
     height: auto;
 }
@@ -57,8 +63,8 @@ body {
 }
 
 #graph {
-    width: 3000px;
-    height: 3000px;
+    width: 5000px;
+    height: 5000px;
 }
 
 #addNewConnectionDialogForm form input[type="text"]{

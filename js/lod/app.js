@@ -12,7 +12,7 @@ $(document).ready(function() {
 
         jsPlumbInstance = jsPlumb.getInstance({
             Container:"graph",
-            Connector: [ "Straight", { stub: 10, gap: 15 } ],
+            Connector: [ Profile.connectorType, { stub: 5, gap: Profile.connectorGap } ],
             ConnectionsDetachable: true,
             EndpointHoverStyle: { fillStyle: "#f00"},
 
@@ -25,20 +25,20 @@ $(document).ready(function() {
                 [ "Label", {
                     label: Profile.defaultConnectionURI,
                     cssClass: "connectionBox label opacityItem",
-                    location: 0.5
+                    location: Profile.connectionLabelLocation
                 }],
                 ["PlainArrow", {
-                    location: 0.8,
-                    width: 14,
-                    length: 20,
+                    location: Profile.connectionArrowLocation,
+                    width: Profile.connectionArrowWidth,
+                    length: Profile.connectionArrowLength,
                     direction: 1
 //            foldback:0.2
 //            id:"myArrow"
                 }]
             ],
 
-//            Anchor: [ 'Top',  'Right', 'Bottom', 'Left'], // faster, but a bit different
-            Anchor: "Continuous"
+            Anchor: [ 'Top',  'Right', 'Bottom', 'Left'] // faster, but a bit different
+//            Anchor: "Continuous"
         });
 
         jsPlumbInstance.registerConnectionTypes({

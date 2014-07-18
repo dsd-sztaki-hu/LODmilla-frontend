@@ -458,6 +458,7 @@ addBottomMenuHandlers = function(){
                         $("#graph_name").addClass("ui-state-error");
                     }
                     if (bValid) {
+                        Profile.zoomRatio = 1;
                         var undoActionLabel = 'action_bottomMenu_loadGraph';
                         BackendCommunicator.load($("#graphid").val(), $("#user_name").val(), $("#graph_name").val(), Graph.load, undoActionLabel);
                         $(this).dialog("close");

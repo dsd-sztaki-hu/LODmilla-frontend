@@ -123,25 +123,26 @@ Node.prototype.vis_show = function(highlight, aroundNode) {
             filter:".node-connection-source",
             deleteEndpointsOnDetach:true,
             isSource:true,
-            connector: "StateMachine",
+            connector: Profile.connectorType,
             overlays:  [ ],
-            endpoint:[ "Rectangle", {
+            endpoint:[ Profile.endpointForm, {
 //            cssClass:"myEndpoint",
-                width:30,
-                height:30
+                width: Profile.endPointWidth,
+                height: Profile.endPointHeight
             }],
-            connectorStyle:{ strokeStyle:"#5c96bc", lineWidth:2, outlineColor:"transparent", outlineWidth:4 }
+            connectorStyle:{ strokeStyle: Profile.connectorStrokeStyle, lineWidth: Profile.connectorLineWidth,
+                outlineColor:"transparent", outlineWidth: Profile.connectorOutlineWidth}
 //            maxConnections:5
         });
         jsPlumbInstance.makeTarget(existing, {
             deleteEndpointsOnDetach:true,
             isTarget:true,
-            connector: "StateMachine",
+            connector: Profile.connectorType,
             overlays:  [ ],
-            endpoint:[ "Rectangle", {
+            endpoint:[ Profile.endpointForm, {
 //            cssClass:"myEndpoint",
-                width:30,
-                height:30
+                width: Profile.endPointWidth,
+                height: Profile.endPointHeight
             }]
 //            maxConnections:5
         });
@@ -665,6 +666,7 @@ Node.prototype.vis_repaintConnections = function() {
     });
 };
 
+//basic creating
 vis_jsPlumbInstance_connect_uri = function(uri1, uri2, connection) {
     var labelShort = connection.getConnectionLabelShort();
     var sourceNode = $("[uri='" + uri1 + "']").attr('id', md5(uri1));
@@ -697,12 +699,13 @@ vis_jsPlumbInstance_connect_uri = function(uri1, uri2, connection) {
         target: targetNode,
         type:"basicConnection",
         deleteEndpointsOnDetach:true,
-        connector: "StateMachine",
+//        connector: "StateMachine",
+        connector: Profile.connectorType,
         overlays: [ ],
-        endpoint:[ "Rectangle", {
+        endpoint:[ Profile.endpointForm, {
 //            cssClass:"myEndpoint",
-            width:30,
-            height:30
+            width: Profile.endPointWidth,
+            height: Profile.endPointHeight
         }],
         parameters:{
             'sourceNodeURI': uri1,
@@ -713,12 +716,12 @@ vis_jsPlumbInstance_connect_uri = function(uri1, uri2, connection) {
     aConnection.addOverlay(["Label", {
         cssClass: "connectionBox label opacityItem",
         label: labelShort,
-        location: 0.5
+        location: Profile.connectionLabelLocation
     }]);
     aConnection.addOverlay(["PlainArrow", {
-            location: 0.8,
-            width: 14,
-            length: 20,
+            location: Profile.connectionArrowLocation,
+            width: Profile.connectionArrowWidth,
+            length: Profile.connectionArrowLength,
             direction: 1
 //            foldback:0.2
 //            id:"myArrow"
@@ -769,7 +772,7 @@ Graph.vis_engineInit = function() {
         HoverClass: "connector-hover"
     });
 
-    window.scrollTo((3000 - $(window).width()) / 2, (3000 - $(window).height()) / 2);
+    window.scrollTo((Profile.graphSize - $(window).width()) / 2, (Profile.graphSize - $(window).height()) / 2);
 
     /** Pan **/
     Graph.canvas[0].onmousedown = function(event) {
@@ -805,15 +808,20 @@ Graph.vis_engineInit = function() {
             var yoffset = $(this).data('y') - event.clientY;
 
             $('.resourceNodeBox').each(function() {
-
-                var position = $(this).position();
+                var vis_node = $(this);
+                var position = vis_node.position();
                 var node = Graph.getNode(this.getAttribute('uri'));
                 node.top = position['top'] - yoffset;
                 node.left = position['left'] - xoffset;
 
-                $(this).animate({'top': node.top + 'px', 'left': node.left + 'px'}, 0, function() {
-                    jsPlumbInstance.repaint($(this));
-                });
+                vis_node.css('left', node.left);
+                vis_node.css('top', node.top);
+//                $(this).animate({'top': node.top + 'px', 'left': node.left + 'px'}, 0, function() {
+//                    jsPlumbInstance.repaint($(this));
+//                });
+            });
+            $('.resourceNodeBox').each(function() {
+                jsPlumbInstance.repaint(this);
             });
         }
         //console.log("UP");
@@ -823,18 +831,32 @@ Graph.vis_engineInit = function() {
     Graph.canvas.bind('mousewheel', function(event, delta) {
         var dir = delta > 0 ? 'Up' : 'Down';
         var vel = Math.abs(delta);
-
-        var zoomRatio = delta > 0 ? 1.1 : 0.9;
+        var calcRatio = Profile.zoomRatio;
+        if (delta > 0) Profile.zoomRatio += 0.1;
+        else if (Profile.zoomRatio > 0.5) Profile.zoomRatio -= 0.1;
+        console.log(Profile.zoomRatio);
+//        var zoomRatio = delta > 0 ? 1.1 : 0.9;
 
         $('.resourceNodeBox').each(function() {
-            var position = $(this).position();
+            var vis_node = $(this);
+            var position = vis_node.position();
             var node = Graph.getNode(this.getAttribute('uri'));
-            node.top = $(document).scrollTop() + event.clientY + (position['top'] - $(document).scrollTop() - event.clientY) * zoomRatio;
-            node.left = $(document).scrollLeft() + event.clientX + (position['left'] - $(document).scrollLeft() - event.clientX) * zoomRatio;
-
-            $(this).animate({'top': node.top + 'px', 'left': node.left + 'px'}, 0, function() {
-                jsPlumbInstance.repaint($(this));
-            });
+//            node.top = $(document).scrollTop() + event.clientY + (position['top'] - $(document).scrollTop() - event.clientY) * Profile.zoomRatio;
+//            node.left = $(document).scrollLeft() + event.clientX + (position['left'] - $(document).scrollLeft() - event.clientX) * Profile.zoomRatio;
+            //TODO
+            vis_node.css('left', $(document).scrollLeft() + event.clientX + (node.left - $(document).scrollLeft() - event.clientX) * Profile.zoomRatio);
+            vis_node.css('top', $(document).scrollTop() + event.clientY  + (node.top - $(document).scrollTop() - event.clientY) * Profile.zoomRatio);
+            if (Profile.zoomRatio <= 1) {
+            vis_node.css('width', node.width * Profile.zoomRatio);
+            vis_node.css('height', node.height * Profile.zoomRatio);
+            }
+//            jsPlumbInstance.animate(this, {'top': node.top + 'px', 'left': node.left + 'px'});
+//            this.animate({'top': node.top + 'px', 'left': node.left + 'px'}, 0, function() {
+//                jsPlumbInstance.repaint($(this));
+//            });
+        });
+        $('.resourceNodeBox').each(function() {
+            jsPlumbInstance.repaint(this);
         });
         return false;
     });
