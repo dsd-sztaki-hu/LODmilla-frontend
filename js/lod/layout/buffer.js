@@ -3,7 +3,7 @@
  */
 
 //Buffer classess for faster computing with the graph.
-function Vertex(id, label, weight, isVirtual, left, top) {
+function Vertex(id, label, weight, isVirtual, left, top, type) {
     this.id = id;
     this.label = label; //for debugging
     this.weight = weight;
@@ -14,6 +14,7 @@ function Vertex(id, label, weight, isVirtual, left, top) {
     this.left = left;
     this.diffTop = 0;
     this.diffLeft = 0;
+    this.type = type;
 }
 
 /**
@@ -39,11 +40,11 @@ Vertex.prototype.clearConnections = function()
     this.targets = [];
 }
 
-Buffer.prototype.addVertex = function(id, label, weight, isVirtual, left, top)
+Buffer.prototype.addVertex = function(id, label, weight, isVirtual, left, top, type)
 {
     var index = this.vertexes.indexOf(id);
     if (index < 0) {
-        var v = new Vertex(id, label, weight, isVirtual, left, top);
+        var v = new Vertex(id, label, weight, isVirtual, left, top, type);
         this.vertexes.push(v);
         return v;
     }
@@ -97,7 +98,8 @@ Buffer.prototype.getVertexIndex = function(vertex)
 
 Buffer.prototype.getVertexIndexById = function(id)
 {
-    for (var index in this.vertexes)
+    var length = this.vertexes.length
+    for (var index = 0; index < length; index++)
     {
         if (this.vertexes[index].id == id)
             return index;

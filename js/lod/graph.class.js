@@ -19,6 +19,8 @@ var Graph = new function() {
     this.lastsavedgraphname = "";
     this.lastsavedgraphusername = "";
 
+    this.zoomRatio = 1;
+
     /**
      * Initialises the graph.
      * @param {type} parent
@@ -201,7 +203,8 @@ var Graph = new function() {
         return $.toJSON({
             nodes: s_nodes,
             scrollX: window.scrollX,
-            scrollY: window.scrollY
+            scrollY: window.scrollY,
+            zoomRatio: Graph.zoomRatio
         });
     };
 
@@ -290,6 +293,10 @@ var Graph = new function() {
             Helper.alertDialog(Profile.alertTexts.loadGraph.title, Profile.alertTexts.loadGraph.text);
         } else {
             Graph.clear();
+            if (jsonobject.graph.zoomRatio === undefined)
+                Graph.zoomRatio = 1;
+            else
+                Graph.zoomRatio = jsonobject.graph.zoomRatio;
             if (jsonobject.graph.nodes !== undefined) {
                 Graph.lastsavedgraphid = jsonobject.graph_id;
                 Graph.lastsavedgraphname = jsonobject.graph_name;

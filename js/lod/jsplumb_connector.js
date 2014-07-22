@@ -159,7 +159,8 @@ Node.prototype.vis_show = function(highlight, aroundNode) {
         var maxDistance = {'dist':0, 'top':0, 'left':0};
         do {
             counter +=1;
-            found = true;            
+            found = true;
+//TODO layout increment
             thisNode.top = vis_get_visibleCanvasRandomPosition(aroundNode)['top'];
             thisNode.left = vis_get_visibleCanvasRandomPosition(aroundNode)['left'];
             
@@ -204,8 +205,8 @@ Node.prototype.vis_show = function(highlight, aroundNode) {
 
     // default image for placeholder
     var nodeImageDiv = $('<div class="nodeImage"></div>');
-    var imgBox = $('<span><img src="' + Profile.nodeTypesDefaultImages.thingEmpty + '" style="width:32px;height:32px;" /></span>');
-
+//    var imgBox = $('<span>' + Helper.getImgSrc(Profile.nodeTypesDefaultImages.thingEmpty)+ '</span>');
+    var imgBox = $('<div>' +Helper.getImgSrc(Profile.nodeTypesDefaultImages.thingEmpty) + '</div>');
     nodeImageDiv.append(imgBox);
     selfDiv.append(nodeImageDiv);
 
@@ -213,7 +214,7 @@ Node.prototype.vis_show = function(highlight, aroundNode) {
         // Node image comes from SZTAKI LOD (default endpoint URL)
         if (self.endpoint.endpointURL === Profile.defaultEndpointURI) {
             if (self.type === 'person' || self.type === 'work') {
-                $('<img src="' + self.nodeImageURL + '" style="width:32px;height:42px;" />').on({
+                $(Helper.getImgSrc(self.nodeImageURL)).on({
                     error: function (e){
                         self.vis_showImageDefaultImage(nodeImageDiv, imgBox);
                     },
@@ -225,7 +226,7 @@ Node.prototype.vis_show = function(highlight, aroundNode) {
         }
         else{
             if (self.nodeImageURL) {
-                $('<img src="' + self.nodeImageURL + '" style="width:32px;height:32px;" />').on({
+                $(Helper.getImgSrc(self.nodeImageURL)).on({
                     error: function (e){
                         self.vis_showImageDefaultImage(nodeImageDiv, imgBox);
                     },
@@ -264,7 +265,7 @@ Node.prototype.vis_show = function(highlight, aroundNode) {
         endpointURL = Helper.getLodServerBaseUrl(self.resource_id);
         
         imgBox = $('<a class="fancybox" href="' + Profile.nodeTypesDefaultImages.noEndpoint + '"></a>');
-        imgBox.append('<img src="' + Profile.nodeTypesDefaultImages.noEndpoint + '" style="width:32px;height:32px;" />');
+        imgBox.append(Helper.getImgSrc(Profile.nodeTypesDefaultImages.noEndpoint));
         nodeImageDiv.empty().append(imgBox);
     }
 
@@ -291,7 +292,7 @@ Node.prototype.vis_show = function(highlight, aroundNode) {
 Node.prototype.vis_showImageOwnImage = function(nodeImageDiv, imgBox){
     var self = this;
     imgBox = $('<a class="fancybox" href="' + self.nodeImageURL + '"></a>');
-    imgBox.append('<img src="' + self.nodeImageURL + '" style="width:32px;height:32px;" />');
+    imgBox.append(Helper.getImgSrc(self.nodeImageURL));
     nodeImageDiv.empty().append(imgBox);
 };
 
@@ -299,7 +300,7 @@ Node.prototype.vis_showImageDefaultEndpoint = function(imgBox){
     var self = this;
     $("<img />").attr('src', self.nodeImageURL).load(function() {
         var imgBox2 = $('<a class="fancybox" target="_blank" href="' + self.nodeImageURL + '"></a>');
-        imgBox2.append('<img src="' + self.nodeImageURL + '" style="width:32px;height:42px;" />');
+        imgBox2.append(Helper.getImgSrc(self.nodeImageURL));
         imgBox.empty().attr('href', self.nodeImageURL).append(imgBox2);
     });
 };
@@ -309,17 +310,17 @@ Node.prototype.vis_showImageDefaultImage = function(nodeImageDiv, imgBox){
     // predefined images, for some types
     if (self.type === 'person' || self.type === 'agent') {
         imgBox = $('<a class="fancybox" target="_blank" href="' + Profile.nodeTypesDefaultImages.person + '"></a>');
-        imgBox.append('<img src="' + Profile.nodeTypesDefaultImages.person + '" style="width:32px;height:32px;" />');
+        imgBox.append(Helper.getImgSrc(Profile.nodeTypesDefaultImages.person));
         nodeImageDiv.empty().append(imgBox);
     }
     else if (self.type === 'work') {
         imgBox = $('<a class="fancybox" target="_blank" href="' + Profile.nodeTypesDefaultImages.work + '"></a>');
-        imgBox.append('<img src="' + Profile.nodeTypesDefaultImages.work + '" style="width:32px;height:32px;" />');
+        imgBox.append(Helper.getImgSrc(Profile.nodeTypesDefaultImages.work));
         nodeImageDiv.empty().append(imgBox);
     }
     else if (self.type === 'group') {
         imgBox = $('<a class="fancybox" target="_blank" href="' + Profile.nodeTypesDefaultImages.group + '"></a>');
-        imgBox.append('<img src="' + Profile.nodeTypesDefaultImages.group + '" style="width:32px;height:32px;" />');
+        imgBox.append(Helper.getImgSrc(Profile.nodeTypesDefaultImages.group));
         nodeImageDiv.empty().append(imgBox);
     }
 };
@@ -829,35 +830,32 @@ Graph.vis_engineInit = function() {
     };
     /* zoom */
     Graph.canvas.bind('mousewheel', function(event, delta) {
-        var dir = delta > 0 ? 'Up' : 'Down';
-        var vel = Math.abs(delta);
-        var calcRatio = Profile.zoomRatio;
-        if (delta > 0) Profile.zoomRatio += 0.1;
-        else if (Profile.zoomRatio > 0.5) Profile.zoomRatio -= 0.1;
-        console.log(Profile.zoomRatio);
-//        var zoomRatio = delta > 0 ? 1.1 : 0.9;
+//        var dir = delta > 0 ? 'Up' : 'Down';
+//        var vel = Math.abs(delta);
+        if (delta > 0) Graph.zoomRatio += 0.1;
+        else if (Graph.zoomRatio > 0.701) Graph.zoomRatio -= 0.1; //float
+        console.log(Graph.zoomRatio);
 
         $('.resourceNodeBox').each(function() {
             var vis_node = $(this);
             var position = vis_node.position();
             var node = Graph.getNode(this.getAttribute('uri'));
-//            node.top = $(document).scrollTop() + event.clientY + (position['top'] - $(document).scrollTop() - event.clientY) * Profile.zoomRatio;
-//            node.left = $(document).scrollLeft() + event.clientX + (position['left'] - $(document).scrollLeft() - event.clientX) * Profile.zoomRatio;
-            //TODO
-            vis_node.css('left', $(document).scrollLeft() + event.clientX + (node.left - $(document).scrollLeft() - event.clientX) * Profile.zoomRatio);
-            vis_node.css('top', $(document).scrollTop() + event.clientY  + (node.top - $(document).scrollTop() - event.clientY) * Profile.zoomRatio);
-            if (Profile.zoomRatio <= 1) {
-            vis_node.css('width', node.width * Profile.zoomRatio);
-            vis_node.css('height', node.height * Profile.zoomRatio);
-            }
+            vis_node.css('left', $(document).scrollLeft() + event.clientX + (node.left - $(document).scrollLeft() - event.clientX) * Graph.zoomRatio);
+            vis_node.css('top', $(document).scrollTop() + event.clientY  + (node.top - $(document).scrollTop() - event.clientY) * Graph.zoomRatio);
+//            if (Graph.zoomRatio <= 1.0) {
+            vis_node.css('width', node.width * Graph.zoomRatio);
+            vis_node.css('height', node.height * Graph.zoomRatio);
+            vis_node.find('.nodeImage img').css('max-height', 75 * Graph.zoomRatio - 36); //perfect
+//            vis_node.find('.resourceLabel').css('max-height', 30 * Graph.zoomRatio);
+//            var img2 = this.find('.nodeImage img');
+
+//            }
 //            jsPlumbInstance.animate(this, {'top': node.top + 'px', 'left': node.left + 'px'});
-//            this.animate({'top': node.top + 'px', 'left': node.left + 'px'}, 0, function() {
-//                jsPlumbInstance.repaint($(this));
-//            });
         });
         $('.resourceNodeBox').each(function() {
             jsPlumbInstance.repaint(this);
         });
+
         return false;
     });
 };

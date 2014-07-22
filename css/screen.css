@@ -39,6 +39,58 @@ body {
     /*display: inline-table;*/
 }
 
+
+.resourceNodeBox .nodeImage{
+    position: relative;
+    width: 50;
+    height: 50;
+    /*position: absolute;*/
+    /*bottom: 14px;*/
+    /*left: 34px;*/
+
+}
+.resourceNodeBox .nodeImage img {
+    align: center;
+    position: relative;
+    display: block;
+    margin: 3px auto;
+
+    width: auto;
+    height: auto;
+    max-height:42px;
+}
+
+/* Node types colors */
+
+.resourceNodeBox{
+    /*background-color: #fff6e7;*/
+    background-color: #d0d0d0;
+}
+.resourceNodeBox.nodetype_person,
+.resourceNodeBox.nodetype_agent {
+    background-color: #e0f5d6;
+}
+.resourceNodeBox.nodetype_work {
+    background-color: #feeacb;
+}
+.resourceNodeBox.nodetype_group {
+    background-color: #e5ecf1;
+}
+
+/* opened (right box) node */
+
+.resourceNodeBox.opened {
+    /*background: url(../img/tileable-metal-texture-1_v2.png) 50% 50% repeat #A36200;*/
+    background: #4c8db2;
+    color: #fcfbf9;
+}
+.resourceNodeBox.opened a{
+    color: #fcfbf9;
+}
+.resourceNodeBox.opened a:hover{
+    color: #000;
+}
+
 .resourceNodeBox .progressbar .progress-label,
 #remoteSearchPalette .progressbar .progress-label,
 #findPathPalette .progressbar .progress-label{
@@ -115,6 +167,7 @@ body {
     max-height: 30px;
     overflow: hidden;
     text-align: center;
+    width: auto;
 }
 
 .resourceNodeBox .node-hide{
@@ -155,8 +208,9 @@ body {
     overflow: hidden;
     font-size: 11px;
     text-align: center;
-    width: 70px;
+    width: auto;
     left: 19px;
+    right: 19px;
 }
 .resourceNodeBox .node-open:hover {
     cursor: pointer;
@@ -374,25 +428,25 @@ a:hover {
 .ui-corner-top,
 .ui-corner-left,
 .ui-corner-tl {
-    border-top-left-radius: 10px;
+    border-top-left-radius: 5px;
 }
 .ui-corner-all,
 .ui-corner-top,
 .ui-corner-right,
 .ui-corner-tr {
-    border-top-right-radius: 10px;
+    border-top-right-radius: 5px;
 }
 .ui-corner-all,
 .ui-corner-bottom,
 .ui-corner-left,
 .ui-corner-bl {
-    border-bottom-left-radius: 10px;
+    border-bottom-left-radius: 5px;
 }
 .ui-corner-all,
 .ui-corner-bottom,
 .ui-corner-right,
 .ui-corner-br {
-    border-bottom-right-radius: 10px;
+    border-bottom-right-radius: 5px;
 }
 
 
@@ -501,49 +555,6 @@ h3.ui-accordion-header, .ui-widget-header {
     font-size: 80%;
 }
 
-.resourceNodeBox .nodeImage{
-    position: relative;
-    position: absolute;
-    bottom: 14px;
-    left: 34px;
-}
-.resourceNodeBox .nodeImage img {
-    display: block;
-    margin: 3px auto;
-    width:40px;
-    height:50px;
-}
-
-/* Node types colors */
-
-.resourceNodeBox{ 
-    /*background-color: #fff6e7;*/
-    background-color: #d0d0d0;
-}
-.resourceNodeBox.nodetype_person,
-.resourceNodeBox.nodetype_agent { 
-    background-color: #e0f5d6;
-}
-.resourceNodeBox.nodetype_work {
-    background-color: #feeacb;
-}
-.resourceNodeBox.nodetype_group {
-    background-color: #e5ecf1;
-}
-
-/* opened (right box) node */
-
-.resourceNodeBox.opened {
-    /*background: url(../img/tileable-metal-texture-1_v2.png) 50% 50% repeat #A36200;*/
-    background: #4c8db2;
-    color: #fcfbf9;
-}
-.resourceNodeBox.opened a{
-    color: #fcfbf9;
-}
-.resourceNodeBox.opened a:hover{
-    color: #000;
-}
 /* Properties */
 
 #nodeOpenedContentTabs .property-value-normal{

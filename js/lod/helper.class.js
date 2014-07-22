@@ -98,4 +98,10 @@ var Helper = new function(){
         return regexp.test(s);
     }
 
+    this.getImgSrc = function(uri) {
+        return '<img src="' + uri + '"/>' ;
+            //+ '" style=width:' + Profile.imageWidth + ';height:' + Profile.imageHeight +
+            //';margin-bottom:32px;position:relative;" />'
+    }
+
 };

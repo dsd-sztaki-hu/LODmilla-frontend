@@ -12,7 +12,6 @@
  */
 var Profile = new function() {
 
-    this.zoomRatio = 1;
     this.graphSize = 5000;
 
     this.minNodeDistance = 150;
@@ -34,7 +33,7 @@ var Profile = new function() {
     this.defaultConnectionURI = "[EMPTY]";
     this.defaultConnectionsColor = "#056";
     this.highlightedConnectionsColor = "#f00";
-    this.connectorType = "Straight";
+    this.connectorType = "StateMachine";
     this.connectorStrokeStyle = "#5c96bc";
     this.connectorLineWidth = 2;
     this.connectorOutlineWidth = 4;
@@ -61,6 +60,9 @@ var Profile = new function() {
     this.searchMaxHits = 20;
     this.searchMaxTitleLen = 40;
     this.searchMinLength = 3;
+
+    this.imageWidth = "auto";
+    this.imageHeight = 42;
 
     this.propertyList = {};
 

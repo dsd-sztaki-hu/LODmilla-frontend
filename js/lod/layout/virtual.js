@@ -88,14 +88,16 @@ function addVirtualNodes(buffer, virtualWeight)
     for (var index in cc.inConns) {
         i = cc.inConns[index];
         if (i.pairs.length > 1) {
-            var v = buffer.addVertex(i.id, "virtual_" + virtualcounter++, virtualWeight, true, 0, 0);
+            var v = buffer.addVertex(i.id, "virtual_" + virtualcounter, virtualWeight, true, 0, 0, "virtual_" + virtualcounter++);
             var v_zero = buffer.getVertexById(i.pairs[0]);
             var center_left = v_zero.left, center_top = v_zero.top;
             var length = i.pairs.length;
+            var v_index = buffer.getVertexIndex(v);
             for (var index2 in i.pairs) {
-                var tindex = buffer.getVertexIndexById(i.pairs[index2]);
-                v.addConnection(tindex);
-                var d_v = buffer.getVertexByIndex(tindex);
+                //var tindex = buffer.getVertexIndexById(i.pairs[index2]);
+                var d_v = buffer.getVertexById(i.pairs[index2]);
+                buffer.addConnection(v.id, d_v.id);
+//                var d_v = buffer.getVertexByIndex(tindex);
                 center_left = (center_left + d_v.left) / 2.0; //this is not necessary for the first time
                 center_top = (center_top + d_v.top) / 2.0; //but a lot cleaner this way
             }
@@ -108,13 +110,44 @@ function addVirtualNodes(buffer, virtualWeight)
     for (var index in cc.outConns) {
         i = cc.outConns[index];
         if (i.pairs.length > 1) {
-            var v = buffer.addVertex(i.id, "virtual_" + virtualcounter++, virtualWeight, true, 0, 0);
-            var vindex = buffer.getVertexIndex(v);
+            var v = buffer.addVertex(i.id, "virtual_" + virtualcounter++, virtualWeight, true, 0, 0, "virtual_" + virtualcounter++);
             var v_zero = buffer.getVertexById(i.pairs[0]);
             var center_left = v_zero.left, center_top = v_zero.top;
             for (var index2 in i.pairs) {
                 var t = buffer.getVertexById(i.pairs[index2]);
-                t.addConnection(vindex);
+                buffer.addConnection(t.id, v.id);
+                center_left = (center_left + t.left) / 2.0;
+                center_top = (center_top + t.top) / 2.0;
+            }
+            v.left = center_left;
+            v.top = center_top;
+        }
+    }
+}
+
+function addVirtualTypeNodes(buffer, virtualWeight)
+{
+    //known unseen virtual points
+    //connection match from the database
+
+    var cc = new ConnectionCounter();
+    for (var index in Graph.nodes)
+    {
+        i = Graph.nodes[index];
+        cc.addOutgoingConnection(i.resource_id, i.type);
+    }
+    var virtualcounter = 0;
+    //add virtual nodes to the visible nodes
+    //outgoing connections
+    for (var index in cc.outConns) {
+        i = cc.outConns[index];
+        if (i.pairs.length > 1) {
+            var v = buffer.addVertex(i.id, "virtual_" + virtualcounter++, virtualWeight, true, 0, 0, "virtual_" + virtualcounter++);
+            var v_zero = buffer.getVertexById(i.pairs[0]);
+            var center_left = v_zero.left, center_top = v_zero.top;
+            for (var index2 in i.pairs) {
+                var t = buffer.getVertexById(i.pairs[index2]);
+                buffer.addConnection(t.id, v.id);
                 center_left = (center_left + t.left) / 2.0;
                 center_top = (center_top + t.top) / 2.0;
             }

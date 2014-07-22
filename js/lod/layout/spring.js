@@ -16,6 +16,7 @@
 function springLayout(buffer, steps, max_time,  min_distance, grid_distance, spring_strain, spring_length, spring_gravitation) {
     var start_time = Date.now();
     var max = 1;
+    var maxmin = 1;
     var min = spring_gravitation, min0 = spring_gravitation;
     var a_cc = 0;
     for (var i = 0; i < buffer.vertexes.length; i++) {
@@ -25,14 +26,16 @@ function springLayout(buffer, steps, max_time,  min_distance, grid_distance, spr
     a_cc++;
     a_cc /= buffer.vertexes.length;
 //    a_cc = a_cc * a_cc;
-    max = iterativeMaxDistance(max, spring_strain, spring_length, min, a_cc) * min_distance;
+    max = repulsiveMaxDistance(max, spring_strain, spring_length, min, a_cc) * min_distance;
+//    max = 1000;
     for (var i = 0; i < steps; i++) {
         if (Date.now() - start_time > max_time) break;
         if (Math.abs(min - min0) > min_distance) {
             min0 = min;
-            max = iterativeMaxDistance(max, spring_strain, spring_length, min, a_cc) * min_distance;
+            max = repulsiveMaxDistance(max, spring_strain, spring_length, min, a_cc) * min_distance;
         }
         min = calculateSpringStep(buffer, min_distance , spring_strain, spring_length, min, max);
+        if (max > maxmin) maxmin = max;
         setNewPosition(buffer, grid_distance, spring_strain, spring_length, min);
     }
     setVisiblePosition(buffer);
@@ -56,6 +59,11 @@ function iterativeMaxDistance(prev, spring_strain, spring_length, spring_gravita
     return ni;
 }
 
+function repulsiveMaxDistance(prev, spring_strain, spring_length, spring_gravitation, average_connection)
+{
+    return Math.pow(spring_gravitation / 10, 1/3);
+}
+
 function calculateSpringStep(buffer, min_distance, spring_strain, spring_length, spring_gravitation, max_distance)
 {
     var i,j;
@@ -67,7 +75,7 @@ function calculateSpringStep(buffer, min_distance, spring_strain, spring_length,
     var distance, distance2;
     var min_count = 0, max_count = 0, count = 0;
     var force_pull;
-//    var neighbour_factor = 1;
+    var neighbour_factor = 1;
     for (i = 0; i < i_length; i++)
     {
         i_node = buffer.getVertexByIndex(i);
@@ -81,7 +89,12 @@ function calculateSpringStep(buffer, min_distance, spring_strain, spring_length,
             j_node = buffer.getVertexByIndex(j);
             j_cc = j_node.targets.length + j_node.sources.length + 1;
             force_pull = i_cc == j_cc && buffer.areNeighbours(i, j);
-//            if (force_pull) {
+//            if (i_node.type == j_node.type) {
+//                force_pull = true;
+//                neighbour_factor = 2;
+//            }
+//            else
+//                neighbour_factor = 1;
 //                neighbour_factor += i_cc;
 ////                neighbour_factor = Math.sqrt(i_cc);
 //            }
@@ -95,18 +108,31 @@ function calculateSpringStep(buffer, min_distance, spring_strain, spring_length,
             d_left = Math.abs(i_node.left - j_node.left);
             d_top = Math.abs(i_node.top - j_node.top);
             distance2 = d_left * d_left + d_top * d_top;
-            if (distance2 < min_distance * min_distance) {
-                distance = min_distance;
+            if (d_left < min_distance * 0.75 && d_top < min_distance * 0.75) {
+                if (distance2 < 0.1) {
+                    distance2 = 1;
+                    distance = 1;
+                    d_left = 1;
+                    d_top = 1;
+                }
+                else {
+                    if (d_left < min_distance) d_left = min_distance;
+                    else d_top = min_distance;
+                    distance2 = d_left * d_left + d_top * d_top;
+                    distance = Math.sqrt(distance2);
+                }
                 min_count++;
             }
-            distance = Math.sqrt(distance2);
+            else
+            {
+                distance = Math.sqrt(distance2);
+            }
             if (i_node.targets.indexOf(j) > -1 || j_node.targets.indexOf(i) > -1 || force_pull)
             {
                 // pull
                 F = spring_strain * Math.log(distance / spring_length)
                     - spring_gravitation * d_cc / distance2;
                 F /= distance;
-//                F *= neighbour_factor;
                 F_left = F * d_left;
                 F_top = F * d_top;
                 F_i = F_left / i_node.weight / i_cc;
@@ -140,7 +166,7 @@ function calculateSpringStep(buffer, min_distance, spring_strain, spring_length,
             if (distance > max_distance)
             {
                 max_count++;
-                //continue;
+                continue;
             }
             F = spring_gravitation * d_cc / (distance2 * distance);
             F_left = F * d_left;
@@ -172,11 +198,17 @@ function calculateSpringStep(buffer, min_distance, spring_strain, spring_length,
             }
         }
     }
-    var ret = 1 + (min_count - max_count) / count;
+    var ret = 1 + (min_count - Math.log(max_count + 1)) / count;
+    ret = ret * spring_gravitation;
+    //if (ret > 40000)
+        //return 40000;
+    //else
+    if (ret < min_distance)
+        return min_distance;
 //    if (spring_gravitation > 100000)
 //        ret = ret;
     //if (ret < 1) return spring_gravitation;
-    return spring_gravitation * ret;
+    return ret;
 }
 
 function setNewPosition(buffer, min_distance, spring_strain, spring_length, spring_gravitation)

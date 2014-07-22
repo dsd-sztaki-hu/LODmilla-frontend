@@ -26,7 +26,7 @@ function applyLayout(layoutType)
             gridLayout();
             break;
         case LayoutEnum.SPRING:
-            springLayout(buffer, 10000, 30000, 100, 100, 1, 1, 1);
+            springLayout(buffer, 10000, 10000, 100, 100, 1, 1, 10000);
             break;
         default :
             console.log("Wrong layout type.");
@@ -43,7 +43,7 @@ function initLayout(name, buffer, useVirtual, weight, virtualWeight)
     for (var index in Graph.nodes)
     {
         var act = Graph.nodes[index];
-        buffer.addVertex(act.resource_id, act.label, weight, false, act.left, act.top);
+        buffer.addVertex(act.resource_id, act.label, weight, false, act.left, act.top, act.type);
     }
     console.timeEnd("Loading nodes to buffer");
     console.time("Loading edges to buffer");
@@ -57,7 +57,8 @@ function initLayout(name, buffer, useVirtual, weight, virtualWeight)
     console.timeEnd("Loading edges to buffer");
     if (useVirtual) {
         console.time("Loading virtual nodes to buffer");
-        addVirtualNodes(buffer, virtualWeight);
+        addVirtualTypeNodes(buffer, virtualWeight);
+//        addVirtualNodes(buffer, virtualWeight);
         console.timeEnd("Loading virtual nodes to buffer");
     }
 
