@@ -832,33 +832,110 @@ Graph.vis_engineInit = function() {
     Graph.canvas.bind('mousewheel', function(event, delta) {
 //        var dir = delta > 0 ? 'Up' : 'Down';
 //        var vel = Math.abs(delta);
-        if (delta > 0) Graph.zoomRatio += 0.1;
-        else if (Graph.zoomRatio > 0.701) Graph.zoomRatio -= 0.1; //float
-        console.log(Graph.zoomRatio);
+        if (delta > 0)
+        {
+            if (Graph.zoomRatio > 0.601)
+                Graph.zoomRatio += 0.1000; //normal
+            else if (Graph.zoomRatio > 0.4000)
+                Graph.zoomRatio = 0.7000; //small to normal
+            else Graph.zoomRatio = 0.5000; //label to small
+        }
+        else
+        {
+            if (Graph.zoomRatio > 0.701)
+                Graph.zoomRatio -= 0.1000; //normal
+            else if (Graph.zoomRatio > 0.501)
+                Graph.zoomRatio = 0.5000; //normal to small
+            else Graph.zoomRatio = 0.3000; //small to label
+        }
+//        console.log(Graph.zoomRatio);
+        zoom(Graph.zoomRatio);
 
-        $('.resourceNodeBox').each(function() {
-            var vis_node = $(this);
-            var position = vis_node.position();
-            var node = Graph.getNode(this.getAttribute('uri'));
-            vis_node.css('left', $(document).scrollLeft() + event.clientX + (node.left - $(document).scrollLeft() - event.clientX) * Graph.zoomRatio);
-            vis_node.css('top', $(document).scrollTop() + event.clientY  + (node.top - $(document).scrollTop() - event.clientY) * Graph.zoomRatio);
+
+        return false;
+    });
+};
+
+function zoom(ratio)
+{
+    if (ratio > 0.699) zoomNormal();
+    else if (ratio > 0.499) zoomSmall();
+    else if (ratio > -0.001) zoomLabel();
+}
+
+function zoomNormal()
+{
+    console.log('normal: ' + Graph.zoomRatio);
+    $('.resourceNodeBox').each(function() {
+        var vis_node = $(this);
+        var position = vis_node.position();
+        var node = Graph.getNode(this.getAttribute('uri'));
+        vis_node.css('left', $(document).scrollLeft() + event.clientX + (node.left - $(document).scrollLeft() - event.clientX) * Graph.zoomRatio);
+        vis_node.css('top', $(document).scrollTop() + event.clientY  + (node.top - $(document).scrollTop() - event.clientY) * Graph.zoomRatio);
 //            if (Graph.zoomRatio <= 1.0) {
-            vis_node.css('width', node.width * Graph.zoomRatio);
-            vis_node.css('height', node.height * Graph.zoomRatio);
-            vis_node.find('.nodeImage img').css('max-height', 75 * Graph.zoomRatio - 36); //perfect
+        vis_node.css('width', node.width * Graph.zoomRatio);
+        vis_node.css('height', node.height * Graph.zoomRatio);
+        vis_node.find('.nodeImage img').css('visibility', 'visible').css('max-height', 75 * Graph.zoomRatio - 36); //perfect
 //            vis_node.find('.resourceLabel').css('max-height', 30 * Graph.zoomRatio);
 //            var img2 = this.find('.nodeImage img');
 
 //            }
 //            jsPlumbInstance.animate(this, {'top': node.top + 'px', 'left': node.left + 'px'});
-        });
-        $('.resourceNodeBox').each(function() {
-            jsPlumbInstance.repaint(this);
-        });
-
-        return false;
     });
-};
+    $('.resourceNodeBox').each(function() {
+        jsPlumbInstance.repaint(this);
+    });
+}
+
+function zoomSmall()
+{
+    console.log('small: ' + Graph.zoomRatio);
+    $('.resourceNodeBox').each(function() {
+        var vis_node = $(this);
+        var node = Graph.getNode(this.getAttribute('uri'));
+        vis_node.css('left', $(document).scrollLeft() + event.clientX + (node.left - $(document).scrollLeft() - event.clientX) * 0.7000);
+        vis_node.css('top', $(document).scrollTop() + event.clientY  + (node.top - $(document).scrollTop() - event.clientY) * Graph.zoomRatio);
+        vis_node.css('width', node.width * 0.7000);
+        vis_node.css('height', node.height * Graph.zoomRatio);
+        vis_node.css('padding', '0.5em').css('padding-top', '2em').css('padding-bottom', '1.5em');
+        vis_node.find('.nodeImage img').css('visibility', 'hidden');
+        vis_node.find('.endpointLink').css('visibility', 'visible');
+        vis_node.find('.node-button.node-highlight').css('visibility', 'visible');
+        vis_node.find('.node-button.node-delete').css('visibility', 'visible');
+        vis_node.find('.node-button.node-open').css('visibility', 'visible');
+        vis_node.find('.node-button.node-hide').css('visibility', 'visible');
+        vis_node.find('.node-connection-source').css('visibility', 'visible');
+        vis_node.find('.resourceLabel').css('position', 'relative').css('top','0px').css('max-height','30px');
+    });
+    $('.resourceNodeBox').each(function() {
+        jsPlumbInstance.repaint(this);
+    });
+}
+
+function zoomLabel()
+{
+    console.log('tiny: ' + Graph.zoomRatio);
+    $('.resourceNodeBox').each(function() {
+        var vis_node = $(this);
+        var node = Graph.getNode(this.getAttribute('uri'));
+        vis_node.css('left', $(document).scrollLeft() + event.clientX + (node.left - $(document).scrollLeft() - event.clientX) * 0.7000);
+        vis_node.css('top', $(document).scrollTop() + event.clientY  + (node.top - $(document).scrollTop() - event.clientY) * Graph.zoomRatio);
+        vis_node.css('width', node.width * 0.7000);
+        vis_node.css('height', node.height * Graph.zoomRatio);
+        vis_node.css('padding', '5px');
+        vis_node.find('.nodeImage img');
+        vis_node.find('.endpointLink').css('visibility', 'hidden');
+        vis_node.find('.node-button.node-highlight').css('visibility', 'hidden');
+        vis_node.find('.node-button.node-delete').css('visibility', 'hidden');
+        vis_node.find('.node-button.node-open').css('visibility', 'hidden');
+        vis_node.find('.node-button.node-hide').css('visibility', 'hidden');
+        vis_node.find('.node-connection-source').css('visibility', 'hidden');
+        vis_node.find('.resourceLabel').css('position', 'absolute').css('top','10%').css('max-height','90%');
+    });
+    $('.resourceNodeBox').each(function() {
+        jsPlumbInstance.repaint(this);
+    });
+}
 
 Graph.vis_highlight = function(selector, edgehl) {    
     $(selector).addClass("highlighted");

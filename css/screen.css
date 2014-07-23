@@ -167,7 +167,7 @@ body {
     max-height: 30px;
     overflow: hidden;
     text-align: center;
-    width: auto;
+    width: 90%;
 }
 
 .resourceNodeBox .node-hide{
@@ -462,6 +462,15 @@ a:hover {
     /*border-color: #dcc8a9;*/
     border-color: #c8c8c8;
 }
+
+#logowrap {
+    z-index: 201;
+}
+
+.buttonWrap {
+    z-index: 200;
+}
+
 .buttonWrap button{
     background-color: #4C8DB2;
     color: #fff;

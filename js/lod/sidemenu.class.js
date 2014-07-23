@@ -484,6 +484,10 @@ var Sidemenu = new function() {
         self.buttonUndo = $('<div class="buttonWrap"><button id="undoButton" title="Undo last action">Undo</button></div>');
         parent.append(self.buttonUndo);
 
+        // EXPORT selected button
+        self.buttonExport = $('<div class="buttonWrap"><button id="exportButton" title="Export graph to CSV">Export</button></div>');
+        parent.append(self.buttonExport);
+
         // edit mode button
 //        self.buttonEdit = $('<div class="buttonWrap"><button id="editButton" title="Edit mode">Edit mode</button></div>')
 //        parent.append(self.buttonEdit);
@@ -496,7 +500,7 @@ var Sidemenu = new function() {
         self.logoWrap = $('<div id="logowrap"><div id="logo"><a href="http://www.sztaki.hu" target="_blank"><img src="img/SZTAKI_logo_2012_small_RGB.png" width="94" height="50" /></a></div></div>');
         parent.append(self.logoWrap);
 
-        $("#loadGraphButton, #saveGraphButton, #myEditsButton, #clearGraphButton, #deleteSelectedButton, #undoButton, #editButton").button();
+        $("#loadGraphButton, #saveGraphButton, #myEditsButton, #clearGraphButton, #deleteSelectedButton, #undoButton, #exportButtton, #editButton").button();
 
         self.buttonLoad.position({my: "left bottom", at: "left+10 bottom-10", of: window});
         self.buttonSave.position({my: "left bottom", at: "right bottom", of: self.buttonLoad});
@@ -504,6 +508,7 @@ var Sidemenu = new function() {
         self.buttonClear.position({my: "left bottom", at: "right bottom", of: self.buttonMyEdits});
         self.buttonDeleteSelected.position({my: "left bottom", at: "right bottom", of: self.buttonClear});
         self.buttonUndo.position({my: "left bottom", at: "right bottom", of: self.buttonDeleteSelected});
+        self.buttonExport.position({my: "left bottom", at: "right bottom", of: self.buttonExport});
 //        self.buttonEdit.position({my: "left bottom", at: "right bottom", of: self.buttonUndo});
         self.buttonHelp.position({my: "right bottom", at: "right-5 bottom-5", of: window});
         self.logoWrap.position({my: "left bottom", at: "left top", of: self.buttonLoad});
@@ -516,6 +521,7 @@ var Sidemenu = new function() {
             self.buttonClear.position({my: "left bottom", at: "right bottom", of: self.buttonMyEdits});
             self.buttonDeleteSelected.position({my: "left bottom", at: "right bottom", of: self.buttonClear});
             self.buttonUndo.position({my: "left bottom", at: "right bottom", of: self.buttonDeleteSelected});
+            self.buttonExport.position({my: "left bottom", at: "right bottom", of: self.buttonExport});
 //            self.buttonEdit.position({my: "left bottom", at: "right bottom", of: self.buttonUndo});
             self.buttonHelp.position({my: "right bottom", at: "right-5 bottom-5", of: window});
             self.logoWrap.position({my: "left bottom", at: "left top", of: self.buttonLoad});
