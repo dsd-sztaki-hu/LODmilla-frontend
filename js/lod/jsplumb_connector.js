@@ -9,6 +9,8 @@
 
 // TODO: attenni a nem ide illo fv-eket, nem jsPlumb related..plusz kodot rendezni refactor
 
+var fancyBoxOpen = true;
+
 vis_get_visibleCanvasRandomPosition = function(aroundNode){
     var top, left;
     if (!aroundNode){
@@ -717,7 +719,8 @@ vis_jsPlumbInstance_connect_uri = function(uri1, uri2, connection) {
     aConnection.addOverlay(["Label", {
         cssClass: "connectionBox label opacityItem",
         label: labelShort,
-        location: Profile.connectionLabelLocation
+        location: Profile.connectionLabelLocation,
+        id: "label"
     }]);
     aConnection.addOverlay(["PlainArrow", {
             location: Profile.connectionArrowLocation,
@@ -775,23 +778,49 @@ Graph.vis_engineInit = function() {
 
     window.scrollTo((Profile.graphSize - $(window).width()) / 2, (Profile.graphSize - $(window).height()) / 2);
 
+//prevent link opening with CTRL
+    Graph.canvas[0].onclick = function(event) {
+        if (event.ctrlKey || Graph.zoomRatio < 0.701)
+        {
+            event.preventDefault();
+            if ($(event.target).is('.fancybox')) fancyBoxOpen = false;
+            return;
+        }
+        else
+            fancyBoxOpen = true;
+    }
+
     /** Pan **/
     Graph.canvas[0].onmousedown = function(event) {
 //        console.log(event.target)
         // if node connection label is dragged
-        if ($(event.target).is('.connectionBox.label *, .connectionBox.label')) {
+        var event_target = $(event.target);
+        if (event_target.is('.connectionBox.label *, .connectionBox.label')) {
             return false;
         }
         // if node endpoint is dragged
-        if ($(event.target).is('rect *, rect')) {
+        if (event_target.is('rect *, rect')) {
             return false;
         }
         // if node source endpoint is dragged
-        if ($(event.target).is('circle *, circle')) {
+        if (event_target.is('circle *, circle')) {
             return false;
         }
-        // if node is dragged
-        if ($(event.target).is('.resourceNodeBox *, .resourceNodeBox')) {
+//        if node is dragged
+        if (event_target.is('.resourceNodeBox'))
+        {
+            var tmp = event_target[0].getAttribute('uri');
+            var node = Graph.getNode(tmp);
+            $(this).data('x', event.clientX)
+                .data('y', event.clientY).data('sourceID',node.resource_id);
+            return false;
+        }
+        if (event_target.is('.resourceNodeBox *')) {
+            var parent_node = event_target.parent('.resourceNodeBox');
+            var tmp = parent_node[0].getAttribute('uri');
+            var node = Graph.getNode(tmp);
+            $(this).data('x', event.clientX)
+                .data('y', event.clientY).data('sourceID',node.resource_id);
             return false;
         }
         $(this)
@@ -803,6 +832,7 @@ Graph.vis_engineInit = function() {
     };
 
     Graph.canvas[0].onmouseup = function(event) {
+        if (event.ctrlKey) return;
         if ($(this).data('down') === true) {
             $(this).data('down', false);
             var xoffset = $(this).data('x') - event.clientX;
@@ -822,10 +852,49 @@ Graph.vis_engineInit = function() {
 //                });
             });
             $('.resourceNodeBox').each(function() {
+
+            });
+            return false;
+        }
+        var enter_if = false;
+        var source_node =$(this);
+        var event_target = $(event.target);
+        if (event_target.is('.resourceNodeBox'))
+            enter_if = event_target.find('.node-highlight').hasClass('opened');
+        else if (event_target.is('.resourceNodeBox *'))
+        {
+            enter_if = source_node.find('.node-highlight').hasClass('opened');
+        }
+        if (enter_if) {
+            var xoffset = source_node.data('x') - event.clientX;
+            var yoffset = source_node.data('y') - event.clientY;
+
+            $('.resourceNodeBox').each(function() {
+                var vis_node = $(this);
+
+                if (!vis_node.find('.node-highlight').hasClass('opened')) return;
+                var position = vis_node.position();
+                var node = Graph.getNode(this.getAttribute('uri'));
+                if (node.resource_id == source_node.data('sourceID'))
+                {
+                    return;
+                }
+                node.top = position['top'] - yoffset;
+                node.left = position['left'] - xoffset;
+
+                vis_node.css('left', node.left);
+                vis_node.css('top', node.top);
+//                $(this).animate({'top': node.top + 'px', 'left': node.left + 'px'}, 0, function() {
+//                    jsPlumbInstance.repaint($(this));
+//                });
+            });
+            $('.resourceNodeBox').each(function() {
                 jsPlumbInstance.repaint(this);
             });
+            return false;
         }
         //console.log("UP");
+//        jsPlumbInstance.repaint(this);
         return false;
     };
     /* zoom */

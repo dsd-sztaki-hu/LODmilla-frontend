@@ -95,7 +95,10 @@ $(document).ready(function() {
         }
 
         $(".fancybox").fancybox({
-            'type':'image'
+            'type':'image',
+            beforeLoad: function() {
+                return fancyBoxOpen;
+            }
         });
 
     });

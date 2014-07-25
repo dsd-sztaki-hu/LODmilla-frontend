@@ -601,11 +601,30 @@ addBottomMenuHandlers = function(){
     $("body").on('click', '#main .buttonWrap #undoButton', function(event) {
         Graph.undo();
     });
+
+    $("body").on('click', '#main .buttonWrap #exportButton', function(event) {
+        exportToDot();
+        console.log('exported');
+    });
 };
 
 addNodeHandlers = function(){
+    $("body").on('click', '#main #graph .resourceNodeBox', function(event) {
+        if (event.ctrlKey) {
+            var resource_id = this.getAttribute('uri');
+            var act = $(this);
+            if (Graph.getNode(resource_id).type !== Profile.unloadedNodeType) {
+                if (act.find('.node-highlight').hasClass('opened'))
+                    Graph.removeHighlight(act);
+                else
+                    Graph.highlight(act, 2);
+            }
+        }
+    });
+
     $("body").on('click', '#main #graph .resourceNodeBox .node-highlight', function(event) {
-        var resource_id = this.parentNode.getAttribute('uri');
+        if (event.ctrlKey) return;
+            var resource_id = this.parentNode.getAttribute('uri');
         if (Graph.getNode(resource_id).type !== Profile.unloadedNodeType){
             if ($(this).hasClass('opened'))
                 Graph.removeHighlight($(this).parent());
@@ -615,6 +634,7 @@ addNodeHandlers = function(){
     });
 
     $("body").on('click', '#main #graph .resourceNodeBox .node-hide', function(event) {
+        if (event.ctrlKey) return;
         var resource_id = this.parentNode.getAttribute('uri');
         if (Graph.getNode(resource_id).type !== Profile.unloadedNodeType){
             var node = $('div.resourceNodeBox[uri="' + resource_id + '"]');
@@ -640,6 +660,7 @@ addNodeHandlers = function(){
     });
 
     $("body").on('click', '#main #graph .resourceNodeBox .node-delete', function(event) {
+        if (event.ctrlKey) return;
         var resource_id = this.parentNode.getAttribute('uri');
         if (Graph.getNode(resource_id).type !== Profile.unloadedNodeType){
             var node_id = this.parentNode.getAttribute('id');
@@ -669,6 +690,7 @@ addNodeHandlers = function(){
     });
 
     $("body").on('click', '#main #graph .resourceNodeBox .node-open', function(event) {
+        if (event.ctrlKey) return;
         var resource_id = this.parentNode.getAttribute('uri');
         if (Graph.getNode(resource_id).type !== Profile.unloadedNodeType){
             var node = Graph.getNode(this.parentNode.getAttribute('uri'));
