@@ -816,7 +816,7 @@ Graph.vis_engineInit = function() {
             return false;
         }
         if (event_target.is('.resourceNodeBox *')) {
-            var parent_node = event_target.parent('.resourceNodeBox');
+            var parent_node = event_target.closest('.resourceNodeBox');
             var tmp = parent_node[0].getAttribute('uri');
             var node = Graph.getNode(tmp);
             $(this).data('x', event.clientX)
