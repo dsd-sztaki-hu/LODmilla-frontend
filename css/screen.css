@@ -588,3 +588,9 @@ h3.ui-accordion-header, .ui-widget-header {
 #myedits-list .myedits-parent span{
     cursor: pointer;
 }
+
+.selection-box {
+    position:    absolute;
+    background: transparent;
+    border:     1px dotted #000;
+}

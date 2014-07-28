@@ -10,6 +10,11 @@
 // TODO: attenni a nem ide illo fv-eket, nem jsPlumb related..plusz kodot rendezni refactor
 
 var fancyBoxOpen = true;
+var rectangleSelection = false;
+var selectionWidth = 0, selectionHeight = 0;
+var selectionLeft = 0, selectionTop = 0;
+var selectionOriginalLeft = 0, selectionOriginalTop = 0;
+var selectedID = -1, selectedIsHighlighted = false;
 
 vis_get_visibleCanvasRandomPosition = function(aroundNode){
     var top, left;
@@ -807,20 +812,26 @@ Graph.vis_engineInit = function() {
             return false;
         }
 //        if node is dragged
-        if (event_target.is('.resourceNodeBox'))
+        if (event_target.is('.resourceNodeBox, .resourceNodeBox *'))
         {
-            var tmp = event_target[0].getAttribute('uri');
-            var node = Graph.getNode(tmp);
+            var tmp_node;
+            if (event_target.is('.resourceNodeBox *')) tmp_node = event_target.closest('.resourceNodeBox');
+            else tmp_node = event_target;
+            var tmp_uri = tmp_node[0].getAttribute('uri');
+            var node = Graph.getNode(tmp_uri);
+            selectedIsHighlighted = tmp_node.find('.node-highlight').hasClass('opened');
             $(this).data('x', event.clientX)
-                .data('y', event.clientY).data('sourceID',node.resource_id);
+                .data('y', event.clientY);
+            selectedID = node.resource_id;
             return false;
         }
-        if (event_target.is('.resourceNodeBox *')) {
-            var parent_node = event_target.closest('.resourceNodeBox');
-            var tmp = parent_node[0].getAttribute('uri');
-            var node = Graph.getNode(tmp);
-            $(this).data('x', event.clientX)
-                .data('y', event.clientY).data('sourceID',node.resource_id);
+        if (event.ctrlKey)
+        {
+            $(this).append('<div class="selection-box" top=' + event.pageX + "px " +
+                "left=" + event.pageY + 'px width = "0px" height = "0px" />');
+            selectionOriginalLeft = event.pageX;
+            selectionOriginalTop = event.pageY;
+            rectangleSelection = true;
             return false;
         }
         $(this)
@@ -831,7 +842,45 @@ Graph.vis_engineInit = function() {
         return false;
     };
 
+    Graph.canvas[0].onmousemove = function(event) {
+        //source http://jsbin.com/ireqix/226
+        if (!rectangleSelection) return;
+        var canvas = $(this);
+
+        selectionWidth  = Math.abs(selectionOriginalLeft - event.pageX);
+        selectionHeight = Math.abs(selectionOriginalTop - event.pageY);
+
+        selectionLeft = (selectionOriginalLeft < event.pageX) ? (event.pageX - selectionWidth) : event.pageX;
+        selectionTop = (selectionOriginalTop < event.pageY) ? (event.pageY - selectionHeight) : event.pageY;
+
+        $('.selection-box').css({
+            'width': selectionWidth,
+            'height': selectionHeight,
+            'top': selectionTop,
+            'left': selectionLeft
+        });
+    }
+
     Graph.canvas[0].onmouseup = function(event) {
+        if (rectangleSelection) {
+            $('.resourceNodeBox').each(function() {
+                var vis_node = $(this);
+                var position = vis_node.position();
+                if (position['top'] > selectionLeft &&
+                    position['left'] > selectionTop &&
+                    position['top'] < selectionLeft + selectionWidth &&
+                    position['left'] < selectionTop + selectionHeight)
+                {
+                    var resource_id = this.getAttribute('uri');
+                    if (!vis_node.find('.node-highlight').hasClass('opened') &&
+                        Graph.getNode(resource_id).type !== Profile.unloadedNodeType)
+                            Graph.highlight(vis_node, 2);
+                }
+            });
+            $('.selection-box').remove();
+            rectangleSelection = false;
+            return;
+        }
         if (event.ctrlKey) return;
         if ($(this).data('down') === true) {
             $(this).data('down', false);
@@ -852,22 +901,17 @@ Graph.vis_engineInit = function() {
 //                });
             });
             $('.resourceNodeBox').each(function() {
-
+                jsPlumbInstance.repaint(this);
             });
             return false;
         }
-        var enter_if = false;
-        var source_node =$(this);
+        var $canvas = $(this);
         var event_target = $(event.target);
-        if (event_target.is('.resourceNodeBox'))
-            enter_if = event_target.find('.node-highlight').hasClass('opened');
-        else if (event_target.is('.resourceNodeBox *'))
-        {
-            enter_if = source_node.find('.node-highlight').hasClass('opened');
-        }
-        if (enter_if) {
-            var xoffset = source_node.data('x') - event.clientX;
-            var yoffset = source_node.data('y') - event.clientY;
+        var f1 = event_target.is('.resourceNodeBox, .resourceNodeBox *');
+        var f2 = selectedIsHighlighted;
+        if (f1 && f2) {
+            var xoffset = $canvas.data('x') - event.clientX;
+            var yoffset = $canvas.data('y') - event.clientY;
 
             $('.resourceNodeBox').each(function() {
                 var vis_node = $(this);
@@ -875,7 +919,7 @@ Graph.vis_engineInit = function() {
                 if (!vis_node.find('.node-highlight').hasClass('opened')) return;
                 var position = vis_node.position();
                 var node = Graph.getNode(this.getAttribute('uri'));
-                if (node.resource_id == source_node.data('sourceID'))
+                if (node.resource_id == selectedID)
                 {
                     return;
                 }
