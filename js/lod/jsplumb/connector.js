@@ -15,6 +15,8 @@ var selectionWidth = 0, selectionHeight = 0;
 var selectionLeft = 0, selectionTop = 0;
 var selectionOriginalLeft = 0, selectionOriginalTop = 0;
 var selectedID = -1, selectedIsHighlighted = false;
+var mouseDown = false;
+var mousePositionLeft = 0, mousePositionTop = 0;
 
 vis_get_visibleCanvasRandomPosition = function(aroundNode){
     var top, left;
@@ -797,6 +799,8 @@ Graph.vis_engineInit = function() {
 
     /** Pan **/
     Graph.canvas[0].onmousedown = function(event) {
+        mouseDown = true;
+        jsPlumbInstance.setSuspendDrawing(true);
 //        console.log(event.target)
         // if node connection label is dragged
         var event_target = $(event.target);
@@ -820,8 +824,8 @@ Graph.vis_engineInit = function() {
             var tmp_uri = tmp_node[0].getAttribute('uri');
             var node = Graph.getNode(tmp_uri);
             selectedIsHighlighted = tmp_node.find('.node-highlight').hasClass('opened');
-            $(this).data('x', event.clientX)
-                .data('y', event.clientY);
+            mousePositionLeft = event.pageX;
+            mousePositionTop = event.pageY;
             selectedID = node.resource_id;
             return false;
         }
@@ -844,32 +848,40 @@ Graph.vis_engineInit = function() {
 
     Graph.canvas[0].onmousemove = function(event) {
         //source http://jsbin.com/ireqix/226
-        if (!rectangleSelection) return;
-        var canvas = $(this);
+//        if (event.ctrlKey) return;
+        if (rectangleSelection) {
+            selectionWidth = Math.abs(selectionOriginalLeft - event.pageX);
+            selectionHeight = Math.abs(selectionOriginalTop - event.pageY);
 
-        selectionWidth  = Math.abs(selectionOriginalLeft - event.pageX);
-        selectionHeight = Math.abs(selectionOriginalTop - event.pageY);
+            selectionLeft = (selectionOriginalLeft < event.pageX) ? (event.pageX - selectionWidth) : event.pageX;
+            selectionTop = (selectionOriginalTop < event.pageY) ? (event.pageY - selectionHeight) : event.pageY;
 
-        selectionLeft = (selectionOriginalLeft < event.pageX) ? (event.pageX - selectionWidth) : event.pageX;
-        selectionTop = (selectionOriginalTop < event.pageY) ? (event.pageY - selectionHeight) : event.pageY;
-
-        $('.selection-box').css({
-            'width': selectionWidth,
-            'height': selectionHeight,
-            'top': selectionTop,
-            'left': selectionLeft
-        });
+            $('.selection-box').css({
+                'width': selectionWidth,
+                'height': selectionHeight,
+                'top': selectionTop,
+                'left': selectionLeft
+            });
+        }
+        else
+        {
+            if (mouseDown && selectedIsHighlighted && $(event.target).is('.resourceNodeBox, .resourceNodeBox *')) {
+                moveNodesExcept(event);
+//                setTimeout(repaintNodes, 1000);
+            }
+        }
     }
 
     Graph.canvas[0].onmouseup = function(event) {
+        mouseDown = false;
         if (rectangleSelection) {
             $('.resourceNodeBox').each(function() {
                 var vis_node = $(this);
                 var position = vis_node.position();
-                if (position['top'] > selectionLeft &&
-                    position['left'] > selectionTop &&
-                    position['top'] < selectionLeft + selectionWidth &&
-                    position['left'] < selectionTop + selectionHeight)
+                if (position['left'] > selectionLeft &&
+                    position['top'] > selectionTop &&
+                    position['left'] < selectionLeft + selectionWidth &&
+                    position['top'] < selectionTop + selectionHeight)
                 {
                     var resource_id = this.getAttribute('uri');
                     if (!vis_node.find('.node-highlight').hasClass('opened') &&
@@ -882,64 +894,34 @@ Graph.vis_engineInit = function() {
             return;
         }
         if (event.ctrlKey) return;
-        if ($(this).data('down') === true) {
-            $(this).data('down', false);
-            var xoffset = $(this).data('x') - event.clientX;
-            var yoffset = $(this).data('y') - event.clientY;
-
-            $('.resourceNodeBox').each(function() {
-                var vis_node = $(this);
-                var position = vis_node.position();
-                var node = Graph.getNode(this.getAttribute('uri'));
-                node.top = position['top'] - yoffset;
-                node.left = position['left'] - xoffset;
-
-                vis_node.css('left', node.left);
-                vis_node.css('top', node.top);
-//                $(this).animate({'top': node.top + 'px', 'left': node.left + 'px'}, 0, function() {
-//                    jsPlumbInstance.repaint($(this));
-//                });
-            });
-            $('.resourceNodeBox').each(function() {
-                jsPlumbInstance.repaint(this);
-            });
-            return false;
-        }
         var $canvas = $(this);
-        var event_target = $(event.target);
-        var f1 = event_target.is('.resourceNodeBox, .resourceNodeBox *');
-        var f2 = selectedIsHighlighted;
-        if (f1 && f2) {
+        if ($canvas.data('down') === true) {
+            $canvas.data('down', false);
             var xoffset = $canvas.data('x') - event.clientX;
             var yoffset = $canvas.data('y') - event.clientY;
 
             $('.resourceNodeBox').each(function() {
                 var vis_node = $(this);
-
-                if (!vis_node.find('.node-highlight').hasClass('opened')) return;
                 var position = vis_node.position();
                 var node = Graph.getNode(this.getAttribute('uri'));
-                if (node.resource_id == selectedID)
-                {
-                    return;
-                }
+
                 node.top = position['top'] - yoffset;
                 node.left = position['left'] - xoffset;
 
                 vis_node.css('left', node.left);
                 vis_node.css('top', node.top);
-//                $(this).animate({'top': node.top + 'px', 'left': node.left + 'px'}, 0, function() {
-//                    jsPlumbInstance.repaint($(this));
-//                });
             });
-            $('.resourceNodeBox').each(function() {
-                jsPlumbInstance.repaint(this);
-            });
+//            repaintNodes();
             return false;
         }
-        //console.log("UP");
-//        jsPlumbInstance.repaint(this);
+
+        if ($(event.target).is('.resourceNodeBox, .resourceNodeBox *') && selectedIsHighlighted) {
+            moveNodesExcept(event);
+//            repaintNodes();
+        }
+        jsPlumbInstance.setSuspendDrawing(false,true);
         return false;
+
     };
     /* zoom */
     Graph.canvas.bind('mousewheel', function(event, delta) {
@@ -968,87 +950,6 @@ Graph.vis_engineInit = function() {
         return false;
     });
 };
-
-function zoom(ratio)
-{
-    if (ratio > 0.699) zoomNormal();
-    else if (ratio > 0.499) zoomSmall();
-    else if (ratio > -0.001) zoomLabel();
-}
-
-function zoomNormal()
-{
-    console.log('normal: ' + Graph.zoomRatio);
-    $('.resourceNodeBox').each(function() {
-        var vis_node = $(this);
-        var position = vis_node.position();
-        var node = Graph.getNode(this.getAttribute('uri'));
-        vis_node.css('left', $(document).scrollLeft() + event.clientX + (node.left - $(document).scrollLeft() - event.clientX) * Graph.zoomRatio);
-        vis_node.css('top', $(document).scrollTop() + event.clientY  + (node.top - $(document).scrollTop() - event.clientY) * Graph.zoomRatio);
-//            if (Graph.zoomRatio <= 1.0) {
-        vis_node.css('width', node.width * Graph.zoomRatio);
-        vis_node.css('height', node.height * Graph.zoomRatio);
-        vis_node.find('.nodeImage img').css('visibility', 'visible').css('max-height', 75 * Graph.zoomRatio - 36); //perfect
-//            vis_node.find('.resourceLabel').css('max-height', 30 * Graph.zoomRatio);
-//            var img2 = this.find('.nodeImage img');
-
-//            }
-//            jsPlumbInstance.animate(this, {'top': node.top + 'px', 'left': node.left + 'px'});
-    });
-    $('.resourceNodeBox').each(function() {
-        jsPlumbInstance.repaint(this);
-    });
-}
-
-function zoomSmall()
-{
-    console.log('small: ' + Graph.zoomRatio);
-    $('.resourceNodeBox').each(function() {
-        var vis_node = $(this);
-        var node = Graph.getNode(this.getAttribute('uri'));
-        vis_node.css('left', $(document).scrollLeft() + event.clientX + (node.left - $(document).scrollLeft() - event.clientX) * 0.7000);
-        vis_node.css('top', $(document).scrollTop() + event.clientY  + (node.top - $(document).scrollTop() - event.clientY) * Graph.zoomRatio);
-        vis_node.css('width', node.width * 0.7000);
-        vis_node.css('height', node.height * Graph.zoomRatio);
-        vis_node.css('padding', '0.5em').css('padding-top', '2em').css('padding-bottom', '1.5em');
-        vis_node.find('.nodeImage img').css('visibility', 'hidden');
-        vis_node.find('.endpointLink').css('visibility', 'visible');
-        vis_node.find('.node-button.node-highlight').css('visibility', 'visible');
-        vis_node.find('.node-button.node-delete').css('visibility', 'visible');
-        vis_node.find('.node-button.node-open').css('visibility', 'visible');
-        vis_node.find('.node-button.node-hide').css('visibility', 'visible');
-        vis_node.find('.node-connection-source').css('visibility', 'visible');
-        vis_node.find('.resourceLabel').css('position', 'relative').css('top','0px').css('max-height','30px');
-    });
-    $('.resourceNodeBox').each(function() {
-        jsPlumbInstance.repaint(this);
-    });
-}
-
-function zoomLabel()
-{
-    console.log('tiny: ' + Graph.zoomRatio);
-    $('.resourceNodeBox').each(function() {
-        var vis_node = $(this);
-        var node = Graph.getNode(this.getAttribute('uri'));
-        vis_node.css('left', $(document).scrollLeft() + event.clientX + (node.left - $(document).scrollLeft() - event.clientX) * 0.7000);
-        vis_node.css('top', $(document).scrollTop() + event.clientY  + (node.top - $(document).scrollTop() - event.clientY) * Graph.zoomRatio);
-        vis_node.css('width', node.width * 0.7000);
-        vis_node.css('height', node.height * Graph.zoomRatio);
-        vis_node.css('padding', '5px');
-        vis_node.find('.nodeImage img');
-        vis_node.find('.endpointLink').css('visibility', 'hidden');
-        vis_node.find('.node-button.node-highlight').css('visibility', 'hidden');
-        vis_node.find('.node-button.node-delete').css('visibility', 'hidden');
-        vis_node.find('.node-button.node-open').css('visibility', 'hidden');
-        vis_node.find('.node-button.node-hide').css('visibility', 'hidden');
-        vis_node.find('.node-connection-source').css('visibility', 'hidden');
-        vis_node.find('.resourceLabel').css('position', 'absolute').css('top','10%').css('max-height','90%');
-    });
-    $('.resourceNodeBox').each(function() {
-        jsPlumbInstance.repaint(this);
-    });
-}
 
 Graph.vis_highlight = function(selector, edgehl) {    
     $(selector).addClass("highlighted");

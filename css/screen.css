@@ -18,14 +18,16 @@ body {
 }
 
 .resourceNodeBox {    
-    padding:0.5em;     
-    border:1px solid #346789; 
+    padding:0.5em;
+    border:1px solid #346789;
+    padding-right: 1.5em;
+    padding-left: 1.5em;
     padding-top:2em;
     padding-bottom:1.5em;
     position:absolute; 
     font-size:0.8em;
     border-radius:10px;
-
+    /*display: block;*/
     width:95px; /*95,75*/
     height:75px;
     box-shadow: 3px 3px 3px #888888;

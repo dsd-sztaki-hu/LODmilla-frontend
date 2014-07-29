@@ -35,8 +35,11 @@ $(document).ready(function() {
 //            foldback:0.2
 //            id:"myArrow"
                 }]
-            ],
-
+            ]
+            ,
+//            Anchor: [ "Assign", {
+//                position:"Fixed"
+//            }]
             Anchor: [ 'Top',  'Right', 'Bottom', 'Left'] // faster, but a bit different
 //            Anchor: "Continuous"
         });
