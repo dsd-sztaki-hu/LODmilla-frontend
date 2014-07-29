@@ -911,13 +911,13 @@ Graph.vis_engineInit = function() {
                 vis_node.css('left', node.left);
                 vis_node.css('top', node.top);
             });
-//            repaintNodes();
-            return false;
+            repaintNodes();
+//            return false;
         }
 
         if ($(event.target).is('.resourceNodeBox, .resourceNodeBox *') && selectedIsHighlighted) {
             moveNodesExcept(event);
-//            repaintNodes();
+            repaintNodes();
         }
         jsPlumbInstance.setSuspendDrawing(false,true);
         return false;
