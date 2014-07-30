@@ -840,8 +840,10 @@ Graph.vis_engineInit = function() {
         }
         $(this)
                 .data('down', true)
-                .data('x', event.clientX)
-                .data('y', event.clientY);
+                .data('x', event.pageX)
+                .data('y', event.pageY);
+        mousePositionLeft = event.pageX;
+        mousePositionTop = event.pageY;
         //console.log("DWNPOS: " + $(this).data('x') + ' ' + $(this).data('y'));
         return false;
     };
@@ -865,10 +867,14 @@ Graph.vis_engineInit = function() {
         }
         else
         {
+//            jsPlumbInstance.setSuspendDrawing(false,true);
+//            setTimeout(repaintNodes, 1000);
             if (mouseDown && selectedIsHighlighted && $(event.target).is('.resourceNodeBox, .resourceNodeBox *')) {
-                moveNodesExcept(event);
+                moveNodesExcept(event, selectedID);
+                repaintNodes();
 //                setTimeout(repaintNodes, 1000);
             }
+//            jsPlumbInstance.setSuspendDrawing(true);
         }
     }
 
@@ -897,54 +903,32 @@ Graph.vis_engineInit = function() {
         var $canvas = $(this);
         if ($canvas.data('down') === true) {
             $canvas.data('down', false);
-            var xoffset = $canvas.data('x') - event.clientX;
-            var yoffset = $canvas.data('y') - event.clientY;
-
-            $('.resourceNodeBox').each(function() {
-                var vis_node = $(this);
-                var position = vis_node.position();
-                var node = Graph.getNode(this.getAttribute('uri'));
-
-                node.top = position['top'] - yoffset;
-                node.left = position['left'] - xoffset;
-
-                vis_node.css('left', node.left);
-                vis_node.css('top', node.top);
-            });
+            moveNodes(event);
             repaintNodes();
 //            return false;
         }
 
         if ($(event.target).is('.resourceNodeBox, .resourceNodeBox *') && selectedIsHighlighted) {
-            moveNodesExcept(event);
+            moveNodesExcept(event, selectedID);
             repaintNodes();
         }
+//        updateModelPosition($canvas.data('x'), $canvas.data('y'), event.pageX, event.pageY);
         jsPlumbInstance.setSuspendDrawing(false,true);
         return false;
 
     };
     /* zoom */
     Graph.canvas.bind('mousewheel', function(event, delta) {
-//        var dir = delta > 0 ? 'Up' : 'Down';
-//        var vel = Math.abs(delta);
+        console.log(delta);
         if (delta > 0)
         {
-            if (Graph.zoomRatio > 0.601)
-                Graph.zoomRatio += 0.1000; //normal
-            else if (Graph.zoomRatio > 0.4000)
-                Graph.zoomRatio = 0.7000; //small to normal
-            else Graph.zoomRatio = 0.5000; //label to small
+            Graph.zoomRatio += 0.1000 * delta;
         }
         else
         {
-            if (Graph.zoomRatio > 0.701)
-                Graph.zoomRatio -= 0.1000; //normal
-            else if (Graph.zoomRatio > 0.501)
-                Graph.zoomRatio = 0.5000; //normal to small
-            else Graph.zoomRatio = 0.3000; //small to label
+            if (Graph.zoomRatio > 0.4001) Graph.zoomRatio += 0.1000 * delta;
         }
-//        console.log(Graph.zoomRatio);
-        zoom(Graph.zoomRatio);
+        zoom(Graph.zoomRatio, event.pageX, event.pageY);
 
 
         return false;
