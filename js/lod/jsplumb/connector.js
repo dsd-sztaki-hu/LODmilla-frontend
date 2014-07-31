@@ -198,12 +198,7 @@ Node.prototype.vis_show = function(highlight, aroundNode) {
     var graphitem = $("[uri='" + this.resource_id + "']");
     graphitem.zIndex(100);
     graphitem.css({top: this.top, left: this.left});
-    graphitem[0].onmouseup = function(event) {
-        var position = $(this).position();
-        node = Graph.getNode(this.getAttribute('uri'));
-        node.top = position.top;
-        node.left = position.left;
-    };
+    graphitem[0].onmouseup = moveNode;
 
     var selfDiv = $('div.resourceNodeBox[uri="' + self.resource_id + '"]');
 
@@ -919,14 +914,16 @@ Graph.vis_engineInit = function() {
     };
     /* zoom */
     Graph.canvas.bind('mousewheel', function(event, delta) {
-        console.log(delta);
+//        console.log(delta);
         if (delta > 0)
         {
             Graph.zoomRatio += 0.1000 * delta;
         }
         else
         {
-            if (Graph.zoomRatio > 0.4001) Graph.zoomRatio += 0.1000 * delta;
+            if (Graph.zoomRatio > 0.4001 - delta / 10) Graph.zoomRatio += 0.1000 * delta;
+            else if (Graph.zoomRatio > 0.4001) Graph.zoomRatio -= 0.1000;
+            else return false;
         }
         zoom(Graph.zoomRatio, event.pageX, event.pageY);
 
