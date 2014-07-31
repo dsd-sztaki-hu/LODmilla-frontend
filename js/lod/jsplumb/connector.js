@@ -268,7 +268,7 @@ Node.prototype.vis_show = function(highlight, aroundNode) {
         endpointShortDescription = Helper.truncateString(Helper.getLodServerBaseUrl(self.resource_id), Profile.nodeLabelMaxLength);
         endpointURL = Helper.getLodServerBaseUrl(self.resource_id);
         
-        imgBox = $('<a class="fancybox" href="' + Profile.nodeTypesDefaultImages.noEndpoint + '"></a>');
+        imgBox = $('<a href="' + Profile.nodeTypesDefaultImages.noEndpoint + '"></a>');
         imgBox.append(Helper.getImgSrc(Profile.nodeTypesDefaultImages.noEndpoint));
         nodeImageDiv.empty().append(imgBox);
     }
@@ -295,7 +295,7 @@ Node.prototype.vis_show = function(highlight, aroundNode) {
 
 Node.prototype.vis_showImageOwnImage = function(nodeImageDiv, imgBox){
     var self = this;
-    imgBox = $('<a class="fancybox" href="' + self.nodeImageURL + '"></a>');
+    imgBox = $('<a class="fancybox" rel="galery1" href="' + self.nodeImageURL + '"></a>');
     imgBox.append(Helper.getImgSrc(self.nodeImageURL));
     nodeImageDiv.empty().append(imgBox);
 };
@@ -303,7 +303,7 @@ Node.prototype.vis_showImageOwnImage = function(nodeImageDiv, imgBox){
 Node.prototype.vis_showImageDefaultEndpoint = function(imgBox){
     var self = this;
     $("<img />").attr('src', self.nodeImageURL).load(function() {
-        var imgBox2 = $('<a class="fancybox" target="_blank" href="' + self.nodeImageURL + '"></a>');
+        var imgBox2 = $('<a class="fancybox" rel="galery1" target="_blank" href="' + self.nodeImageURL + '"></a>');
         imgBox2.append(Helper.getImgSrc(self.nodeImageURL));
         imgBox.empty().attr('href', self.nodeImageURL).append(imgBox2);
     });
@@ -313,17 +313,20 @@ Node.prototype.vis_showImageDefaultImage = function(nodeImageDiv, imgBox){
     var self = this;
     // predefined images, for some types
     if (self.type === 'person' || self.type === 'agent') {
-        imgBox = $('<a class="fancybox" target="_blank" href="' + Profile.nodeTypesDefaultImages.person + '"></a>');
+//        imgBox = $('<a target="_blank" href="' + Profile.nodeTypesDefaultImages.person + '"></a>');
+        imgBox = $('<div/>');
         imgBox.append(Helper.getImgSrc(Profile.nodeTypesDefaultImages.person));
         nodeImageDiv.empty().append(imgBox);
     }
     else if (self.type === 'work') {
-        imgBox = $('<a class="fancybox" target="_blank" href="' + Profile.nodeTypesDefaultImages.work + '"></a>');
+//        imgBox = $('<a target="_blank" href="' + Profile.nodeTypesDefaultImages.work + '"></a>');
+        imgBox = $('<div/>');
         imgBox.append(Helper.getImgSrc(Profile.nodeTypesDefaultImages.work));
         nodeImageDiv.empty().append(imgBox);
     }
     else if (self.type === 'group') {
-        imgBox = $('<a class="fancybox" target="_blank" href="' + Profile.nodeTypesDefaultImages.group + '"></a>');
+//        imgBox = $('<a target="_blank" href="' + Profile.nodeTypesDefaultImages.group + '"></a>');
+        imgBox = $('<div/>');
         imgBox.append(Helper.getImgSrc(Profile.nodeTypesDefaultImages.group));
         nodeImageDiv.empty().append(imgBox);
     }
@@ -782,7 +785,7 @@ Graph.vis_engineInit = function() {
 
 //prevent link opening with CTRL
     Graph.canvas[0].onclick = function(event) {
-        if (event.ctrlKey || Graph.zoomRatio < 0.701)
+        if (event.ctrlKey || event.altKey || Graph.zoomRatio < 0.701)
         {
             event.preventDefault();
             if ($(event.target).is('.fancybox')) fancyBoxOpen = false;
@@ -824,7 +827,7 @@ Graph.vis_engineInit = function() {
             selectedID = node.resource_id;
             return false;
         }
-        if (event.ctrlKey)
+        if (event.ctrlKey || event.altKey)
         {
             $(this).append('<div class="selection-box" top=' + event.pageX + "px " +
                 "left=" + event.pageY + 'px width = "0px" height = "0px" />');
@@ -885,16 +888,26 @@ Graph.vis_engineInit = function() {
                     position['top'] < selectionTop + selectionHeight)
                 {
                     var resource_id = this.getAttribute('uri');
-                    if (!vis_node.find('.node-highlight').hasClass('opened') &&
-                        Graph.getNode(resource_id).type !== Profile.unloadedNodeType)
-                            Graph.highlight(vis_node, 2);
+                    if (Graph.getNode(resource_id).type !== Profile.unloadedNodeType) {
+                        if (vis_node.find('.node-highlight').hasClass('opened')) {
+                            if (event.altKey)
+                                Graph.removeHighlight(vis_node);
+                        }
+                        else {
+                            if (event.ctrlKey)
+                                Graph.highlight(vis_node, 2);
+                        }
+                    }
                 }
             });
             $('.selection-box').remove();
             rectangleSelection = false;
             return;
         }
-        if (event.ctrlKey) return;
+        if (event.ctrlKey || event.altKey) {
+            jsPlumbInstance.setSuspendDrawing(false,true);
+            return;
+        }
         var $canvas = $(this);
         if ($canvas.data('down') === true) {
             $canvas.data('down', false);

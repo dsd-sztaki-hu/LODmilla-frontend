@@ -610,7 +610,7 @@ addBottomMenuHandlers = function(){
 
 addNodeHandlers = function(){
     $("body").on('click', '#main #graph .resourceNodeBox', function(event) {
-        if (event.ctrlKey) {
+        if (event.ctrlKey || event.altKey) {
             var resource_id = this.getAttribute('uri');
             var act = $(this);
             if (Graph.getNode(resource_id).type !== Profile.unloadedNodeType) {
@@ -623,7 +623,7 @@ addNodeHandlers = function(){
     });
 
     $("body").on('click', '#main #graph .resourceNodeBox .node-highlight', function(event) {
-        if (event.ctrlKey) return;
+        if (event.ctrlKey || event.altKey) return;
             var resource_id = this.parentNode.getAttribute('uri');
         if (Graph.getNode(resource_id).type !== Profile.unloadedNodeType){
             if ($(this).hasClass('opened'))
@@ -634,7 +634,7 @@ addNodeHandlers = function(){
     });
 
     $("body").on('click', '#main #graph .resourceNodeBox .node-hide', function(event) {
-        if (event.ctrlKey) return;
+        if (event.ctrlKey || event.altKey) return;
         var resource_id = this.parentNode.getAttribute('uri');
         if (Graph.getNode(resource_id).type !== Profile.unloadedNodeType){
             var node = $('div.resourceNodeBox[uri="' + resource_id + '"]');
@@ -660,7 +660,7 @@ addNodeHandlers = function(){
     });
 
     $("body").on('click', '#main #graph .resourceNodeBox .node-delete', function(event) {
-        if (event.ctrlKey) return;
+        if (event.ctrlKey || event.altKey) return;
         var resource_id = this.parentNode.getAttribute('uri');
         if (Graph.getNode(resource_id).type !== Profile.unloadedNodeType){
             var node_id = this.parentNode.getAttribute('id');
@@ -690,7 +690,7 @@ addNodeHandlers = function(){
     });
 
     $("body").on('click', '#main #graph .resourceNodeBox .node-open', function(event) {
-        if (event.ctrlKey) return;
+        if (event.ctrlKey || event.altKey) return;
         var resource_id = this.parentNode.getAttribute('uri');
         if (Graph.getNode(resource_id).type !== Profile.unloadedNodeType){
             var node = Graph.getNode(this.parentNode.getAttribute('uri'));
