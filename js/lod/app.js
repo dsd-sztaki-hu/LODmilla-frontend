@@ -109,4 +109,40 @@ $(document).ready(function() {
 
 });
 
+document.addEventListener(
+    "keydown",
+    function(event)
+    {
+        if (event.keyCode === 17)
+        {
+            document.body.style.cursor = 'crosshair';
+        }
+    },
+    false
+);
+
+document.addEventListener(
+    "keydown",
+    function(event)
+    {
+        if (event.keyCode === 18)
+        {
+            document.body.style.cursor = 'vertical-text';
+        }
+    },
+    false
+);
+
+document.addEventListener(
+    "keyup",
+    function(event)
+    {
+        if (event.keyCode === 17 || event.keyCode === 18)
+        {
+            document.body.style.cursor = 'default';
+        }
+    },
+    false
+);
+
 

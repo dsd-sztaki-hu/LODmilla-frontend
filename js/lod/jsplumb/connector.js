@@ -879,30 +879,33 @@ Graph.vis_engineInit = function() {
     Graph.canvas[0].onmouseup = function(event) {
         mouseDown = false;
         if (rectangleSelection) {
+            var w = Profile.nodeWidth * Graph.zoomRatio / 2;
+            var h = Profile.nodeWidth * Graph.zoomRatio / 2;
             $('.resourceNodeBox').each(function() {
                 var vis_node = $(this);
                 var position = vis_node.position();
-                if (position['left'] > selectionLeft &&
-                    position['top'] > selectionTop &&
-                    position['left'] < selectionLeft + selectionWidth &&
-                    position['top'] < selectionTop + selectionHeight)
+                if (position['left'] + w > selectionLeft &&
+                    position['top'] + h > selectionTop &&
+                    position['left'] + w < selectionLeft + selectionWidth &&
+                    position['top'] + h < selectionTop + selectionHeight)
                 {
                     var resource_id = this.getAttribute('uri');
                     if (Graph.getNode(resource_id).type !== Profile.unloadedNodeType) {
                         if (vis_node.find('.node-highlight').hasClass('opened')) {
-                            if (event.altKey)
+                            if (event.altKey) {
                                 Graph.removeHighlight(vis_node);
+                            }
                         }
                         else {
-                            if (event.ctrlKey)
+                            if (event.ctrlKey) {
                                 Graph.highlight(vis_node, 2);
+                            }
                         }
                     }
                 }
             });
             $('.selection-box').remove();
             rectangleSelection = false;
-            return;
         }
         if (event.ctrlKey || event.altKey) {
             jsPlumbInstance.setSuspendDrawing(false,true);
