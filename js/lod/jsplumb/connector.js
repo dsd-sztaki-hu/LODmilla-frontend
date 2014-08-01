@@ -379,6 +379,7 @@ Node.prototype.scrollToResult = function(tab, panel) {
 };
 
 Node.prototype.vis_switchTab = function(targetTabName, property, target) {
+    console.time('details: ' + this.label);
     var resBox = $('#nodeOpenedContent');
     // res box was opened
     if (resBox && resBox.length !== 0) {
@@ -422,7 +423,7 @@ Node.prototype.vis_switchTab = function(targetTabName, property, target) {
     else {
         this.vis_openNode(targetTabName, property, target);
     }
-
+    console.timeEnd('details: ' + this.label);
 
 
 };
@@ -440,23 +441,24 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
     $('#nodeOpenedContent').remove();
     var nodeContent = this.getContent();
 
-    var str_content = '',
-        str_header = '',
-        tabcounter = 0,
+//    var str_content = '',
+//        var str_header = '',
+        var tabcounter = 0,
         deletePropertyBtn = '<span class="inspectorBtn deletePropertyBtn" title="Delete property">[x]</span>',
         deleteConnectionBtn = '<span class="inspectorBtn deleteConnectionBtn" title="Delete connection">[x]</span>',
         addPropertyBtn = '<span class="inspectorBtn addPropertyBtn" title="Add property">[add]</span>',
         addConnectionBtn = '<span class="inspectorBtn addConnectionBtn" title="Add connection">[add]</span>',
         addNewConnectionBtn = '<span class="inspectorBtn addNewConnectionBtn" title="Add new connection type">[add]</span>',
         addNewPropertyBtn = '<span class="inspectorBtn addNewPropertyBtn" title="Add new property type">[add]</span>';
-
+    var str_content = [], str_header = [];
+    console.time('1');
     $.each(nodeContent, function(idx, elem) {
         $.each(elem, function(type, item) {
 //            if (targetTabName && targetTabName !== '' && targetTabName === type && property && property !== '' && target && target !== '')
             if (targetTabName && targetTabName === type && property && target )
-                str_header += '<li class="' + type + '" property="' + property + '" target="' + target + '">';
+                str_header.push('<li class="', 'type', '" property="', property, '" target="', target, '">');
             else
-                str_header += '<li class="' + type + '">';
+                str_header.push('<li class="', type, '">');
 
             var tabName;
             switch (type){
@@ -472,13 +474,13 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
             }
 
 
-            str_header += '<a href="#itemtab-' + tabcounter + '">' + tabName + '</a></li>';
-            str_content += '<div direction="'+type+'" id="itemtab-' + tabcounter + '">';
+            str_header.push('<a href="#itemtab-', tabcounter, '">', tabName, '</a></li>');
+            str_content.push('<div direction="', type, '" id="itemtab-', tabcounter, '">');
             var propertyName;
 
             // literals, aka. description tab,  values in the right panel
             if (type === 'literals') {
-                str_content += addNewPropertyBtn;
+                str_content.push(addNewPropertyBtn);
                 $.each(item, function(connectionURI, connectionItems) {
                     propertyName = Profile.getPropertyLabel(connectionURI);
                     propertyName = Helper.getCapitalizedString(propertyName);
@@ -495,12 +497,12 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
                             propValue = propValue + '<a href="' + Profile.getPropertyIfGeo(connectionURI, propValue, item, self.label) + '" target="_blank"><img src="' + Profile.getPropertyIfGeo(connectionURI, propValue, item, self.label) + '"></a>';
                         }
 
-                        str_content += "<p class='conncollapse'><b class='conncollapsetoggle' title='" + connectionURI + "'>" + propertyName + " (" + "<span class='propNum'>1</span>" + ")</b> "+addPropertyBtn+"</p>";
-                        str_content += "<ul><li refProp='" + connectionURI + "' refPropVal='" + connectionItems[0] + "' class='property-value-normal'>" + deletePropertyBtn + propValue +"</li></ul>";
+                        str_content.push("<p class='conncollapse'><b class='conncollapsetoggle' title='", connectionURI, "'>", propertyName, " (", "<span class='propNum'>1</span>", ")</b> ", addPropertyBtn, "</p>");
+                        str_content.push("<ul><li refProp='", connectionURI, "' refPropVal='", connectionItems[0], "' class='property-value-normal'>", deletePropertyBtn, propValue, "</li></ul>");
                     }
                     // tobb, mint 1 elem van ebbol a propertybol
                     else {
-                        str_content += "<p class='conncollapse'><b class='conncollapsetoggle'" + connectionURI + "'>" + propertyName + " (" + "<span class='propNum'>"+connectionItems.length+ "</span>" + ")</b> "+ addPropertyBtn +"</p><ul>";
+                        str_content.push("<p class='conncollapse'><b class='conncollapsetoggle'", connectionURI, "'>", propertyName, " (", "<span class='propNum'>", connectionItems.length, "</span>", ")</b> ", addPropertyBtn , "</p><ul>");
                         $.each(connectionItems, function(connectionItemIndex, connectionItem) {
                             propValue = connectionItem;
                             if (Profile.isPropertyExternalLink(connectionURI)){
@@ -508,46 +510,164 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
                                 propValue = '<a href="' + propValue + '" target="_blank">' + propValue + '</a>';
                             }
 
-                            str_content += "<li refProp='" + connectionURI + "' refPropVal='" + connectionItem + "' class='property-value-normal'>" + deletePropertyBtn + propValue + "</li>";
+                            str_content.push("<li refProp='", connectionURI, "' refPropVal='", connectionItem, "' class='property-value-normal'>", deletePropertyBtn, propValue, "</li>");
                         });
-                        str_content += "</ul>";
+                        str_content.push("</ul>");
                     }
                 });
 
             // out and in tabs, aka. connections in the right panel
             } else {
-                str_content += addNewConnectionBtn;
+                str_content.push(addNewConnectionBtn);
                 $.each(item, function(connectionURI, connectionItems) {
                     propertyName = Helper.getCapitalizedString(Profile.getPropertyLabel(connectionURI));
 
                     // 1 elem van ebbol a propertybol
+
                     if (connectionItems.length === 1) {
-                        str_content += "<p class='conncollapse'><b class='conncollapsetoggle' title='" + connectionURI + "'>" + propertyName + " (" + "<span class='propNum'>1</span>" + ")</b> "+ addConnectionBtn +"</p>";
-                        str_content += "<ul><li>" + deleteConnectionBtn + Profile.getPropertyIfImage(connectionItems[0].target, connectionItems[0].label, connectionURI, self.resource_id, type) + "</li></ul>";
+                        var start = new Date().getMilliseconds();
+                        Helper.pushCollImgStr(1, str_content, connectionURI, propertyName, addConnectionBtn);
+                        str_content.push("<li>", deleteConnectionBtn, Profile.getPropertyIfImage(connectionItems[0].target, connectionItems[0].label, connectionURI, self.resource_id, type), "</li></ul>");
+                        var end = new Date().getMilliseconds();
+                        if (end - start > 300)
+                        console.log('1.1 ' + (end - start));
                     }
                     // tobb, mint 1 elem van ebbol a propertybol
                     else {
-                        str_content += "<p class='conncollapse'><b class='conncollapsetoggle' title='" + connectionURI + "'>" + propertyName + " (" + "<span class='propNum'>"+connectionItems.length+ "</span>" + ")</b> "+ addConnectionBtn +"</p><ul>";
+                        var start = new Date().getMilliseconds();
+                        Helper.pushCollImgStr(connectionItems.length, str_content, connectionURI, propertyName, addConnectionBtn);
                         $.each(connectionItems, function(connectionItemIndex, connectionItem) {
-                            str_content += "<li>" + deleteConnectionBtn + Profile.getPropertyIfImage(connectionItem.target, connectionItem.label, connectionURI, self.resource_id, type) + "</li>";
+                            str_content.push("<li>", deleteConnectionBtn, Profile.getPropertyIfImage(connectionItem.target, connectionItem.label, connectionURI, self.resource_id, type), "</li>");
                         });
-                        str_content += "</ul>";
+                        str_content.push("</ul>");
+                        var end = new Date().getMilliseconds();
+                        if (end - start > 300)
+                        console.log('1.2 ' + (end - start));
                     }
+
 
                 });
             }
 
-            str_content += "</div>";
+            str_content.push("</div>");
             tabcounter++;
         });
     });
 
-    str_header = "<ul>" + str_header + "</ul>";
-    
-    Graph.canvas.parent().append('<div id="nodeOpenedContent" title="' + this.label + '"><div id="nodeOpenedContentTabs">' + str_header + str_content + '</div></div>');
-    $('#nodeOpenedContent').css('overflow', 'hidden');
-    
-    $('#nodeOpenedContent').dialog({
+//    console.time('1');
+//    $.each(nodeContent, function(idx, elem) {
+//        $.each(elem, function(type, item) {
+////            if (targetTabName && targetTabName !== '' && targetTabName === type && property && property !== '' && target && target !== '')
+//            if (targetTabName && targetTabName === type && property && target )
+//                str_header += '<li class="' + type + '" property="' + property + '" target="' + target + '">';
+//            else
+//                str_header += '<li class="' + type + '">';
+//
+//            var tabName;
+//            switch (type){
+//                case 'literals':
+//                    tabName = 'Properties';
+//                    break;
+//                case 'out':
+//                    tabName = 'Links out';
+//                    break;
+//                case 'in':
+//                    tabName = 'Links in';
+//                    break;
+//            }
+//
+//
+//            str_header += '<a href="#itemtab-' + tabcounter + '">' + tabName + '</a></li>';
+//            str_content += '<div direction="'+type+'" id="itemtab-' + tabcounter + '">';
+//            var propertyName;
+//
+//            // literals, aka. description tab,  values in the right panel
+//            if (type === 'literals') {
+//                str_content += addNewPropertyBtn;
+//                $.each(item, function(connectionURI, connectionItems) {
+//                    propertyName = Profile.getPropertyLabel(connectionURI);
+//                    propertyName = Helper.getCapitalizedString(propertyName);
+//
+//                    var propValue = $('');
+//                    // 1 elem van ebbol a propertybol
+//                    if (connectionItems.length === 1) {
+//                        propValue = connectionItems[0];
+//                        if (Profile.isPropertyExternalLink(connectionURI)){
+////                            propValue = '<a href="' + propValue + '" target="_blank">' + propValue.replace(/_/g , " ") + '</a>';
+//                            propValue = '<a href="' + propValue + '" target="_blank">' + propValue + '</a>';
+//                        }
+//                        else if (Profile.getPropertyIfGeo(connectionURI, propValue, item, self.label)){
+//                            propValue = propValue + '<a href="' + Profile.getPropertyIfGeo(connectionURI, propValue, item, self.label) + '" target="_blank"><img src="' + Profile.getPropertyIfGeo(connectionURI, propValue, item, self.label) + '"></a>';
+//                        }
+//
+//                        str_content += "<p class='conncollapse'><b class='conncollapsetoggle' title='" + connectionURI + "'>" + propertyName + " (" + "<span class='propNum'>1</span>" + ")</b> "+addPropertyBtn+"</p>";
+//                        str_content += "<ul><li refProp='" + connectionURI + "' refPropVal='" + connectionItems[0] + "' class='property-value-normal'>" + deletePropertyBtn + propValue +"</li></ul>";
+//                    }
+//                    // tobb, mint 1 elem van ebbol a propertybol
+//                    else {
+//                        str_content += "<p class='conncollapse'><b class='conncollapsetoggle'" + connectionURI + "'>" + propertyName + " (" + "<span class='propNum'>"+connectionItems.length+ "</span>" + ")</b> "+ addPropertyBtn +"</p><ul>";
+//                        $.each(connectionItems, function(connectionItemIndex, connectionItem) {
+//                            propValue = connectionItem;
+//                            if (Profile.isPropertyExternalLink(connectionURI)){
+////                                propValue = '<a href="' + propValue + '" target="_blank">' + propValue.replace(/_/g , " ") + '</a>';
+//                                propValue = '<a href="' + propValue + '" target="_blank">' + propValue + '</a>';
+//                            }
+//
+//                            str_content += "<li refProp='" + connectionURI + "' refPropVal='" + connectionItem + "' class='property-value-normal'>" + deletePropertyBtn + propValue + "</li>";
+//                        });
+//                        str_content += "</ul>";
+//                    }
+//                });
+//
+//                // out and in tabs, aka. connections in the right panel
+//            } else {
+//                str_content += addNewConnectionBtn;
+//                $.each(item, function(connectionURI, connectionItems) {
+//                    propertyName = Helper.getCapitalizedString(Profile.getPropertyLabel(connectionURI));
+//
+//                    // 1 elem van ebbol a propertybol
+//
+//                    if (connectionItems.length === 1) {
+//                        var start = new Date().getMilliseconds();
+//                        str_content += "<p class='conncollapse'><b class='conncollapsetoggle' title='" + connectionURI + "'>" + propertyName + " (" + "<span class='propNum'>1</span>" + ")</b> "+ addConnectionBtn +"</p>";
+//                        str_content += "<ul><li>" + deleteConnectionBtn + Profile.getPropertyIfImage(connectionItems[0].target, connectionItems[0].label, connectionURI, self.resource_id, type) + "</li></ul>";
+//                        var end = new Date().getMilliseconds();
+//                        if (end - start > 300)
+//                            console.log('1.1 ' + (end - start));
+//                    }
+//                    // tobb, mint 1 elem van ebbol a propertybol
+//                    else {
+//                        var start = new Date().getMilliseconds();
+//                        str_content += "<p class='conncollapse'><b class='conncollapsetoggle' title='" + connectionURI + "'>" + propertyName + " (" + "<span class='propNum'>"+connectionItems.length+ "</span>" + ")</b> "+ addConnectionBtn +"</p><ul>";
+//                        $.each(connectionItems, function(connectionItemIndex, connectionItem) {
+//                            str_content += "<li>" + deleteConnectionBtn + Profile.getPropertyIfImage(connectionItem.target, connectionItem.label, connectionURI, self.resource_id, type) + "</li>";
+//                        });
+//                        str_content += "</ul>";
+//                        var end = new Date().getMilliseconds();
+//                        if (end - start > 300)
+//                            console.log('1.2 ' + (end - start));
+//                    }
+//
+//
+//                });
+//            }
+//
+//            str_content += "</div>";
+//            tabcounter++;
+//        });
+//    });
+
+    console.timeEnd('1');
+    str_content = str_content.join("");
+    str_header = "<ul>" + str_header.join("") + "</ul>";
+
+    //2
+    var $nodeOpenedContent = $('<div id="nodeOpenedContent" title="' + this.label + '"><div id="nodeOpenedContentTabs">' + str_header + str_content + '</div></div>');
+    var $nodeOpenedContentChildren = $nodeOpenedContent.children().detach();
+    $nodeOpenedContent.css('overflow', 'hidden');
+    Graph.canvas.parent().append($nodeOpenedContent);
+
+    $nodeOpenedContent.dialog({
         position: {my: "left", at: "right top", of: window},
         height: $(window).height()-50,
         width: Graph.vis_nodeOpenedContent.width,
@@ -568,13 +688,14 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
         resizeStop: function(event) {
             $(event.target).parent().css('position', 'fixed');
             $("#nodeOpenedContentTabs").tabs("option", "heightStyle", "fill");
-            Graph.vis_nodeOpenedContent.height = $("#nodeOpenedContent").dialog("option", "height");
-            Graph.vis_nodeOpenedContent.width = $("#nodeOpenedContent").dialog("option", "width");
+            Graph.vis_nodeOpenedContent.height = $('#nodeOpenedContent').dialog("option", "height");
+            Graph.vis_nodeOpenedContent.width = $('#nodeOpenedContent').dialog("option", "width");
         }
     }).attr('resourceUri', this.resource_id);
-    
-    
-    $("#nodeOpenedContentTabs").tabs({
+    $nodeOpenedContent.append($nodeOpenedContentChildren);
+
+    var $nodeOpenedContentTabs = $("#nodeOpenedContentTabs");
+    $nodeOpenedContentTabs.tabs({
         heightStyle: "fill",
         create: function(event, ui) {
             self.scrollToResult(ui.tab, ui.panel);
@@ -584,15 +705,17 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
         }
     });
 
+
+
     $(window).resize(function() {
-         $('#nodeOpenedContent').dialog('option',{
-             position: {my: "left", at: "right top", of: window},
+        $('#nodeOpenedContent').dialog('option',{
+            position: {my: "left", at: "right top", of: window},
             height: $(window).height()-50,
             width: Graph.vis_nodeOpenedContent.width
-         });
-          $("#nodeOpenedContentTabs").tabs('refresh');
+        });
+        $("#nodeOpenedContentTabs").tabs('refresh');
     });
-    
+
     if (targetTabName && targetTabName !== '') {
         var tabId = $("#nodeOpenedContentTabs ul[role='tablist'] li." + targetTabName).attr('aria-controls');
 
@@ -600,7 +723,7 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
         try{
             targetTabId = parseInt(tabId.replace("itemtab-", ""));
         }
-        // ha nincs ilyen ID-ju tab az inspectorban (azaz pl. nincs out, vagy in kapcsolata a megnyitni kivant nodenak)
+            // ha nincs ilyen ID-ju tab az inspectorban (azaz pl. nincs out, vagy in kapcsolata a megnyitni kivant nodenak)
         catch (ex){
             targetTabId = 0;
         }
@@ -609,9 +732,9 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
 
 
     $('div#nodeOpenedContent').parent().addClass('opacityItem');
-
     // by default collapse props
-    $('.conncollapse').next("ul").slideToggle("medium");
+    $('.conncollapse').next("ul").css('display','none');
+//    $next.slideToggle("medium");
 //    $('.conncollapse').find('.conncollapsetoggle').empty().append('+');
 
     addInspectorHandlers();

@@ -104,4 +104,8 @@ var Helper = new function(){
             //';margin-bottom:32px;position:relative;" />'
     }
 
+    this.pushCollImgStr = function(number, array, connectionURI, propertyName, addConnectionBtn) {
+        array.push("<p class='conncollapse'><b class='conncollapsetoggle' title='", connectionURI, "'>", propertyName, " (<span class='propNum'>",number,"</span>)</b> ", addConnectionBtn, "</p><ul>");
+    }
+
 };

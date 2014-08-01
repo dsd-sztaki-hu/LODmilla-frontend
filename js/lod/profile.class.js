@@ -313,7 +313,14 @@ var Profile = new function() {
                 targetNodeURI_hash = [sourceNodeURI_hash, sourceNodeURI_hash = targetNodeURI_hash][0];
             }
             var hashedID = md5(sourceNodeURI_hash + connectionURI_hash + targetNodeURI_hash);
-
+//            retval = document.createElement("a");
+//            retval.setAttribute('title', targetNodeURI);
+//            retval.setAttribute('refProp', propertyUri);
+//            retval.setAttribute('refPropVal', targetNodeURI);
+//            retval.setAttribute('class', 'property-value-normal');
+//            retval.setAttribute('rel', 'group');
+//            retval.setAttribute('direction', connectionType);
+//            retval.setAttribute('id', hashedID);
             retval = $("<a title='"+ targetNodeURI +"'    refProp='" + propertyUri + "' refPropVal='" + targetNodeURI + "' class='property-value-normal' rel='group' direction="+connectionType+" id="+hashedID+"></a>");
             if (isImage === true && targetNodeURI !== null) {
                 // Image
