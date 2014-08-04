@@ -451,7 +451,7 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
         addNewConnectionBtn = '<span class="inspectorBtn addNewConnectionBtn" title="Add new connection type">[add]</span>',
         addNewPropertyBtn = '<span class="inspectorBtn addNewPropertyBtn" title="Add new property type">[add]</span>';
     var str_content = [], str_header = [];
-    console.time('1');
+//    console.time('1');
     $.each(nodeContent, function(idx, elem) {
         $.each(elem, function(type, item) {
 //            if (targetTabName && targetTabName !== '' && targetTabName === type && property && property !== '' && target && target !== '')
@@ -525,24 +525,16 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
                     // 1 elem van ebbol a propertybol
 
                     if (connectionItems.length === 1) {
-                        var start = new Date().getMilliseconds();
                         Helper.pushCollImgStr(1, str_content, connectionURI, propertyName, addConnectionBtn);
                         str_content.push("<li>", deleteConnectionBtn, Profile.getPropertyIfImage(connectionItems[0].target, connectionItems[0].label, connectionURI, self.resource_id, type), "</li></ul>");
-                        var end = new Date().getMilliseconds();
-                        if (end - start > 300)
-                        console.log('1.1 ' + (end - start));
                     }
                     // tobb, mint 1 elem van ebbol a propertybol
                     else {
-                        var start = new Date().getMilliseconds();
                         Helper.pushCollImgStr(connectionItems.length, str_content, connectionURI, propertyName, addConnectionBtn);
                         $.each(connectionItems, function(connectionItemIndex, connectionItem) {
                             str_content.push("<li>", deleteConnectionBtn, Profile.getPropertyIfImage(connectionItem.target, connectionItem.label, connectionURI, self.resource_id, type), "</li>");
                         });
                         str_content.push("</ul>");
-                        var end = new Date().getMilliseconds();
-                        if (end - start > 300)
-                        console.log('1.2 ' + (end - start));
                     }
 
 
@@ -657,7 +649,8 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
 //        });
 //    });
 
-    console.timeEnd('1');
+//    console.timeEnd('1');
+//    console.log('ac: ' + ac + ' bc: ' + bc);
     str_content = str_content.join("");
     str_header = "<ul>" + str_header.join("") + "</ul>";
 
@@ -694,8 +687,12 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
     }).attr('resourceUri', this.resource_id);
     $nodeOpenedContent.append($nodeOpenedContentChildren);
 
+    var $conncollapse = $('.conncollapse').next("ul");
+    $conncollapse.css('display','none');
+    $conncollapse.next("ul").css('display','none');
     var $nodeOpenedContentTabs = $("#nodeOpenedContentTabs");
     $nodeOpenedContentTabs.tabs({
+//        show : false,
         heightStyle: "fill",
         create: function(event, ui) {
             self.scrollToResult(ui.tab, ui.panel);
@@ -704,6 +701,7 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
             self.scrollToResult(ui.newTab, ui.newPanel);
         }
     });
+//    $conncollapse.css('display','initial');
 
 
 
@@ -733,7 +731,7 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
 
     $('div#nodeOpenedContent').parent().addClass('opacityItem');
     // by default collapse props
-    $('.conncollapse').next("ul").css('display','none');
+//    $('.conncollapse').next("ul").css('display','none');
 //    $next.slideToggle("medium");
 //    $('.conncollapse').find('.conncollapsetoggle').empty().append('+');
 

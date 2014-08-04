@@ -66,7 +66,6 @@ var Profile = new function() {
 
     this.propertyList = {};
 
-
     this.alertTexts = {
         'loadGraph': {
             'title': 'Problem with the backend server',
@@ -200,6 +199,7 @@ var Profile = new function() {
 
     // regexp for searching images in the connections
     this.findImagesRegexp = "^http.*(jpg|png|gif|svg)$";
+    this.imgPatt = new RegExp(this.findImagesRegexp, "i");
 
     this.defaultNodeType = 'default';
     this.unloadedNodeType = 'unloaded';
@@ -287,13 +287,111 @@ var Profile = new function() {
         return retVal;
 
     };
+
+    this.isPropertyExternalLink = function(propValue) {
+        if (this.externalLinkProperties.indexOf(propValue) < 0) return false;
+        return true;
+    };
+/*
     this.isPropertyExternalLink = function(propValue) {
         if (this.externalLinkProperties.indexOf(propValue) >= 0)
             return true;
         else
             return false;
+    };*/
+
+
+    this.getPropertyIfImage = function(targetNodeURI, label, propertyUri, sourceNodeURI, connectionType) {
+        if (connectionType == 'literals') return "";
+        var sourceNodeURI_hash = sourceNodeURI,
+            targetNodeURI_hash = targetNodeURI;
+        // ha befele jovo kapcsolat, akkor a source es target felcserelodik
+        if (connectionType == 'in'){
+            targetNodeURI_hash = [sourceNodeURI_hash, sourceNodeURI_hash = targetNodeURI_hash][0];
+        }
+        var addclass = 'property-value-normal';
+        var slink, schild;
+
+        if (targetNodeURI != null && this.imgPatt.test(targetNodeURI)) {
+            // Image
+            addclass += ' fancybox';
+            slink = 'href="' + targetNodeURI + '"';
+            schild = "<img src='" + targetNodeURI + "' alt=\"\" />";
+        }
+        else if (label != null && this.imgPatt.test(label)) {
+            // Image
+            addclass += ' fancybox';
+            slink = 'href="' + label + '"';
+            schild = "<img src='" + label + "' alt=\"\" />";
+        }
+        else if (this.isPropertyExternalLink(propertyUri))
+        {
+            // External link
+            slink = 'href="' + targetNodeURI + '" target="_blank"';
+            schild = label.replace(/_/g, " ");
+        }
+        else return label.replace(/_/g, " ");
+        var retval = [];
+        retval.push('<a title="', targetNodeURI,
+            '" refProp="', propertyUri,
+            '" refPropVal="', targetNodeURI,
+            '" class="', addclass,
+            '" rel="group" direction="', connectionType,
+            '" id="', md5(sourceNodeURI_hash + propertyUri + targetNodeURI_hash),
+            '" ', slink,
+            ' >', schild,
+            '</a>'
+        );
+        return retval.join("");
     };
 
+
+/*
+    this.getPropertyIfImage = function(targetNodeURI, label, propertyUri, sourceNodeURI, connectionType) {
+        if (connectionType == 'literals') return "";
+            var sourceNodeURI_hash = sourceNodeURI,
+                targetNodeURI_hash = targetNodeURI;
+            // ha befele jovo kapcsolat, akkor a source es target felcserelodik
+            if (connectionType == 'in'){
+                targetNodeURI_hash = [sourceNodeURI_hash, sourceNodeURI_hash = targetNodeURI_hash][0];
+            }
+            var cval = document.createElement("a");
+            cval.setAttribute('title', targetNodeURI);
+            cval.setAttribute('refProp', propertyUri);
+            cval.setAttribute('refPropVal', targetNodeURI);
+            cval.setAttribute('class', 'property-value-normal');
+            cval.setAttribute('rel', 'group');
+            cval.setAttribute('direction', connectionType);
+            cval.setAttribute('id', md5(sourceNodeURI_hash + propertyUri + targetNodeURI_hash));
+            var retval = $(cval);
+                if (targetNodeURI != null && this.imgPatt.test(targetNodeURI)) {
+                    // Image
+                    retval
+                        .addClass('fancybox')
+                        .attr('href', targetNodeURI)
+                        .append("<img src='" + targetNodeURI + "' alt=\"\" />");
+                }
+                else if (label != null && this.imgPatt.test(label)) {
+                    // Image
+                    retval
+                        .addClass('fancybox')
+                        .attr('href', label)
+                        .append("<img src='" + label + "' alt=\"\" />");
+                }
+                else if (this.isPropertyExternalLink(propertyUri))
+                {
+                    // External link
+                    retval
+                        .attr('href', targetNodeURI)
+                        .attr('target', '_blank')
+                        .append(label.replace(/_/g, " "));
+                }
+                else return label.replace(/_/g, " ");
+        return retval.prop('outerHTML');
+    };
+*/
+
+    /*
     this.getPropertyIfImage = function(targetNodeURI, label, propertyUri, sourceNodeURI, connectionType) {
         var retval = "";
         var patt = new RegExp(this.findImagesRegexp, "i");
@@ -313,14 +411,6 @@ var Profile = new function() {
                 targetNodeURI_hash = [sourceNodeURI_hash, sourceNodeURI_hash = targetNodeURI_hash][0];
             }
             var hashedID = md5(sourceNodeURI_hash + connectionURI_hash + targetNodeURI_hash);
-//            retval = document.createElement("a");
-//            retval.setAttribute('title', targetNodeURI);
-//            retval.setAttribute('refProp', propertyUri);
-//            retval.setAttribute('refPropVal', targetNodeURI);
-//            retval.setAttribute('class', 'property-value-normal');
-//            retval.setAttribute('rel', 'group');
-//            retval.setAttribute('direction', connectionType);
-//            retval.setAttribute('id', hashedID);
             retval = $("<a title='"+ targetNodeURI +"'    refProp='" + propertyUri + "' refPropVal='" + targetNodeURI + "' class='property-value-normal' rel='group' direction="+connectionType+" id="+hashedID+"></a>");
             if (isImage === true && targetNodeURI !== null) {
                 // Image
@@ -353,7 +443,7 @@ var Profile = new function() {
 
         return retval.prop('outerHTML');
     };
-
+*/
     this.addService = function(name, shortDescription, description, endpoint, prefix, graph, sparqlTemplates, disabled) {
         var s = new Service(name, shortDescription, description, endpoint, prefix, graph, sparqlTemplates, disabled);
         this.services.push(s);
