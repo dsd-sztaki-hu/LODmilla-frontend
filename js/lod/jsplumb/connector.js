@@ -647,8 +647,31 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
 
 Node.prototype.vis_repaintConnections = function() {
     var length = this.connections.length;
-    var self = this;    
-    
+    var self = this;
+
+    var connection, target;
+    var $res = $(".resourceNodeBox");
+    var lookup = [];
+    var uri;
+    $res.each( function()
+        {
+            lookup[this.getAttribute('uri')] = true;
+        }
+    );
+    for (var i = 0; i < length; i++) {
+        connection = this.connections[i];
+        target = decodeURIComponent(connection.target);
+        if (lookup[target] !== undefined) {
+            var localsource = self.resource_id;
+            var localtarget = target;
+            if (connection.direction == 'in') {
+                localsource = target;
+                localtarget = self.resource_id;
+            }
+            vis_jsPlumbInstance_connect_uri(localsource, localtarget, connection);
+        }
+    }
+    /*
     for (var i = 0; i < length; i++) {
         var connection = this.connections[i],
             target = decodeURIComponent(connection.target);
@@ -667,6 +690,8 @@ Node.prototype.vis_repaintConnections = function() {
             vis_jsPlumbInstance_connect_uri(localsource, localtarget, connection);
         }
     }
+    */
+    console.timeEnd('a');
     // Iterate through the connections of all nodes in the graph to find
     // the not reflexive connections
     // DONE? .length property on undefined errors in console

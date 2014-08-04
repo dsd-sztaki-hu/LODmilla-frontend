@@ -308,7 +308,6 @@ var Graph = new function() {
                         nodeList.push({resource_id: node.resource_id, action: 'added', highlighted: false});
                     Graph.addNode(node.resource_id, node.label, node.top, node.left, false);
                 });
-
                 Graph.logUndoAction(undoActionLabel, nodeList);
 
                 window.scrollTo(jsonobject.graph.scrollX, jsonobject.graph.scrollY);

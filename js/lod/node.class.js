@@ -30,6 +30,7 @@ var Node = function(resource_id, label) {
     };
 
     this.connections = new Array();
+    this.hasConnection = [];
     this.literals = {};
     this.top = null;
     this.left = null;
@@ -52,6 +53,19 @@ var Node = function(resource_id, label) {
     };
 
     this.addConnection = function(targetURI, connectionLabel, direction, endpointLabel) {
+        var s = targetURI + connectionLabel;
+//        var f = this.hasConnection[s];
+        if (this.hasConnection[s] === undefined)
+        {
+            this.hasConnection[s] = true;
+            var newConn = new Connection(targetURI, connectionLabel, direction, endpointLabel);
+            this.connections.push(newConn);
+            return newConn;
+        }
+        return false;
+    };
+    /*
+    this.addConnection = function(targetURI, connectionLabel, direction, endpointLabel) {
         var length = this.connections.length;
         var conn;
         for (var i = 0; i < length; i++)
@@ -60,15 +74,11 @@ var Node = function(resource_id, label) {
             if (targetURI==conn.target && connectionLabel==conn.connectionUri)
                 return false;
         }
-//        $.each(this.connections, function(index, conn){
-//            if (targetURI==conn.target && connectionLabel==conn.connectionUri)
-//                return false;
-//        });
         var newConn = new Connection(targetURI, connectionLabel, direction, endpointLabel);
         this.connections.push(newConn);
         return newConn;
     };
-
+    */
     /*
     this.addConnection = function(targetURI, connectionLabel, direction, endpointLabel) {
         var alreadyAdded = false;                              
@@ -217,8 +227,8 @@ var Node = function(resource_id, label) {
     };
 
     this.getResourceCallback = function(json, service, highlight, undoActionLabel) {
-
-        var self = this;        
+        var self = this;
+        self.hasConnection = [];
         var aroundNode = Graph.getAroundNode(false, false);
 //        if (json === false || json === undefined || (json && (!json.hasOwnProperty('head') || !json.hasOwnProperty('results')))) {
         if (json === false || json === undefined ) {
