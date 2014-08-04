@@ -52,6 +52,25 @@ var Node = function(resource_id, label) {
     };
 
     this.addConnection = function(targetURI, connectionLabel, direction, endpointLabel) {
+        var length = this.connections.length;
+        var conn;
+        for (var i = 0; i < length; i++)
+        {
+            conn = this.connections[i];
+            if (targetURI==conn.target && connectionLabel==conn.connectionUri)
+                return false;
+        }
+//        $.each(this.connections, function(index, conn){
+//            if (targetURI==conn.target && connectionLabel==conn.connectionUri)
+//                return false;
+//        });
+        var newConn = new Connection(targetURI, connectionLabel, direction, endpointLabel);
+        this.connections.push(newConn);
+        return newConn;
+    };
+
+    /*
+    this.addConnection = function(targetURI, connectionLabel, direction, endpointLabel) {
         var alreadyAdded = false;                              
         $.each(this.connections, function(index, conn){
             if (connectionLabel===conn.connectionUri && targetURI===conn.target){
@@ -67,6 +86,7 @@ var Node = function(resource_id, label) {
             return newConn;
         }
     };
+    */
 
     this.getContent = function() {
         var content = {};
@@ -197,6 +217,7 @@ var Node = function(resource_id, label) {
     };
 
     this.getResourceCallback = function(json, service, highlight, undoActionLabel) {
+
         var self = this;        
         var aroundNode = Graph.getAroundNode(false, false);
 //        if (json === false || json === undefined || (json && (!json.hasOwnProperty('head') || !json.hasOwnProperty('results')))) {
@@ -207,6 +228,7 @@ var Node = function(resource_id, label) {
             self.vis_repaintConnections();
         } else {
             console.log('loading: ' + this.resource_id);
+            console.time('load time');
             // JSON comes from a known LOD - present in the Profile
             if (service && service !== "") {
                 self.endpoint.shortDescription = service.shortDescription;
@@ -553,6 +575,7 @@ var Node = function(resource_id, label) {
                 
         var nodeList = [{resource_id:this.resource_id, action:'added',highlighted:highlight}];
         Graph.logUndoAction(undoActionLabel, nodeList);
+        console.timeEnd('load time');
     };
 
     this.collectData = function(highlight, undoActionLabel) {

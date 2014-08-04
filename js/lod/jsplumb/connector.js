@@ -441,9 +441,7 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
     $('#nodeOpenedContent').remove();
     var nodeContent = this.getContent();
 
-//    var str_content = '',
-//        var str_header = '',
-        var tabcounter = 0,
+    var tabcounter = 0,
         deletePropertyBtn = '<span class="inspectorBtn deletePropertyBtn" title="Delete property">[x]</span>',
         deleteConnectionBtn = '<span class="inspectorBtn deleteConnectionBtn" title="Delete connection">[x]</span>',
         addPropertyBtn = '<span class="inspectorBtn addPropertyBtn" title="Add property">[add]</span>',
@@ -451,7 +449,7 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
         addNewConnectionBtn = '<span class="inspectorBtn addNewConnectionBtn" title="Add new connection type">[add]</span>',
         addNewPropertyBtn = '<span class="inspectorBtn addNewPropertyBtn" title="Add new property type">[add]</span>';
     var str_content = [], str_header = [];
-    console.time('1');
+
     $.each(nodeContent, function(idx, elem) {
         $.each(elem, function(type, item) {
 //            if (targetTabName && targetTabName !== '' && targetTabName === type && property && property !== '' && target && target !== '')
@@ -601,7 +599,6 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
     $conncollapse.next("ul").css('display','none');
     var $nodeOpenedContentTabs = $("#nodeOpenedContentTabs");
     $nodeOpenedContentTabs.tabs({
-//        show : false,
         heightStyle: "fill",
         create: function(event, ui) {
             self.scrollToResult(ui.tab, ui.panel);
@@ -611,7 +608,6 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
         }
     });
 //    $conncollapse.css('display','initial');
-    console.timeEnd('1');
 
 
     $(window).resize(function() {
