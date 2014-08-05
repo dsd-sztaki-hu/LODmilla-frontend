@@ -33,11 +33,12 @@ var Profile = new function() {
     this.defaultConnectionURI = "[EMPTY]";
     this.defaultConnectionsColor = "#056";
     this.highlightedConnectionsColor = "#f00";
-    this.connectorType = "Straight"; //StateMachine
+    this.connectorType = "StateMachine"; //StateMachine, Straight, Bezier
     this.connectorStrokeStyle = "#5c96bc";
     this.connectorLineWidth = 2;
     this.connectorOutlineWidth = 4;
     this.connectorGap = 5;
+    this.connectorStub = 5;
 
     this.connectionLabelLocation = 0.5;
     this.connectionArrowLocation = 0.75;
@@ -311,18 +312,22 @@ var Profile = new function() {
         }
         var addclass = 'property-value-normal';
         var slink, schild;
+        var sfancy = "";
+        var retval = [];
 
         if (targetNodeURI != null && this.imgPatt.test(targetNodeURI)) {
             // Image
             addclass += ' fancybox';
             slink = 'href="' + targetNodeURI + '"';
             schild = "<img src='" + targetNodeURI + "' alt=\"\" />";
+            sfancy = '" rel="group';
         }
         else if (label != null && this.imgPatt.test(label)) {
             // Image
             addclass += ' fancybox';
             slink = 'href="' + label + '"';
             schild = "<img src='" + label + "' alt=\"\" />";
+            sfancy = '" rel="group';
         }
         else if (this.isPropertyExternalLink(propertyUri))
         {
@@ -330,18 +335,27 @@ var Profile = new function() {
             slink = 'href="' + targetNodeURI + '" target="_blank"';
             schild = label.replace(/_/g, " ");
         }
-        else return label.replace(/_/g, " ");
-        var retval = [];
+        else
+        {
+            slink = 'href="' + targetNodeURI + '" target="_blank"';
+            schild = decodeURI(label.replace(/_/g, " "));
+//            schild = label;
+        }
+
+
         retval.push('<a title="', targetNodeURI,
-            '" refProp="', propertyUri,
-            '" refPropVal="', targetNodeURI,
+//            '" refProp="', propertyUri,
+//            '" refPropVal="', targetNodeURI,
             '" class="', addclass,
-            '" rel="group" direction="', connectionType,
-            '" id="', md5(sourceNodeURI_hash + propertyUri + targetNodeURI_hash),
+
+//            '" rel="group" direction="', connectionType,
+//            '" id="', md5(sourceNodeURI_hash + propertyUri + targetNodeURI_hash),
             '" ', slink,
-            ' >', schild,
+            sfancy,
+            '" >', schild,
             '</a>'
         );
+
         return retval.join("");
     };
 
@@ -443,7 +457,8 @@ var Profile = new function() {
 
         return retval.prop('outerHTML');
     };
-*/
+    */
+
     this.addService = function(name, shortDescription, description, endpoint, prefix, graph, sparqlTemplates, disabled) {
         var s = new Service(name, shortDescription, description, endpoint, prefix, graph, sparqlTemplates, disabled);
         this.services.push(s);

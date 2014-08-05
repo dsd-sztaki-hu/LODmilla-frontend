@@ -302,10 +302,13 @@ var Graph = new function() {
                 Graph.lastsavedgraphname = jsonobject.graph_name;
                 Graph.lastsavedgraphusername = jsonobject.graph_username;
                 var nodeList = [];
+                jsPlumbInstance.setSuspendDrawing(true);
+                Helper.stillLoading = 0;
                 $.each(jsonobject.graph.nodes, function(index, node) {
 //                    console.log("add node: " + node.resource_id);
                     if (!(Graph.getNode(node.resource_id)))
                         nodeList.push({resource_id: node.resource_id, action: 'added', highlighted: false});
+                    Helper.stillLoading++;
                     Graph.addNode(node.resource_id, node.label, node.top, node.left, false);
                 });
                 Graph.logUndoAction(undoActionLabel, nodeList);

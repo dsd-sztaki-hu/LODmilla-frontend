@@ -17,6 +17,7 @@ var selectionOriginalLeft = 0, selectionOriginalTop = 0;
 var selectedID = -1, selectedIsHighlighted = false;
 var mouseDown = false;
 var mousePositionLeft = 0, mousePositionTop = 0;
+var stillLoading = 0;
 
 vis_get_visibleCanvasRandomPosition = function(aroundNode){
     var top, left;
@@ -75,6 +76,7 @@ Graph.vis_getDistance = function(node1, node2){
 };
 
 Node.prototype.vis_show = function(highlight, aroundNode) {
+
     var self = this;
 
     // connections num in the Node
@@ -83,6 +85,7 @@ Node.prototype.vis_show = function(highlight, aroundNode) {
 
     if (this.loaded) {
         self.setImageURL();
+
     }
     var nodeHighlightBtn = $('<div class="node-button node-highlight" title="Highlight node"></div>'),
         nodeHideBtn = '<div class="node-button node-hide" title="Hide node"></div>',
@@ -334,6 +337,11 @@ Node.prototype.vis_showImageDefaultImage = function(nodeImageDiv, imgBox){
        
 Node.prototype.vis_refresh = function(highlight, aroundNode) {
     this.vis_show(highlight, aroundNode);
+    Helper.stillLoading--;
+    if (Helper.stillLoading < 1) {
+        Helper.stillLoading = -1;
+        jsPlumbInstance.setSuspendDrawing(false, true);
+    }
 };
 
 Node.prototype.vis_openNode = function(targetTabName, property, target) {

@@ -12,7 +12,7 @@ $(document).ready(function() {
 
         jsPlumbInstance = jsPlumb.getInstance({
             Container:"graph",
-            Connector: [ Profile.connectorType, { stub: 5, gap: Profile.connectorGap } ],
+            Connector: [ Profile.connectorType, { stub: Profile.connectorStub, gap: Profile.connectorGap } ],
             ConnectionsDetachable: true,
             EndpointHoverStyle: { fillStyle: "#f00"},
 
