@@ -40,8 +40,15 @@ $(document).ready(function() {
 //            Anchor: [ "Assign", {
 //                position:"Fixed"
 //            }]
-            Anchor: [ 'Top',  'Right', 'Bottom', 'Left'] // faster, but a bit different
-//            Anchor: "Continuous"
+//            Anchor: [ "Assign", {
+//                position:"Grid",
+//                grid:[3,3]
+//            }]
+//            Anchor: [ 'Top',  'Right', 'Bottom', 'Left', 'TopRight','BottomRight','TopLeft','BottomLeft'] // faster, but a bit different
+            Anchor: "Continuous"
+//            Anchor: "AutoDefault"
+//            Anchor: [ 'Top',  'Right', 'Bottom', 'Left']
+//            anchor:[ "Perimeter", { shape:"Square", anchorCount:150 }]
         });
 
         jsPlumbInstance.registerConnectionTypes({

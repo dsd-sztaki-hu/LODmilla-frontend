@@ -33,7 +33,7 @@ var Profile = new function() {
     this.defaultConnectionURI = "[EMPTY]";
     this.defaultConnectionsColor = "#056";
     this.highlightedConnectionsColor = "#f00";
-    this.connectorType = "StateMachine"; //StateMachine, Straight, Bezier
+    this.connectorType = "Straight"; //StateMachine, Straight, Bezier
     this.connectorStrokeStyle = "#5c96bc";
     this.connectorLineWidth = 2;
     this.connectorOutlineWidth = 4;
@@ -304,57 +304,51 @@ var Profile = new function() {
 
     this.getPropertyIfImage = function(targetNodeURI, label, propertyUri, sourceNodeURI, connectionType) {
         if (connectionType == 'literals') return "";
-        var sourceNodeURI_hash = sourceNodeURI,
-            targetNodeURI_hash = targetNodeURI;
-        // ha befele jovo kapcsolat, akkor a source es target felcserelodik
-        if (connectionType == 'in'){
-            targetNodeURI_hash = [sourceNodeURI_hash, sourceNodeURI_hash = targetNodeURI_hash][0];
-        }
-        var addclass = 'property-value-normal';
-        var slink, schild;
-        var sfancy = "";
         var retval = [];
-
         if (targetNodeURI != null && this.imgPatt.test(targetNodeURI)) {
             // Image
-            addclass += ' fancybox';
-            slink = 'href="' + targetNodeURI + '"';
-            schild = "<img src='" + targetNodeURI + "' alt=\"\" />";
-            sfancy = '" rel="group';
+            retval.push('<a title="', targetNodeURI,
+                '" class="property-value-normal fancybox" rel="group" href="', targetNodeURI,
+                '" ><img src="', targetNodeURI, '" alt=\"\" /></a>'
+            );
+
         }
         else if (label != null && this.imgPatt.test(label)) {
             // Image
-            addclass += ' fancybox';
-            slink = 'href="' + label + '"';
-            schild = "<img src='" + label + "' alt=\"\" />";
-            sfancy = '" rel="group';
+            retval.push('<a title="', label,
+                '" class="property-value-normal fancybox" rel="group" href="', label,
+                '" ><img src="', label, '" alt=\"\" /></a>'
+            );
         }
         else if (this.isPropertyExternalLink(propertyUri))
         {
             // External link
-            slink = 'href="' + targetNodeURI + '" target="_blank"';
-            schild = label.replace(/_/g, " ");
+            retval.push('<a title="', targetNodeURI,
+                '" class="property-value-normal" href="', targetNodeURI,
+                '" target="_blank">', label.replace(/_/g, " "), '</a>'
+            );
         }
         else
         {
-            slink = 'href="' + targetNodeURI + '" target="_blank"';
-            schild = decodeURI(label.replace(/_/g, " "));
-//            schild = label;
+//            var sourceNodeURI_hash = sourceNodeURI,
+//                targetNodeURI_hash = targetNodeURI;
+//            // ha befele jovo kapcsolat, akkor a source es target felcserelodik
+//            if (connectionType == 'in'){
+//                targetNodeURI_hash = [sourceNodeURI_hash, sourceNodeURI_hash = targetNodeURI_hash][0];
+//            }
+            retval.push('<a title="', targetNodeURI,
+                '" refProp="', propertyUri,
+                '" refPropVal="', targetNodeURI,
+                '" direction="', connectionType);
+            // ha befele jovo kapcsolat, akkor a source es target felcserelodik
+            if (connectionType == 'in')
+                retval.push('" id="', md5(targetNodeURI + propertyUri + sourceNodeURI));
+            else
+                retval.push('" id="', md5(sourceNodeURI + propertyUri + targetNodeURI));
+            retval.push('" class="property-value-normal showableNodeUri" href="', targetNodeURI,
+                '">', label, '</a>'
+            );
         }
-
-
-        retval.push('<a title="', targetNodeURI,
-//            '" refProp="', propertyUri,
-//            '" refPropVal="', targetNodeURI,
-            '" class="', addclass,
-
-//            '" rel="group" direction="', connectionType,
-//            '" id="', md5(sourceNodeURI_hash + propertyUri + targetNodeURI_hash),
-            '" ', slink,
-            sfancy,
-            '" >', schild,
-            '</a>'
-        );
 
         return retval.join("");
     };

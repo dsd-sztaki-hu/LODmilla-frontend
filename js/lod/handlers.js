@@ -603,6 +603,10 @@ addBottomMenuHandlers = function(){
     });
 
     $("body").on('click', '#main .buttonWrap #exportButton', function(event) {
+//        var $canvas = Graph.canvas[0];
+//        var img = $canvas.toDataURL("image/png");
+
+//        $("#graph").html('<img src="'+img+'"/>');
         exportToDot();
         console.log('exported');
     });

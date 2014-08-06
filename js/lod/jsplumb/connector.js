@@ -340,7 +340,8 @@ Node.prototype.vis_refresh = function(highlight, aroundNode) {
     Helper.stillLoading--;
     if (Helper.stillLoading < 1) {
         Helper.stillLoading = -1;
-        jsPlumbInstance.setSuspendDrawing(false, true);
+        jsPlumbInstance.setSuspendDrawing(false, false);
+        repaintNodes();
     }
 };
 
@@ -968,7 +969,8 @@ Graph.vis_engineInit = function() {
             rectangleSelection = false;
         }
         if (event.ctrlKey || event.altKey) {
-            jsPlumbInstance.setSuspendDrawing(false,true);
+            jsPlumbInstance.setSuspendDrawing(false,false);
+            repaintNodes();
             return;
         }
         var $canvas = $(this);
@@ -984,7 +986,8 @@ Graph.vis_engineInit = function() {
             repaintNodes();
         }
 //        updateModelPosition($canvas.data('x'), $canvas.data('y'), event.pageX, event.pageY);
-        jsPlumbInstance.setSuspendDrawing(false,true);
+        jsPlumbInstance.setSuspendDrawing(false,false);
+        repaintNodes();
         return false;
 
     };
