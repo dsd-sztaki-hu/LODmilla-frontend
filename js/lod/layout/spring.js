@@ -29,7 +29,10 @@ function springLayout(buffer, steps, max_time,  min_distance, grid_distance, spr
     max = repulsiveMaxDistance(max, spring_strain, spring_length, min, a_cc) * min_distance;
 //    max = 1000;
     for (var i = 0; i < steps; i++) {
-        if (Date.now() - start_time > max_time) break;
+        if (Date.now() - start_time > max_time) {
+            console.log('Spring layout finished: ' + i / steps * 100 + '%');
+            break;
+        }
         if (Math.abs(min - min0) > min_distance) {
             min0 = min;
             max = repulsiveMaxDistance(max, spring_strain, spring_length, min, a_cc) * min_distance;
@@ -88,7 +91,8 @@ function calculateSpringStep(buffer, min_distance, spring_strain, spring_length,
 //            neighbour_factor = 1;
             j_node = buffer.getVertexByIndex(j);
             j_cc = j_node.targets.length + j_node.sources.length + 1;
-            force_pull = i_cc == j_cc && buffer.areNeighbours(i, j);
+//            force_pull = i_cc == j_cc && buffer.areNeighbours(i, j);
+            force_pull = i_cc == j_cc && buffer.neighbours[i][j];
 //            if (i_node.type == j_node.type) {
 //                force_pull = true;
 //                neighbour_factor = 2;
@@ -127,7 +131,8 @@ function calculateSpringStep(buffer, min_distance, spring_strain, spring_length,
             {
                 distance = Math.sqrt(distance2);
             }
-            if (i_node.targets.indexOf(j) > -1 || j_node.targets.indexOf(i) > -1 || force_pull)
+//            if (force_pull || i_node.targets.indexOf(j) > -1 || j_node.targets.indexOf(i) > -1)
+            if (buffer.connected[i][j] != 0 || force_pull)
             {
                 // pull
                 F = spring_strain * Math.log(distance / spring_length)

@@ -49,11 +49,22 @@ function initLayout(name, buffer, useVirtual, weight, virtualWeight)
     console.time("Loading edges to buffer");
     //loading edges to buffer
     var conns = jsPlumbInstance.getAllConnections();
-    $.each(conns, function() {
+    $.each(conns, function(conn_id, l_conn) {
         var source = $(this.source).attr('uri');
         var target = $(this.target).attr('uri');
-        buffer.addConnection(source, target);
+        $.each(l_conn.getOverlays(), function(overlay_id, overlay) {
+            if (overlay.type === 'Label') {
+                buffer.addConnection(source, target, overlay.getLabel());
+            }
+        });
+//            }
     });
+//    $.each(conns, function() {
+//        var source = $(this.source).attr('uri');
+//        var target = $(this.target).attr('uri');
+//        buffer.addConnection(source, target);
+//    });
+
     console.timeEnd("Loading edges to buffer");
     if (useVirtual) {
         console.time("Loading virtual nodes to buffer");
@@ -61,7 +72,8 @@ function initLayout(name, buffer, useVirtual, weight, virtualWeight)
 //        addVirtualNodes(buffer, virtualWeight);
         console.timeEnd("Loading virtual nodes to buffer");
     }
-
+    buffer.createNeighboursMap();
+    buffer.createConnectionMap();
     console.time(name + " layout");
 }
 

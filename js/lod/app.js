@@ -45,6 +45,7 @@ $(document).ready(function() {
 //                grid:[3,3]
 //            }]
 //            Anchor: [ 'Top',  'Right', 'Bottom', 'Left', 'TopRight','BottomRight','TopLeft','BottomLeft'] // faster, but a bit different
+            // TODO set back to Continuous
             Anchor: "Continuous"
 //            Anchor: "AutoDefault"
 //            Anchor: [ 'Top',  'Right', 'Bottom', 'Left']

@@ -340,8 +340,8 @@ Node.prototype.vis_refresh = function(highlight, aroundNode) {
     Helper.stillLoading--;
     if (Helper.stillLoading < 1) {
         Helper.stillLoading = -1;
-        jsPlumbInstance.setSuspendDrawing(false, false);
-        repaintNodes();
+        jsPlumbInstance.setSuspendDrawing(false, true);
+//        repaintNodes(); initnél nem számít, mert nincs timestampből gond
     }
 };
 

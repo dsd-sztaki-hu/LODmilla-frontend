@@ -7,11 +7,14 @@ var normalNodeSize = true;
 
 function repaintNodes()
 {
+    console.time('Repaint all');
 //    jsPlumbInstance.repaintEverything();
     // repaintEverything() nem működik megbízhatóan automatikusan kiszámolt anchorral, tudnak a hibáról
+
     $('.resourceNodeBox').each(function() {
         jsPlumbInstance.repaint(this);
     });
+    console.timeEnd('Repaint all');
 }
 
 function refreshNodeModelPosition(node, dx, dy)
