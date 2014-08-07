@@ -8,9 +8,8 @@ var normalNodeSize = true;
 function repaintNodes()
 {
     console.time('Repaint all');
-//    jsPlumbInstance.repaintEverything();
     // repaintEverything() nem működik megbízhatóan automatikusan kiszámolt anchorral, tudnak a hibáról
-
+    jsPlumbInstance.setSuspendDrawing(false);
     $('.resourceNodeBox').each(function() {
         jsPlumbInstance.repaint(this);
     });
@@ -53,7 +52,7 @@ function moveNodes(event)
     mousePositionTop = event.pageY;
 }
 
-function moveNodesExcept(event, selected)
+function moveNodesExcept(event, selected, repaint)
 {
     var dx = mousePositionLeft - event.pageX;
     var dy = mousePositionTop - event.pageY;
@@ -71,6 +70,7 @@ function moveNodesExcept(event, selected)
             refreshNodeModelPosition(node, dx, dy);
             refreshNodeVisiblePosition($node, dx, dy);
         }
+        if (repaint) jsPlumbInstance.repaint($node);
     });
     mousePositionLeft = event.pageX;
     mousePositionTop = event.pageY;
@@ -85,7 +85,7 @@ function zoom(ratio, x, y)
         jsPlumbInstance.setSuspendDrawing(true);
         blockResetDrawing = true;
         decideZoom(ratio, x, y);
-        setTimeout(checkDrawing, 500);
+        setTimeout(checkDrawing, 1000);
     }
 }
 
@@ -118,10 +118,11 @@ function decideZoom(ratio, x, y)
 function checkDrawing()
 {
     if (resetDrawingCounter == 0) {
-        jsPlumbInstance.setSuspendDrawing(false, true);
+        jsPlumbInstance.setSuspendDrawing(false, false);
+        repaintNodes();
         blockResetDrawing = false;
     }
-    if (resetDrawingCounter > 0) setTimeout(checkDrawing, 500);
+    if (resetDrawingCounter > 0) setTimeout(checkDrawing, 1000);
 }
 
 function applyZoom(x, y)

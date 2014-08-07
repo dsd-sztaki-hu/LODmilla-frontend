@@ -453,6 +453,9 @@ var Sidemenu = new function() {
         self.layoutBox.append('<div class="layoutGridButton"><input type="button" value="Grid" /></div>');
         self.layoutBox.find('.layoutGridButton input').button();
 
+        self.layoutBox.append('<div class="layoutRadialButton"><input type="button" value="Radial" /></div>');
+        self.layoutBox.find('.layoutRadialButton input').button();
+
         self.layoutBox.append('<div class="layoutSpringButton"><input type="button" value="Spring" /></div>');
         self.layoutBox.find('.layoutSpringButton input').button();
 

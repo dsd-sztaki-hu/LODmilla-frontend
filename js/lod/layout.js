@@ -9,6 +9,7 @@
 
 var LayoutEnum = {
     GRID : "Grid",
+    RADIAL : "Radial",
     SPRING : "Spring"
 }
 
@@ -24,6 +25,9 @@ function applyLayout(layoutType)
     {
         case LayoutEnum.GRID:
             gridLayout();
+            break;
+        case LayoutEnum.RADIAL:
+            radialLayout(buffer, 200 * Graph.zoomRatio);
             break;
         case LayoutEnum.SPRING:
             springLayout(buffer, 10000, 10000, 100, 100, 1, 1, 10000);
@@ -81,8 +85,23 @@ function finishLayout(name)
 {
     console.timeEnd(name + " layout");
     console.time("Animate");
-    animateMovementIterative("slow",1);
+//    animateMovementIterative("slow",1);
+    updateNewPosition();
     console.timeEnd("Animate");
+}
+
+function updateNewPosition()
+{
+//    jsPlumbInstance.setSuspendDrawing(true); no effect
+    $('.resourceNodeBox').each(function() {
+        var $node = $(this);
+        var node = Graph.getNode(this.getAttribute('uri'));
+        $node.css('left', node.left);
+        $node.css('top', node.top);
+    });
+//    jsPlumbInstance.setSuspendDrawing(false, false);
+    repaintNodes();
+//
 }
 
 /**

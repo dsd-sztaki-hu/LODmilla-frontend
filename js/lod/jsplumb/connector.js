@@ -858,8 +858,8 @@ Graph.vis_engineInit = function() {
 
     /** Pan **/
     Graph.canvas[0].onmousedown = function(event) {
-        mouseDown = true;
         jsPlumbInstance.setSuspendDrawing(true);
+        mouseDown = true;
 //        console.log(event.target)
         // if node connection label is dragged
         var event_target = $(event.target);
@@ -929,16 +929,16 @@ Graph.vis_engineInit = function() {
 //            jsPlumbInstance.setSuspendDrawing(false,true);
 //            setTimeout(repaintNodes, 1000);
             if (mouseDown && selectedIsHighlighted && $(event.target).is('.resourceNodeBox, .resourceNodeBox *')) {
-                moveNodesExcept(event, selectedID);
-                repaintNodes();
-//                setTimeout(repaintNodes, 1000);
+
+                moveNodesExcept(event, selectedID, false);
+//                repaintNodes();
             }
-//            jsPlumbInstance.setSuspendDrawing(true);
         }
     }
 
     Graph.canvas[0].onmouseup = function(event) {
         mouseDown = false;
+        jsPlumbInstance.setSuspendDrawing(false,false);
         if (rectangleSelection) {
             var w = Profile.nodeWidth * Graph.zoomRatio / 2;
             var h = Profile.nodeWidth * Graph.zoomRatio / 2;
@@ -968,11 +968,10 @@ Graph.vis_engineInit = function() {
             $('.selection-box').remove();
             rectangleSelection = false;
         }
-        if (event.ctrlKey || event.altKey) {
-            jsPlumbInstance.setSuspendDrawing(false,false);
-            repaintNodes();
-            return;
-        }
+//        if (event.ctrlKey || event.altKey) {
+//            repaintNodes();
+//            return;
+//        }
         var $canvas = $(this);
         if ($canvas.data('down') === true) {
             $canvas.data('down', false);
@@ -980,14 +979,13 @@ Graph.vis_engineInit = function() {
             repaintNodes();
 //            return false;
         }
-
         if ($(event.target).is('.resourceNodeBox, .resourceNodeBox *') && selectedIsHighlighted) {
-            moveNodesExcept(event, selectedID);
-            repaintNodes();
+            moveNodesExcept(event, selectedID, true);
+//            repaintNodes();
         }
 //        updateModelPosition($canvas.data('x'), $canvas.data('y'), event.pageX, event.pageY);
-        jsPlumbInstance.setSuspendDrawing(false,false);
-        repaintNodes();
+
+//        repaintNodes();
         return false;
 
     };

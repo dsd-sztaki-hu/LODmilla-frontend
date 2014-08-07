@@ -17,6 +17,8 @@ function Vertex(id, label, weight, isVirtual, left, top, type) {
     this.diffTop = 0;
     this.diffLeft = 0;
     this.type = type;
+    this.inConnCounter = 0;
+    this.outConnCounter = 0;
 }
 
 /**
@@ -31,6 +33,7 @@ function Buffer() {
 
 Vertex.prototype.addTargetConnection = function(target_index, label)
 {
+    this.outConnCounter++;
     var index = this.targets.indexOf(target_index);
     if (index < 0)
     {
@@ -48,6 +51,7 @@ Vertex.prototype.addTargetConnection = function(target_index, label)
 Vertex.prototype.addSourceConnection = function(source_index, label)
 {
 //    if (this.sources.indexOf(source_index) < 0) this.sources.push(source_index);
+    this.inConnCounter++;
     var index = this.sources.indexOf(source_index);
     if (index < 0)
     {

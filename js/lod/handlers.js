@@ -389,6 +389,11 @@ addPaletteHandlers = function(){
         applyLayout(LayoutEnum.GRID);
     });
 
+    //Radial layout buttton
+    $('body').on("click", '#main #paletteBox #layoutPalette div.layoutRadialButton input', function(event) {
+        applyLayout(LayoutEnum.RADIAL);
+    });
+
     //Spring layout button
     $('body').on("click", '#main #paletteBox #layoutPalette div.layoutSpringButton input', function(event) {
         applyLayout(LayoutEnum.SPRING);
