@@ -7,12 +7,37 @@ var normalNodeSize = true;
 
 function repaintNodes()
 {
-    console.time('Repaint all');
+
+    var $res;
+    var $node = [], $child = [], length = 0;
+    var $tnode;
+    var i;
     // repaintEverything() nem működik megbízhatóan automatikusan kiszámolt anchorral, tudnak a hibáról
-    jsPlumbInstance.setSuspendDrawing(false);
-    $('.resourceNodeBox').each(function() {
-        jsPlumbInstance.repaint(this);
+    console.time('Repaint all');
+    jsPlumbInstance.setSuspendDrawing(false, false);
+
+//        $res = $('.resourceNodeBox');
+
+//    jsPlumbInstance.repaintEverything();
+    $res = $('.resourceNodeBox');
+    $res.each(function() {
+        $tnode = $(this);
+        $node.push($tnode);
+        $child.push($tnode.children().detach());
+        length++;
     });
+    jsPlumbInstance.repaintEverything();
+
+//    $res.each(function() {
+////        $node = $(this);
+////        $child = $node.children().detach();
+//        jsPlumbInstance.repaint(this);
+////        $node.append($child);
+//    });
+    for (i = 0; i < length; i++)
+    {
+        $node[i].append($child[i]);
+    }
     console.timeEnd('Repaint all');
 }
 

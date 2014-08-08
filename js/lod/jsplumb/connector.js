@@ -346,17 +346,28 @@ Node.prototype.vis_refresh = function(highlight, aroundNode) {
     });
     if (loaded == length) {
         jsPlumbInstance.setSuspendDrawing(false, false);
-//        $.fancybox.open([{
+
+//        $.fancybox({
+//                showCloseButton : false,
 //                href:'img/SZTAKI_logo_2012_english_RG.png'
-//            }]);
+//            });
 //        repaintNodes();
 //        applyLayout(LayoutEnum.RADIAL, false);
-        applyLayout(LayoutEnum.SPRING, true);
+
+        applyLayout(LayoutEnum.SPRING, false);
+        repaintNodes();
+
+//        $.fancybox.hideLoading();
+//        $.fancybox.close();
 //        $.each(Graph.nodes, function(){
 //            this.weight = 1000;
 //        });
 //        repaintNodes();
 //        repaintNodes(); initnél nem számít, mert nincs timestampből gond
+    }
+    else
+    {
+//        $.fancybox.showLoading();
     }
 };
 

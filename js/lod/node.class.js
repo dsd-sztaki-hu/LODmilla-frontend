@@ -580,13 +580,12 @@ var Node = function(resource_id, label) {
         if (self.type === Profile.unloadedNodeType)
             self.type = Profile.defaultNodeType;     
 
-        Sidemenu.refreshSearchDatabase();        
-        
+        Sidemenu.refreshSearchDatabase();
+        console.timeEnd('load time');
         self.vis_refresh(highlight, aroundNode);
                 
         var nodeList = [{resource_id:this.resource_id, action:'added',highlighted:highlight}];
         Graph.logUndoAction(undoActionLabel, nodeList);
-        console.timeEnd('load time');
     };
 
     this.collectData = function(highlight, undoActionLabel) {

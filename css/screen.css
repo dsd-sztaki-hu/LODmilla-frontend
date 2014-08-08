@@ -18,7 +18,7 @@ body {
 }
 
 .resourceNodeBox {    
-    padding:0.5em;
+    /*padding:0.5em;*/
     border:1px solid #346789;
     padding-right: 1.5em;
     padding-left: 1.5em;
