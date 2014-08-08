@@ -103,7 +103,7 @@ addInspectorHandlers = function(){
         if (!(Graph.getNode(resource_id))){
             var undoActionLabel = 'action_resourceBox_addNewNodeConnection';
             var aroundNode = Graph.getAroundNode();
-            Graph.addNode($(this).attr("refpropval"),false,false,false,false, undoActionLabel, aroundNode);
+            Graph.addNode($(this).attr("refpropval"),false,false,false,true, undoActionLabel, aroundNode);
         }
         else
             $('div[uri="'+resource_id+'"]').effect( "shake" );

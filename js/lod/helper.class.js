@@ -12,8 +12,6 @@
  */
 var Helper = new function(){
 
-    this.stillLoading = 0;
-
     this.getCapitalizedString = function(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     };

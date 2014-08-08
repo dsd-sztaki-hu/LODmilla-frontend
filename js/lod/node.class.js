@@ -37,6 +37,8 @@ var Node = function(resource_id, label) {
     this.width = Profile.nodeWidth;
     this.height = Profile.nodeHeight;
 
+    this.weight = 1;
+
     this.loaded = false;
     var self = this;
 
@@ -235,7 +237,7 @@ var Node = function(resource_id, label) {
             console.log('failed to download a resource: ' + this.resource_id);
             self.vis_remove_load_progressbar();
             self.vis_refresh(highlight, aroundNode);
-            self.vis_repaintConnections();
+//            self.vis_repaintConnections();
         } else {
             console.log('loading: ' + this.resource_id);
             console.time('load time');
@@ -581,7 +583,6 @@ var Node = function(resource_id, label) {
         Sidemenu.refreshSearchDatabase();        
         
         self.vis_refresh(highlight, aroundNode);
-        self.vis_repaintConnections();            
                 
         var nodeList = [{resource_id:this.resource_id, action:'added',highlighted:highlight}];
         Graph.logUndoAction(undoActionLabel, nodeList);

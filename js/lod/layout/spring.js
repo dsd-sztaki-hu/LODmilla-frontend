@@ -2,6 +2,8 @@
  * Created by Attila Gyorok on 2014.07.14..
  */
 
+var springGravitation = 100000;
+
 /**
  * Force based graph layout algorithm.
  * @param buffer Temporary solution is to prepare the data in a buffer structure. See "Buffer" class.
@@ -13,21 +15,21 @@
  * @param spring_length Decreases the attractive force's strength. Scales with logarithm.
  * @param spring_gravitation Increases the repulsive force's strength linearly.
  */
-function springLayout(buffer, steps, max_time,  min_distance, grid_distance, spring_strain, spring_length, spring_gravitation) {
+function springLayout(buffer, steps, max_time,  min_distance, grid_distance, spring_strain, spring_length) {
     var start_time = Date.now();
     var max = 1;
-    var maxmin = 1;
-    var min = spring_gravitation, min0 = spring_gravitation;
-    var a_cc = 0;
-    for (var i = 0; i < buffer.vertexes.length; i++) {
-        var a_node = buffer.getVertexByIndex(i);
-        a_cc +=a_node.targets.length + a_node.sources.length;
-    }
-    a_cc++;
-    a_cc /= buffer.vertexes.length;
+    var min = springGravitation, min0 = springGravitation;
+//    var a_cc = 0;
+//    for (var i = 0; i < buffer.vertexes.length; i++) {
+//        var a_node = buffer.getVertexByIndex(i);
+//        a_cc +=a_node.targets.length + a_node.sources.length;
+//    }
+//    a_cc++;
+//    a_cc /= buffer.vertexes.length;
 //    a_cc = a_cc * a_cc;
-    max = repulsiveMaxDistance(max, spring_strain, spring_length, min, a_cc) * min_distance;
+
 //    max = 1000;
+    max = repulsiveMaxDistance(min, min_distance) * min_distance;
     for (var i = 0; i < steps; i++) {
         if (Date.now() - start_time > max_time) {
             console.log('Spring layout finished: ' + i / steps * 100 + '%');
@@ -35,13 +37,14 @@ function springLayout(buffer, steps, max_time,  min_distance, grid_distance, spr
         }
         if (Math.abs(min - min0) > min_distance) {
             min0 = min;
-            max = repulsiveMaxDistance(max, spring_strain, spring_length, min, a_cc) * min_distance;
+            max = repulsiveMaxDistance(min, min_distance) * min_distance;
         }
+//        max = repulsiveMaxDistance(min, min_distance) * min_distance;
         min = calculateSpringStep(buffer, min_distance , spring_strain, spring_length, min, max);
-        if (max > maxmin) maxmin = max;
         setNewPosition(buffer, grid_distance, spring_strain, spring_length, min);
     }
     setVisiblePosition(buffer);
+    springGravitation = min;
 }
 
 function iterativeMaxDistance(prev, spring_strain, spring_length, spring_gravitation, average_connection)
@@ -62,9 +65,9 @@ function iterativeMaxDistance(prev, spring_strain, spring_length, spring_gravita
     return ni;
 }
 
-function repulsiveMaxDistance(prev, spring_strain, spring_length, spring_gravitation, average_connection)
+function repulsiveMaxDistance(spring_gravitation, min_distance)
 {
-    return Math.pow(spring_gravitation / 10, 1/3);
+    return Math.pow(spring_gravitation / min_distance, 1/3);
 }
 
 function calculateSpringStep(buffer, min_distance, spring_strain, spring_length, spring_gravitation, max_distance)
@@ -173,6 +176,14 @@ function calculateSpringStep(buffer, min_distance, spring_strain, spring_length,
                 max_count++;
                 continue;
             }
+//            if (i_cc == 1 && j_cc == 1)
+//            {
+//                if (distance > max_distance / 100)
+//                {
+//                    max_count++;
+//                    continue;
+//                }
+//            }
             F = spring_gravitation * d_cc / (distance2 * distance);
             F_left = F * d_left;
             F_top = F * d_top;

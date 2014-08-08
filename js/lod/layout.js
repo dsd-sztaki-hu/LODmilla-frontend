@@ -13,7 +13,7 @@ var LayoutEnum = {
     SPRING : "Spring"
 }
 
-function applyLayout(layoutType)
+function applyLayout(layoutType, repaint)
 {
     var buffer = new Buffer();
     var name = layoutType;
@@ -35,7 +35,7 @@ function applyLayout(layoutType)
         default :
             console.log("Wrong layout type.");
     }
-    finishLayout(name);
+    finishLayout(name, repaint);
 }
 
 //TODO undo function
@@ -47,7 +47,7 @@ function initLayout(name, buffer, useVirtual, weight, virtualWeight)
     for (var index in Graph.nodes)
     {
         var act = Graph.nodes[index];
-        buffer.addVertex(act.resource_id, act.label, weight, false, act.left, act.top, act.type);
+        buffer.addVertex(act.resource_id, act.label, act.weight, false, act.left, act.top, act.type);
     }
     console.timeEnd("Loading nodes to buffer");
     console.time("Loading edges to buffer");
@@ -81,16 +81,16 @@ function initLayout(name, buffer, useVirtual, weight, virtualWeight)
     console.time(name + " layout");
 }
 
-function finishLayout(name)
+function finishLayout(name, repaint)
 {
     console.timeEnd(name + " layout");
     console.time("Animate");
 //    animateMovementIterative("slow",1);
-    updateNewPosition();
+    updateNewPosition(repaint);
     console.timeEnd("Animate");
 }
 
-function updateNewPosition()
+function updateNewPosition(repaint)
 {
 //    jsPlumbInstance.setSuspendDrawing(true); no effect
     $('.resourceNodeBox').each(function() {
@@ -100,7 +100,7 @@ function updateNewPosition()
         $node.css('top', node.top);
     });
 //    jsPlumbInstance.setSuspendDrawing(false, false);
-    repaintNodes();
+    if (repaint) jsPlumbInstance.repaintEverything();
 //
 }
 

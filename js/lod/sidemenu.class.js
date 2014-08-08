@@ -693,7 +693,7 @@ var Sidemenu = new function() {
 
     this.openNode = function(newURI, undoActionLabel) {
         if (newURI && newURI !== '') {
-            Graph.addNode(newURI, false, false, false, false, undoActionLabel);
+            Graph.addNode(newURI, false, false, false, true, undoActionLabel);
         }
         self.openResForm.find('div.resourceLabelInput input').removeClass('ui-autocomplete-loading');
     };

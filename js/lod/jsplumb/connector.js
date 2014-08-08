@@ -337,10 +337,25 @@ Node.prototype.vis_showImageDefaultImage = function(nodeImageDiv, imgBox){
        
 Node.prototype.vis_refresh = function(highlight, aroundNode) {
     this.vis_show(highlight, aroundNode);
-    Helper.stillLoading--;
-    if (Helper.stillLoading < 1) {
-        Helper.stillLoading = -1;
-        jsPlumbInstance.setSuspendDrawing(false, true);
+    this.vis_repaintConnections();
+    var length = 0;
+    var loaded = 0;
+    $.each(Graph.nodes, function(){
+        if (this.loaded) loaded++;
+        length++;
+    });
+    if (loaded == length) {
+        jsPlumbInstance.setSuspendDrawing(false, false);
+//        $.fancybox.open([{
+//                href:'img/SZTAKI_logo_2012_english_RG.png'
+//            }]);
+//        repaintNodes();
+//        applyLayout(LayoutEnum.RADIAL, false);
+        applyLayout(LayoutEnum.SPRING, true);
+//        $.each(Graph.nodes, function(){
+//            this.weight = 1000;
+//        });
+//        repaintNodes();
 //        repaintNodes(); initnél nem számít, mert nincs timestampből gond
     }
 };
@@ -562,11 +577,13 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
     var $nodeOpenedContent = $(par);
     par.setAttribute('id','nodeOpenedContent');
     par.setAttribute('title', this.label);
-//    par.innerHTML = '<div id="nodeOpenedContentTabs">' + str_header + str_content + '</div>';
-    var child1 = document.createElement("div");
-    par.appendChild(child1);
-    child1.setAttribute('id','nodeOpenedContentTabs');
-    child1.innerHTML = str_header + str_content;
+//    par.insertAdjacentHTML('beforeend','<div id="nodeOpenedContentTabs">' + str_header + str_content + '</div>');
+    par.innerHTML = '<div id="nodeOpenedContentTabs">' + str_header + str_content + '</div>';
+//    var child1 = document.createElement("div");
+//    par.appendChild(child1);
+//    child1.setAttribute('id','nodeOpenedContentTabs');
+//    child1.insertAdjacentHTML('beforeend', str_header + str_content);
+//    child1.innerHTML = str_header + str_content;
 
 
 //    var $nodeOpenedContent = $('<div id="nodeOpenedContent" title="' + this.label + '"><div id="nodeOpenedContentTabs">' + str_header + str_content + '</div></div>');

@@ -387,6 +387,7 @@ a:hover {
 
 
 #logowrap, #helpButton, #headerWrapper {
+    z-index: 201;
     position: fixed;
     display: block;
 }

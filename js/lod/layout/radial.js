@@ -7,13 +7,11 @@ function radialLayout(buffer, min_distance) {
     var sorting_nodes = [];
     var sorted_nodes = [];
     var tmp_nodes = [];
-    var index, index2, act;
+    var index, act;
     var i, j, k;
 //    var distance = Math.sqrt(2 * min_distance * min_distance);
     var distance = min_distance;
-    var x = 0, y = 0;
-    var r = 0;
-    var full_circle = 0;
+    var x = 0;
     var theta = 0;
 
     var parts = 1;
@@ -47,6 +45,7 @@ function radialLayout(buffer, min_distance) {
             if (unsorted_nodes.length == 0) break;
             else {
                 sorting_nodes[0] = unsorted_nodes[0];
+                unsorted_nodes.splice(0,1);
                 length = 1;
             }
         }
@@ -109,13 +108,14 @@ function radialLayout(buffer, min_distance) {
     var db;
 //    var r0;
     var slices = 1;
-    r = distance * 2;
+    var dist_norm = Math.sqrt(2 * distance * distance);
+    r = distance * 1.25;
     level = sorted_nodes.length;
     for (i = 1; i < level; i++) {
         length = sorted_nodes[i].length;
 //        r = distance * length / PI2;
 //        if (r < r0) r = r0 + distance;
-        parts = PI2 * r / distance;
+        parts = PI2 * r / dist_norm;
         if (length < parts)
             slices = length;
         else
@@ -125,7 +125,7 @@ function radialLayout(buffer, min_distance) {
         for (index = 0; index < length; index++) {
             if (index > db) {
                 r += distance;
-                parts = PI2 * r / distance;
+                parts = PI2 * r / dist_norm;
                 db += parts;
                 x = 0;
                 if (length - index < parts)
@@ -142,7 +142,7 @@ function radialLayout(buffer, min_distance) {
             x++;
             theta = x / slices * PI2;
         }
-        r += 2 * distance;
+        r += distance * 1.25;
 //        r0 = r;
     }
 }
