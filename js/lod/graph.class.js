@@ -21,6 +21,15 @@ var Graph = new function() {
 
     this.zoomRatio = 1;
 
+    this.LayoutEnum = {
+        GRID : "Grid",
+        RADIAL : "Radial",
+        SPRING : "Spring",
+        NONE : "None"
+    }
+
+    this.layout = this.LayoutEnum.NONE;
+
     /**
      * Initialises the graph.
      * @param {type} parent
@@ -204,7 +213,8 @@ var Graph = new function() {
             nodes: s_nodes,
             scrollX: window.scrollX,
             scrollY: window.scrollY,
-            zoomRatio: Graph.zoomRatio
+            zoomRatio: Graph.zoomRatio,
+            layout: Graph.layout
         });
     };
 
@@ -297,6 +307,10 @@ var Graph = new function() {
                 Graph.zoomRatio = 1;
             else
                 Graph.zoomRatio = jsonobject.graph.zoomRatio;
+            if (jsonobject.graph.layout === undefined)
+                Graph.layout = Graph.LayoutEnum.NONE;
+            else
+                Graph.layout = jsonobject.graph.layout;
             if (jsonobject.graph.nodes !== undefined) {
                 Graph.lastsavedgraphid = jsonobject.graph_id;
                 Graph.lastsavedgraphname = jsonobject.graph_name;

@@ -344,30 +344,36 @@ Node.prototype.vis_refresh = function(highlight, aroundNode) {
         if (this.loaded) loaded++;
         length++;
     });
+    if (!Helper.isFancyboxOpen) {
+        Helper.isFancyboxOpen = true;
+        $.fancybox({
+            closeBtn: false,
+            href: 'img/SZTAKI_logo_2012_english_RG.png'
+        });
+    }
     if (loaded == length) {
         jsPlumbInstance.setSuspendDrawing(false, false);
 
-//        $.fancybox({
-//                showCloseButton : false,
-//                href:'img/SZTAKI_logo_2012_english_RG.png'
-//            });
+
 //        repaintNodes();
-        applyLayout(LayoutEnum.GRID, false);
+        if (Graph.layout != Graph.LayoutEnum.NONE)
+            applyLayout(Graph.layout, false);
 //        applyLayout(LayoutEnum.SPRING, false);
         repaintNodes();
 
 //        $.fancybox.hideLoading();
-//        $.fancybox.close();
+        $.fancybox.close();
+        Helper.isFancyboxOpen = false;
 //        $.each(Graph.nodes, function(){
 //            this.weight = 1000;
 //        });
 //        repaintNodes();
 //        repaintNodes(); initnél nem számít, mert nincs timestampből gond
     }
-    else
-    {
+//    else
+//    {
 //        $.fancybox.showLoading();
-    }
+//    }
 };
 
 Node.prototype.vis_openNode = function(targetTabName, property, target) {

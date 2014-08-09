@@ -7,12 +7,6 @@
  *
  */
 
-var LayoutEnum = {
-    GRID : "Grid",
-    RADIAL : "Radial",
-    SPRING : "Spring"
-}
-
 function applyLayout(layoutType, repaint)
 {
     var buffer = new Buffer();
@@ -23,14 +17,17 @@ function applyLayout(layoutType, repaint)
     initLayout(name, buffer, useVirtual, weight, virtualWeight);
     switch(layoutType)
     {
-        case LayoutEnum.GRID:
-            gridLayout(buffer, 100 * Graph.zoomRatio);
+        case Graph.LayoutEnum.GRID:
+            gridLayout(buffer, 100);
+            Graph.layout = Graph.LayoutEnum.GRID;
             break;
-        case LayoutEnum.RADIAL:
-            radialLayout(buffer, 200 * Graph.zoomRatio);
+        case Graph.LayoutEnum.RADIAL:
+            radialLayout(buffer, 200);
+            Graph.layout = Graph.LayoutEnum.RADIAL;
             break;
-        case LayoutEnum.SPRING:
+        case Graph.LayoutEnum.SPRING:
             springLayout(buffer, 10000, 10000, 100, 100, 1, 1, 10000);
+            Graph.layout = Graph.LayoutEnum.SPRING;
             break;
         default :
             console.log("Wrong layout type.");
@@ -43,6 +40,7 @@ function applyLayout(layoutType, repaint)
 function initLayout(name, buffer, useVirtual, weight, virtualWeight)
 {
     console.time("Loading nodes to buffer");
+    decideZoom(1);
     //loading nodes to buffer
     for (var index in Graph.nodes)
     {
@@ -86,11 +84,13 @@ function finishLayout(name, repaint)
     console.timeEnd(name + " layout");
     console.time("Animate");
 //    animateMovementIterative("slow",1);
-    updateNewPosition(repaint);
+    updateNewPosition();
+    decideZoom(Graph.zoomRatio);
+    if (repaint) jsPlumbInstance.repaintEverything();
     console.timeEnd("Animate");
 }
 
-function updateNewPosition(repaint)
+function updateNewPosition()
 {
 //    jsPlumbInstance.setSuspendDrawing(true); no effect
     $('.resourceNodeBox').each(function() {
@@ -100,7 +100,7 @@ function updateNewPosition(repaint)
         $node.css('top', node.top);
     });
 //    jsPlumbInstance.setSuspendDrawing(false, false);
-    if (repaint) jsPlumbInstance.repaintEverything();
+
 //
 }
 

@@ -126,7 +126,7 @@ function decideZoom(ratio, x, y)
             nodeSizeToNormal();
             normalNodeSize = true;
         }
-        applyZoom(cx, cy);
+        applyZoom(ratio, cx, cy);
     }
     else if (ratio > 0.2)
     {
@@ -135,7 +135,7 @@ function decideZoom(ratio, x, y)
             nodeSizeToLabel();
             normalNodeSize = false;
         }
-        applyZoom(cx, cy);
+        applyZoom(ratio, cx, cy);
     }
     resetDrawingCounter--;
 }
@@ -150,19 +150,19 @@ function checkDrawing()
     if (resetDrawingCounter > 0) setTimeout(checkDrawing, 1000);
 }
 
-function applyZoom(x, y)
+function applyZoom(ratio, x, y)
 {
-    console.log('normal: ' + normalNodeSize +  " - " + Graph.zoomRatio);
+    console.log('normal: ' + normalNodeSize +  " - " + ratio);
     $('.resourceNodeBox').each(function() {
         var vis_node = $(this);
-        var position = vis_node.position();
+//        var position = vis_node.position();
         var node = Graph.getNode(this.getAttribute('uri'));
-        vis_node.css('left', x + (node.left - x) * Graph.zoomRatio);
-        vis_node.css('top', y  + (node.top - y) * Graph.zoomRatio);
-        vis_node.css('width', node.width * Graph.zoomRatio);
-        vis_node.css('height', node.height * Graph.zoomRatio);
+        vis_node.css('left', x + (node.left - x) * ratio);
+        vis_node.css('top', y  + (node.top - y) * ratio);
+        vis_node.css('width', node.width * ratio);
+        vis_node.css('height', node.height * ratio);
         if (normalNodeSize)
-            vis_node.find('.nodeImage img').css('visibility', 'visible').css('max-height', 75 * Graph.zoomRatio - 36); //perfect
+            vis_node.find('.nodeImage img').css('visibility', 'visible').css('max-height', 75 * ratio - 36); //perfect
     });
 }
 
