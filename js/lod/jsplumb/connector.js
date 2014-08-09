@@ -352,9 +352,8 @@ Node.prototype.vis_refresh = function(highlight, aroundNode) {
 //                href:'img/SZTAKI_logo_2012_english_RG.png'
 //            });
 //        repaintNodes();
-//        applyLayout(LayoutEnum.RADIAL, false);
-
-        applyLayout(LayoutEnum.SPRING, false);
+        applyLayout(LayoutEnum.GRID, false);
+//        applyLayout(LayoutEnum.SPRING, false);
         repaintNodes();
 
 //        $.fancybox.hideLoading();

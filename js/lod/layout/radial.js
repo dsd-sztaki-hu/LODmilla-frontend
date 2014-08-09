@@ -108,7 +108,7 @@ function radialLayout(buffer, min_distance) {
     var db;
 //    var r0;
     var slices = 1;
-    var dist_norm = Math.sqrt(2 * distance * distance);
+    var dist_norm = distance;
     r = distance * 1.25;
     level = sorted_nodes.length;
     for (i = 1; i < level; i++) {

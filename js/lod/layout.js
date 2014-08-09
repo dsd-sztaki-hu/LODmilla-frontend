@@ -24,7 +24,7 @@ function applyLayout(layoutType, repaint)
     switch(layoutType)
     {
         case LayoutEnum.GRID:
-            gridLayout();
+            gridLayout(buffer, 100 * Graph.zoomRatio);
             break;
         case LayoutEnum.RADIAL:
             radialLayout(buffer, 200 * Graph.zoomRatio);

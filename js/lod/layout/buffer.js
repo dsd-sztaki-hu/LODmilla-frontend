@@ -19,6 +19,8 @@ function Vertex(id, label, weight, isVirtual, left, top, type) {
     this.type = type;
     this.inConnCounter = 0;
     this.outConnCounter = 0;
+    this.gridX = 0;
+    this.gridY = 0;
 }
 
 /**
