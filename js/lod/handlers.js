@@ -250,6 +250,20 @@ addInspectorHandlers = function(){
     $("#nodeOpenedContentTabs").on('click', '.conncollapsetoggle', function() {
         $(this).parent('.conncollapse').next("ul").slideToggle("medium");
     });
+
+    $("#nodeOpenedContentTabs").on('click', 'span.toggleAllBtn', function(event) {
+        var $this = $(this);
+        if ($this.hasClass('openAllBtn'))
+        {
+            $this.closest('.ui-tabs-panel').children("ul").slideDown("medium");
+            $this.removeClass('openAllBtn');
+        }
+        else
+        {
+            $this.closest('.ui-tabs-panel').children("ul").slideUp("medium");
+            $this.addClass('openAllBtn');
+        }
+    });
 };
 
 addPaletteHandlers = function(){

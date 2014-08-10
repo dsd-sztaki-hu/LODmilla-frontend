@@ -487,7 +487,8 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
         addPropertyBtn = '<span class="inspectorBtn addPropertyBtn" title="Add property">[add]</span>',
         addConnectionBtn = '<span class="inspectorBtn addConnectionBtn" title="Add connection">[add]</span>',
         addNewConnectionBtn = '<span class="inspectorBtn addNewConnectionBtn" title="Add new connection type">[add]</span>',
-        addNewPropertyBtn = '<span class="inspectorBtn addNewPropertyBtn" title="Add new property type">[add]</span>';
+        addNewPropertyBtn = '<span class="inspectorBtn addNewPropertyBtn" title="Add new property type">[add]</span>',
+        toggleAllBtn = '<span class="inspectorBtn toggleAllBtn openAllBtn" title="Toggle all">[toggle]</span>';
     var str_content = [], str_header = [];
 
     $.each(nodeContent, function(idx, elem) {
@@ -518,7 +519,7 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
 
             // literals, aka. description tab,  values in the right panel
             if (type === 'literals') {
-                str_content.push(addNewPropertyBtn);
+                str_content.push(addNewPropertyBtn, toggleAllBtn);
                 $.each(item, function(connectionURI, connectionItems) {
                     propertyName = Profile.getPropertyLabel(connectionURI);
                     propertyName = Helper.getCapitalizedString(propertyName);
@@ -556,7 +557,7 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
 
             // out and in tabs, aka. connections in the right panel
             } else {
-                str_content.push(addNewConnectionBtn);
+                str_content.push(addNewConnectionBtn, toggleAllBtn);
                 $.each(item, function(connectionURI, connectionItems) {
                     propertyName = Helper.getCapitalizedString(Profile.getPropertyLabel(connectionURI));
 
