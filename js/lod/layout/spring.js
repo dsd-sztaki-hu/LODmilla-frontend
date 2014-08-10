@@ -283,7 +283,7 @@ function setVisiblePosition(buffer)
     var original;
     for (var index in buffer.vertexes) {
         var act = buffer.vertexes[index];
-        if (act.isvVirtual == false) {
+        if (act.isVirtual == false) {
             original = Graph.getNode(act.id);
             original.left = act.left;
             original.top = act.top;

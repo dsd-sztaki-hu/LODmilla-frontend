@@ -7,7 +7,7 @@ function Vertex(id, label, weight, isVirtual, left, top, type) {
     this.id = id;
     this.label = label; //for debugging
     this.weight = weight;
-    this.isvVirtual = isVirtual;
+    this.isVirtual = isVirtual;
     this.targets = [];
     this.sources = [];
     this.targetLabels = [];

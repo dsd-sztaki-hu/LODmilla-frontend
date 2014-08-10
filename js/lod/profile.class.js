@@ -35,8 +35,8 @@ var Profile = new function() {
     this.highlightedConnectionsColor = "#f00";
     this.connectorType = "Straight"; //StateMachine, Straight, Bezier
     this.connectorStrokeStyle = "#5c96bc";
-    this.connectorLineWidth = 2;
-    this.connectorOutlineWidth = 4;
+    this.connectorLineWidth = 1;
+    this.connectorOutlineWidth = 3;
     this.connectorGap = 5;
     this.connectorStub = 5;
 

@@ -134,11 +134,13 @@ function radialLayout(buffer, min_distance) {
                     slices = parts;
                 theta = x / slices * PI2;
             }
-            act = Graph.nodes[sorted_nodes[i][index].id];
-            nx = r * Math.cos(theta) + cx;
-            ny = r * Math.sin(theta) + cy;
-            act.left = nx;
-            act.top = ny;
+            if (!sorted_nodes[i][index].isVirtual) {
+                act = Graph.nodes[sorted_nodes[i][index].id];
+                nx = r * Math.cos(theta) + cx;
+                ny = r * Math.sin(theta) + cy;
+                act.left = nx;
+                act.top = ny;
+            }
             x++;
             theta = x / slices * PI2;
         }

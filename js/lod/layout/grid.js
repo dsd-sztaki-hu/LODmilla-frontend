@@ -65,6 +65,7 @@ function gridLayout(buffer, min_distance) {
     for (i = 0; i < length; i++)
     {
         act = buffer.vertexes[i];
+        if (act.isVirtual) continue;
         node = Graph.nodes[act.id];
         node.left = act.gridX * min_distance * 2 + mx;
         node.top = act.gridY * min_distance * 2 + my;

@@ -386,17 +386,17 @@ addPaletteHandlers = function(){
 
     //Grid layout buttton
     $('body').on("click", '#main #paletteBox #layoutPalette div.layoutGridButton input', function(event) {
-        applyLayout(Graph.LayoutEnum.GRID);
+        applyLayout(Graph.LayoutEnum.GRID, true);
     });
 
     //Radial layout buttton
     $('body').on("click", '#main #paletteBox #layoutPalette div.layoutRadialButton input', function(event) {
-        applyLayout(Graph.LayoutEnum.RADIAL);
+        applyLayout(Graph.LayoutEnum.RADIAL,true);
     });
 
     //Spring layout button
     $('body').on("click", '#main #paletteBox #layoutPalette div.layoutSpringButton input', function(event) {
-        applyLayout(Graph.LayoutEnum.SPRING);
+        applyLayout(Graph.LayoutEnum.SPRING, true);
     });
 };
 
