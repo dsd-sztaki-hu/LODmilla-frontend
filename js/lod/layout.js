@@ -86,7 +86,7 @@ function finishLayout(name, repaint)
 //    animateMovementIterative("slow",1);
     updateNewPosition();
     decideZoom(Graph.zoomRatio);
-    if (repaint) jsPlumbInstance.repaintEverything();
+    if (repaint) repaintNodes();
     console.timeEnd("Animate");
 }
 

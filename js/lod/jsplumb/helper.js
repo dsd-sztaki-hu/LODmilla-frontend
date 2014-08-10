@@ -26,14 +26,14 @@ function repaintNodes()
         $child.push($tnode.children().detach());
         length++;
     });
-    jsPlumbInstance.repaintEverything();
+//    jsPlumbInstance.repaintEverything();
 
-//    $res.each(function() {
-////        $node = $(this);
-////        $child = $node.children().detach();
-//        jsPlumbInstance.repaint(this);
-////        $node.append($child);
-//    });
+    $res.each(function() {
+//        $node = $(this);
+//        $child = $node.children().detach();
+        jsPlumbInstance.repaint(this);
+//        $node.append($child);
+    });
     for (i = 0; i < length; i++)
     {
         $node[i].append($child[i]);

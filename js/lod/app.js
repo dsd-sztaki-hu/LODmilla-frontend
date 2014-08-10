@@ -46,9 +46,9 @@ $(document).ready(function() {
 //            }]
 //            Anchor: [ 'Top',  'Right', 'Bottom', 'Left', 'TopRight','BottomRight','TopLeft','BottomLeft'] // faster, but a bit different
             // TODO set back to Continuous
-//            Anchor: "Continuous"
+            Anchor: "Continuous"
 //            Anchor: "AutoDefault"
-            Anchor: [ 'Top',  'Right', 'Bottom', 'Left']
+//            Anchor: [ 'Top',  'Right', 'Bottom', 'Left']
 //            anchor:[ "Perimeter", { shape:"Square", anchorCount:150 }]
         });
 
