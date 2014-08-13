@@ -389,7 +389,9 @@ Node.prototype.vis_openNode = function(targetTabName, property, target) {
     else
     {
         this.contentParent.append(this.content);
+//        this.content.show();
         this.content.css('display', 'inherit');
+//        this.content.dialog();
     }
 
 };
@@ -401,7 +403,7 @@ Node.prototype.vis_closeNode = function() {
 
     var $dialog = $('.nodeDetailsDialog');
     this.contentParent = $dialog.parent();
-    this.content = $('.nodeDetailsDialog').detach();
+    this.content = $dialog.detach();
 
 };
 
@@ -602,13 +604,7 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
     var $nodeOpenedContent = $(par);
     par.setAttribute('id','nodeOpenedContent');
     par.setAttribute('title', this.label);
-//    par.insertAdjacentHTML('beforeend','<div id="nodeOpenedContentTabs">' + str_header + str_content + '</div>');
     par.innerHTML = '<div id="nodeOpenedContentTabs">' + str_header + str_content + '</div>';
-//    var child1 = document.createElement("div");
-//    par.appendChild(child1);
-//    child1.setAttribute('id','nodeOpenedContentTabs');
-//    child1.insertAdjacentHTML('beforeend', str_header + str_content);
-//    child1.innerHTML = str_header + str_content;
 
 
 //    var $nodeOpenedContent = $('<div id="nodeOpenedContent" title="' + this.label + '"><div id="nodeOpenedContentTabs">' + str_header + str_content + '</div></div>');
@@ -622,15 +618,17 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
         height: $(window).height()-50,
         width: Graph.vis_nodeOpenedContent.width,
         show: "drop",
+        closeOnEscape: false,
         create: function(event) {
             $(event.target).parent().css('position', 'fixed');
         },
-        close: function(event, ui) {
+        beforeClose: function(event, ui) {
             $('.node-open.opened').each(function(index) {
                 var node = Graph.getNode($(this).parent()[0].getAttribute('uri'));
 //                $(this).find('img').attr('src', "img/document-properties-deactivated.png");
                 node.vis_closeNode();
             });
+            return false;
         },
         resizeStart: function(event) {
             $(event.target).parent().css('position', 'fixed');
@@ -687,8 +685,6 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
 
 
     $('div#nodeOpenedContent').parent().addClass('opacityItem').addClass('nodeDetailsDialog');
-    // by default collapse props
-//    $('.conncollapse').next("ul").css('display','none');
 //    $next.slideToggle("medium");
 //    $('.conncollapse').find('.conncollapsetoggle').empty().append('+');
 
