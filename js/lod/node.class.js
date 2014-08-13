@@ -40,6 +40,10 @@ var Node = function(resource_id, label) {
     this.weight = 1;
 
     this.loaded = false;
+
+    this.content = null;
+    this.contentParent = null;
+
     var self = this;
 
     this.getLiteralsNum = function() {

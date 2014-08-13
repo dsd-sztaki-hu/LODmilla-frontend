@@ -107,7 +107,7 @@ Node.prototype.vis_show = function(highlight, aroundNode) {
     }
 
     if (existing.length === 0) {
-        var node = $('<div class="resourceNodeBox opacityItem" uri="' + this.resource_id + '"></div>');
+        var node = $('<div class="resourceNodeBox normalSizeNode opacityItem" uri="' + this.resource_id + '"></div>');
         if (highlight){
             nodeHighlightBtn.addClass('opened');
         }
@@ -344,13 +344,7 @@ Node.prototype.vis_refresh = function(highlight, aroundNode) {
         if (this.loaded) loaded++;
         length++;
     });
-    if (!Helper.isFancyboxOpen) {
-        Helper.isFancyboxOpen = true;
-        $.fancybox({
-            closeBtn: false,
-            href: 'img/SZTAKI_logo_2012_english_RG.png'
-        });
-    }
+    Helper.openFancybox();
     if (loaded == length) {
         jsPlumbInstance.setSuspendDrawing(false, false);
 
@@ -362,8 +356,10 @@ Node.prototype.vis_refresh = function(highlight, aroundNode) {
         repaintNodes();
 
 //        $.fancybox.hideLoading();
-        $.fancybox.close();
-        Helper.isFancyboxOpen = false;
+        if (Helper.isFancyboxOpen) {
+            $.fancybox.close();
+            Helper.isFancyboxOpen = false;
+        }
 //        $.each(Graph.nodes, function(){
 //            this.weight = 1000;
 //        });
@@ -384,16 +380,28 @@ Node.prototype.vis_openNode = function(targetTabName, property, target) {
     $("[uri='" + this.resource_id + "'] .node-open").addClass('opened');
     $("[uri='" + this.resource_id + "'] .node-open").find('img').attr('src', "img/document-properties.png");
     $("[uri='" + this.resource_id + "']").addClass('opened');
-    
-    this.vis_showOpenedContent(targetTabName, property, target);
-    
+
+    if (this.content == null || this.contentParent == null) {
+        Helper.openFancybox();
+        this.vis_showOpenedContent(targetTabName, property, target);
+        Helper.closeFancybox();
+    }
+    else
+    {
+        this.contentParent.append(this.content);
+        this.content.css('display', 'inherit');
+    }
+
 };
 
 Node.prototype.vis_closeNode = function() {
     $("[uri='" + this.resource_id + "'] .node-open").removeClass('opened');
     $("[uri='" + this.resource_id + "'] .node-open").find('img').attr('src', "img/document-properties-deactivated.png");
-    $('#nodeOpenedContent').remove();
     $(".resourceNodeBox").removeClass('opened');
+
+    var $dialog = $('.nodeDetailsDialog');
+    this.contentParent = $dialog.parent();
+    this.content = $('.nodeDetailsDialog').detach();
 
 };
 
@@ -678,7 +686,7 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
     }
 
 
-    $('div#nodeOpenedContent').parent().addClass('opacityItem');
+    $('div#nodeOpenedContent').parent().addClass('opacityItem').addClass('nodeDetailsDialog');
     // by default collapse props
 //    $('.conncollapse').next("ul").css('display','none');
 //    $next.slideToggle("medium");

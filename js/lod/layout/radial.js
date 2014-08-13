@@ -101,9 +101,11 @@ function radialLayout(buffer, min_distance) {
     var cx = $(document).scrollLeft() + window.screen.width / 2,
         cy = $(document).scrollTop() + window.screen.height / 2;
 
-    act = Graph.nodes[sorted_nodes[0][0].id];
-    act.left = cx;
-    act.top = cy;
+    if (!sorted_nodes[0][0].isVirtual) {
+        act = Graph.nodes[sorted_nodes[0][0].id];
+        act.left = cx;
+        act.top = cy;
+    }
     var PI2 = 2 * Math.PI;
     var db;
 //    var r0;

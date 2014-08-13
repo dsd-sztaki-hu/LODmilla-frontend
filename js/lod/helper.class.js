@@ -12,7 +12,7 @@
  */
 var Helper = new function(){
 
-     this.isFancyboxOpen = false;
+    this.isFancyboxOpen = false;
 
     this.getCapitalizedString = function(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
@@ -109,5 +109,28 @@ var Helper = new function(){
     this.pushCollImgStr = function(number, array, connectionURI, propertyName, addConnectionBtn) {
         array.push("<p class='conncollapse'><b class='conncollapsetoggle' title='", connectionURI, "'>", propertyName, " (<span class='propNum'>",number,"</span>)</b> ", addConnectionBtn, "</p><ul>");
     }
+
+     this.openFancybox = function()
+     {
+         if (!this.isFancyboxOpen) {
+             this.isFancyboxOpen = true;
+             $.fancybox({
+                 transitionIn	:	'none',
+                 transitionOut	:	'none',
+                 speedIn		:	0,
+                 speedOut		:	0,
+                 closeBtn: false,
+                 href: 'img/SZTAKI_logo_2012_english_RG.png'
+             });
+         }
+     }
+
+     this.closeFancybox = function()
+     {
+         if (this.isFancyboxOpen) {
+             $.fancybox.close();
+             this.isFancyboxOpen = false;
+         }
+     }
 
 };

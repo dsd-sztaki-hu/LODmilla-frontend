@@ -39,8 +39,8 @@ function applyLayout(layoutType, repaint)
 
 function initLayout(name, buffer, useVirtual, weight, virtualWeight)
 {
+    Helper.openFancybox();
     console.time("Loading nodes to buffer");
-    decideZoom(1);
     //loading nodes to buffer
     for (var index in Graph.nodes)
     {
@@ -59,13 +59,7 @@ function initLayout(name, buffer, useVirtual, weight, virtualWeight)
                 buffer.addConnection(source, target, overlay.getLabel());
             }
         });
-//            }
     });
-//    $.each(conns, function() {
-//        var source = $(this.source).attr('uri');
-//        var target = $(this.target).attr('uri');
-//        buffer.addConnection(source, target);
-//    });
 
     console.timeEnd("Loading edges to buffer");
     if (useVirtual) {
@@ -82,12 +76,10 @@ function initLayout(name, buffer, useVirtual, weight, virtualWeight)
 function finishLayout(name, repaint)
 {
     console.timeEnd(name + " layout");
-    console.time("Animate");
-//    animateMovementIterative("slow",1);
     updateNewPosition();
     decideZoom(Graph.zoomRatio);
     if (repaint) repaintNodes();
-    console.timeEnd("Animate");
+    Helper.closeFancybox();
 }
 
 function updateNewPosition()
