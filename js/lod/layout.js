@@ -11,7 +11,8 @@ function applyLayout(layoutType, repaint)
 {
     var buffer = new Buffer();
     var name = layoutType;
-    var useVirtual = document.getElementById('layoutCheckBox').checked;
+    var useVirtual = document.getElementById('layoutGroupCheckBox').checked;
+    var maxSpringTime = $('#layoutSpringSlider').slider("option", "value");
     var weight = 1;
     var virtualWeight = 1;
     initLayout(name, buffer, useVirtual, weight, virtualWeight);
@@ -26,7 +27,7 @@ function applyLayout(layoutType, repaint)
             Graph.layout = Graph.LayoutEnum.RADIAL;
             break;
         case Graph.LayoutEnum.SPRING:
-            springLayout(buffer, 10000, 10000, 100, 100, 1, 1, 10000);
+            springLayout(buffer, 10000, maxSpringTime * 1000, 100, 100, 1, 1, 10000);
             Graph.layout = Graph.LayoutEnum.SPRING;
             break;
         default :

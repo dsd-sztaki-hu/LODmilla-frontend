@@ -347,29 +347,13 @@ Node.prototype.vis_refresh = function(highlight, aroundNode) {
     Helper.openFancybox();
     if (loaded == length) {
         jsPlumbInstance.setSuspendDrawing(false, false);
-
-
-//        repaintNodes();
-        if (Graph.layout != Graph.LayoutEnum.NONE)
+        if (Graph.layout != Graph.LayoutEnum.NONE && document.getElementById('layoutUpdateCheckBox').checked)
             applyLayout(Graph.layout, false);
-//        applyLayout(LayoutEnum.SPRING, false);
+        else
+            decideZoom(Graph.zoomRatio);
         repaintNodes();
-
-//        $.fancybox.hideLoading();
-        if (Helper.isFancyboxOpen) {
-            $.fancybox.close();
-            Helper.isFancyboxOpen = false;
-        }
-//        $.each(Graph.nodes, function(){
-//            this.weight = 1000;
-//        });
-//        repaintNodes();
-//        repaintNodes(); initnél nem számít, mert nincs timestampből gond
+        Helper.closeFancybox();
     }
-//    else
-//    {
-//        $.fancybox.showLoading();
-//    }
 };
 
 Node.prototype.vis_openNode = function(targetTabName, property, target) {
@@ -391,6 +375,7 @@ Node.prototype.vis_openNode = function(targetTabName, property, target) {
         this.contentParent.append(this.content);
 //        this.content.show();
         this.content.css('display', 'inherit');
+        changeActiveTab(targetTabName);
 //        this.content.dialog();
     }
 
@@ -443,17 +428,7 @@ Node.prototype.vis_switchTab = function(targetTabName, property, target) {
         }
         // result node's res box opened, switch tab and scroll there
         else {
-            var tab = $("#nodeOpenedContentTabs ul[role='tablist'] li." + targetTabName);
-            var tabId = tab.attr('aria-controls');
-
-            var targetTabId;
-            try{
-                targetTabId = parseInt(tabId.replace("itemtab-", ""));
-            }
-            catch (ex){
-                targetTabId = 0;
-            }
-            $("#nodeOpenedContentTabs").tabs("option", "active", targetTabId);
+            var tabId = changeActiveTab(targetTabName);
 
             var panel = $("#nodeOpenedContentTabs div#" + tabId);
 
@@ -598,8 +573,6 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
     str_content = str_content.join("");
     str_header = "<ul>" + str_header.join("") + "</ul>";
 
-    //2
-
     var par = document.createElement("div");
     var $nodeOpenedContent = $(par);
     par.setAttribute('id','nodeOpenedContent');
@@ -656,7 +629,6 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
             self.scrollToResult(ui.newTab, ui.newPanel);
         }
     });
-//    $conncollapse.css('display','initial');
 
 
     $(window).resize(function() {
@@ -668,21 +640,7 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
         $("#nodeOpenedContentTabs").tabs('refresh');
     });
 
-
-    if (targetTabName && targetTabName !== '') {
-        var tabId = $("#nodeOpenedContentTabs ul[role='tablist'] li." + targetTabName).attr('aria-controls');
-
-        var targetTabId;
-        try{
-            targetTabId = parseInt(tabId.replace("itemtab-", ""));
-        }
-            // ha nincs ilyen ID-ju tab az inspectorban (azaz pl. nincs out, vagy in kapcsolata a megnyitni kivant nodenak)
-        catch (ex){
-            targetTabId = 0;
-        }
-        $("#nodeOpenedContentTabs").tabs("option", "active", targetTabId);
-    }
-
+    changeActiveTab(targetTabName);
 
     $('div#nodeOpenedContent').parent().addClass('opacityItem').addClass('nodeDetailsDialog');
 //    $next.slideToggle("medium");

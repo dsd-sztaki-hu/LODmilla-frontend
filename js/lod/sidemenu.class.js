@@ -448,18 +448,34 @@ var Sidemenu = new function() {
         // Layout box palette
         self.layoutBox = $('<div id="layoutPalette" class="paletteItem opacityItem"></div>');
 
-        self.layoutBox.append('<label for="layoutCheckBox">Group by type</label><input type="checkbox" id="layoutCheckBox"></input>');
+        self.layoutBox.append('<input type="checkbox" id="layoutUpdateCheckBox" class="sameLine" checked="true"/>' +
+            '<label class="sameLine">Update after insert</label></br>');
+        self.layoutBox.append('<input type="checkbox" class="sameLine" id="layoutGroupCheckBox"/>' +
+            '<label class="sameLine">Group by type</label></br>');
 
-        self.layoutBox.append('<div class="layoutGridButton"><input type="button" value="Grid" /></div>');
-        self.layoutBox.find('.layoutGridButton input').button();
+        self.layoutBox.append('</br><fieldset>' +
+            '<legend>Type</legend>' +
+            '<form id="layoutTypeRadio" action="">' +
 
-        self.layoutBox.append('<div class="layoutRadialButton"><input type="button" value="Radial" /></div>');
-        self.layoutBox.find('.layoutRadialButton input').button();
+            '<input class="sameLine" type="radio" name="ltype" value="None" checked="true"><label class="sameLine">None</label></input></br>' +
+            '<input class="sameLine" type="radio" name="ltype" value="Grid"><label class="sameLine">Grid</label></input></br>' +
+            '<input class="sameLine" type="radio" name="ltype" value="Radial"><label class="sameLine">Radial</label></input></br>' +
+            '<input class="sameLine" type="radio" name="ltype" value="Spring"><label class="sameLine">Spring</label></input>' +
+            '</form></fieldset></br>');
 
-        self.layoutBox.append('<div class="layoutSpringButton"><input type="button" value="Spring" /></div>');
-        self.layoutBox.find('.layoutSpringButton input').button();
+        self.layoutBox.append('<div id="layoutSpringSlider"></div><div id="layoutSpringSliderValue">Spring max time: 10 s</div>');
+        self.layoutBox.find("#layoutSpringSlider").slider({
+            value: 10,
+            min: 1,
+            max: 300,
+            step: 1,
+            slide: function(event, ui) {
+                self.layoutBox.find("#layoutSpringSliderValue").empty().html("Spring max time: " + ui.value + " (s)");
+            }
+        });
 
-
+        self.layoutBox.append('<div class="layoutApplyButton"><input type="button" value="Apply"/></div>');
+        self.layoutBox.find('.layoutApplyButton input').button().css('width','100%');
 
 
         // LOAD button

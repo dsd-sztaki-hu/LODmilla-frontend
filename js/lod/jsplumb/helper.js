@@ -149,16 +149,12 @@ function nodeSizeToNormal()
     $('.labelSizeNode').each(function() {
         var vis_node = $(this);
 
-        vis_node.find('.resourceLabel').css('font-size', '12px');
         vis_node.find('.endpointLink').css('visibility', 'visible');
-        vis_node.find('.node-button.node-highlight').css('visibility', 'visible');
-        vis_node.find('.node-button.node-delete').css('visibility', 'visible');
-        vis_node.find('.node-button.node-open').css('visibility', 'visible');
-        vis_node.find('.node-button.node-hide').css('visibility', 'visible');
+        vis_node.find('.node-button').css('visibility', 'visible');
         vis_node.find('.node-connection-source').css('visibility', 'visible');
-        vis_node.find('.resourceLabel').css('position', 'relative').css('top','0px')
-            .css('max-height','30px');
-        vis_node.find('.nodeImage img').css('visibility', 'visible');
+        vis_node.find('.resourceLabel').css('font-size', '12px').css('position', 'relative').css('top','0px')
+            .css('max-height','30px').css('cursor','auto').unbind('click');
+        vis_node.find('.nodeImage').css('visibility', 'visible');
         vis_node.css('padding', '0.5em').css('padding-top', '2em').css('padding-bottom', '1.5em');
         vis_node.removeClass('labelSizeNode');
         vis_node.addClass('normalSizeNode');
@@ -171,17 +167,47 @@ function nodeSizeToLabel()
     $('.normalSizeNode').each(function() {
         var vis_node = $(this);
         vis_node.css('padding', '5px');
-        vis_node.find('.nodeImage img').css('visibility', 'hidden');
+        var $img = vis_node.find('.nodeImage');
+        $img.css('visibility', 'hidden').css('max-height','0px');
         vis_node.find('.endpointLink').css('visibility', 'hidden');
-        vis_node.find('.node-button.node-highlight').css('visibility', 'hidden');
-        vis_node.find('.node-button.node-delete').css('visibility', 'hidden');
-        vis_node.find('.node-button.node-open').css('visibility', 'hidden');
-        vis_node.find('.node-button.node-hide').css('visibility', 'hidden');
+        vis_node.find('.node-button').css('visibility', 'hidden');
         vis_node.find('.node-connection-source').css('visibility', 'hidden');
         vis_node.find('.resourceLabel').css('position', 'absolute').css('top', '10%')
-            .css('max-height','90%').css('font-size', '9px');
+            .css('max-height','90%').css('font-size', '9px').css('cursor','pointer')
+            .on('click', function(event) {
+                if (event.ctrlKey || event.altKey) return;
+                var resource_id = this.parentNode.getAttribute('uri');
+                if (Graph.getNode(resource_id).type !== Profile.unloadedNodeType){
+                    var node = Graph.getNode(this.parentNode.getAttribute('uri'));
+                    if($(this).parent().hasClass('opened')){
+                        node.vis_closeNode();
+                    }
+                    else{
+                        node.vis_openNode(false, false, false);
+                    }
+                }
+            });
         vis_node.removeClass('normalSizeNode');
         vis_node.addClass('labelSizeNode');
     });
     $('.label').css('visibility','hidden');
+}
+
+function changeActiveTab(targetTabName)
+{
+    if (targetTabName && targetTabName !== '') {
+        var tabId = $("#nodeOpenedContentTabs ul[role='tablist'] li." + targetTabName).attr('aria-controls');
+
+        var targetTabId;
+        try{
+            targetTabId = parseInt(tabId.replace("itemtab-", ""));
+        }
+            // ha nincs ilyen ID-ju tab az inspectorban (azaz pl. nincs out, vagy in kapcsolata a megnyitni kivant nodenak)
+        catch (ex){
+            targetTabId = 0;
+        }
+        $("#nodeOpenedContentTabs").tabs("option", "active", targetTabId);
+        return tabId;
+    }
+    return null;
 }

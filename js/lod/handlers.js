@@ -398,19 +398,25 @@ addPaletteHandlers = function(){
 
     //Layout palette handlers
 
-    //Grid layout buttton
-    $('body').on("click", '#main #paletteBox #layoutPalette div.layoutGridButton input', function(event) {
-        applyLayout(Graph.LayoutEnum.GRID, true);
-    });
-
-    //Radial layout buttton
-    $('body').on("click", '#main #paletteBox #layoutPalette div.layoutRadialButton input', function(event) {
-        applyLayout(Graph.LayoutEnum.RADIAL,true);
-    });
-
-    //Spring layout button
-    $('body').on("click", '#main #paletteBox #layoutPalette div.layoutSpringButton input', function(event) {
-        applyLayout(Graph.LayoutEnum.SPRING, true);
+    //Apply layout buttton
+    $('body').on("click", '#main #paletteBox #layoutPalette div.layoutApplyButton input', function() {
+        var selectedType;
+        var radioVal = $("input[type=radio][name=ltype]:checked").val();
+        switch(radioVal)
+        {
+            case 'Grid':
+                selectedType = Graph.LayoutEnum.GRID;
+                break;
+            case 'Radial':
+                selectedType = Graph.LayoutEnum.RADIAL;
+                break;
+            case 'Spring':
+                selectedType = Graph.LayoutEnum.SPRING;
+                break;
+            default :
+                selectedType = Graph.LayoutEnum.NONE;
+        }
+        applyLayout(selectedType, true);
     });
 };
 

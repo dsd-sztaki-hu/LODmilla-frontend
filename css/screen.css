@@ -597,3 +597,7 @@ h3.ui-accordion-header, .ui-widget-header {
     background: transparent;
     border:     1px dotted #000;
 }
+
+.sameLine {
+    display: inline;
+}

@@ -307,10 +307,16 @@ var Graph = new function() {
                 Graph.zoomRatio = 1;
             else
                 Graph.zoomRatio = jsonobject.graph.zoomRatio;
-            if (jsonobject.graph.layout === undefined)
+            if (jsonobject.graph.layout === undefined) {
                 Graph.layout = Graph.LayoutEnum.NONE;
-            else
+                $("input[type=radio][name=ltype]:checked").attr('checked',false);
+                $("input[type=radio][name=ltype][value=None]").prop('checked',true);
+            }
+            else {
                 Graph.layout = jsonobject.graph.layout;
+                $("input[type=radio][name=ltype]:checked").attr('checked',false);
+                $("input[type=radio][name=ltype][value=" + Graph.layout + "]").prop('checked',true);
+            }
             if (jsonobject.graph.nodes !== undefined) {
                 Graph.lastsavedgraphid = jsonobject.graph_id;
                 Graph.lastsavedgraphname = jsonobject.graph_name;
