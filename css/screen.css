@@ -628,3 +628,7 @@ h3.ui-accordion-header, .ui-widget-header {
     top: 88%;
     color: #4c8db2;
 }
+
+.toggleAllBtn {
+    float: right;
+}
