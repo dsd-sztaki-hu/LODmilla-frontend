@@ -6,7 +6,12 @@ var resetDrawingCounter = 0, blockResetDrawing = false;
 
 function repaintNodes()
 {
-    Helper.openFancybox();
+    Helper.showLoadScreen();
+    setTimeout(delayedRepaintNodes, 10);
+}
+
+function delayedRepaintNodes()
+{
     var $res;
     var $node = [], $child = [], length = 0;
     var $tnode;
@@ -22,6 +27,7 @@ function repaintNodes()
         length++;
     });
 
+    i = 0;
     $res.each(function() {
         jsPlumbInstance.repaint(this);
     });
@@ -30,7 +36,7 @@ function repaintNodes()
         $node[i].append($child[i]);
     }
     console.timeEnd('Repaint all');
-    Helper.closeFancybox();
+    Helper.closeLoadScreen();
 }
 
 function refreshNodeModelPosition(node, dx, dy)

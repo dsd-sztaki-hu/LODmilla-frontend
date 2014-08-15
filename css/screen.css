@@ -601,3 +601,30 @@ h3.ui-accordion-header, .ui-widget-header {
 .sameLine {
     display: inline;
 }
+
+#loadScreen {
+    display: none;
+    position: fixed;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+    z-index: 1200;
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
+    filter: alpha(opacity=30);
+    -moz-opacity:0.3;
+    -khtml-opacity: 0.3;
+    opacity: 0.3;
+}
+
+#loadScreenText {
+    display: none;
+    position: fixed;
+    width: 100%;
+    font-size: 46px;
+    font-weight: bold;
+    left: 8%;
+    top: 88%;
+    color: #4c8db2;
+}

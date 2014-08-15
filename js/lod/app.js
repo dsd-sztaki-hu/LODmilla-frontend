@@ -111,6 +111,9 @@ $(document).ready(function() {
                 return fancyBoxOpen;
             }
         });
+
+        Helper.loadScreen = document.getElementById('loadScreen');
+        Helper.loadText = document.getElementById('loadScreenText');
     });
 
 

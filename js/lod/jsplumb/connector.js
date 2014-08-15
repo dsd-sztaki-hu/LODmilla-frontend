@@ -344,7 +344,7 @@ Node.prototype.vis_refresh = function(highlight, aroundNode) {
         if (this.loaded) loaded++;
         length++;
     });
-    Helper.openFancybox();
+    Helper.showLoadScreen();
     if (loaded == length) {
         jsPlumbInstance.setSuspendDrawing(false, false);
         if (Graph.layout != Graph.LayoutEnum.NONE && document.getElementById('layoutUpdateCheckBox').checked)
@@ -352,7 +352,6 @@ Node.prototype.vis_refresh = function(highlight, aroundNode) {
         else
             decideZoom(Graph.zoomRatio);
         repaintNodes();
-        Helper.closeFancybox();
     }
 };
 
@@ -366,9 +365,10 @@ Node.prototype.vis_openNode = function(targetTabName, property, target) {
     $("[uri='" + this.resource_id + "']").addClass('opened');
 
     if (this.content == null || this.contentParent == null) {
-        Helper.openFancybox();
+        // won't show, no idea, tested with setTimeout too
+        Helper.showLoadScreen();
         this.vis_showOpenedContent(targetTabName, property, target);
-        Helper.closeFancybox();
+        Helper.closeLoadScreen();
     }
     else
     {
@@ -378,7 +378,6 @@ Node.prototype.vis_openNode = function(targetTabName, property, target) {
         changeActiveTab(targetTabName);
 //        this.content.dialog();
     }
-
 };
 
 Node.prototype.vis_closeNode = function() {
@@ -455,7 +454,6 @@ Node.prototype.vis_switchTab = function(targetTabName, property, target) {
 
 Node.prototype.vis_showOpenedContent = function(targetTabName, property, target) {
     var self = this;
-    
     if (!Graph.vis_nodeOpenedContent) {
         Graph.vis_nodeOpenedContent = {
             'width': 300,
@@ -473,7 +471,7 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
         addConnectionBtn = '<span class="inspectorBtn addConnectionBtn" title="Add connection">[add]</span>',
         addNewConnectionBtn = '<span class="inspectorBtn addNewConnectionBtn" title="Add new connection type">[add]</span>',
         addNewPropertyBtn = '<span class="inspectorBtn addNewPropertyBtn" title="Add new property type">[add]</span>',
-        toggleAllBtn = '<span class="inspectorBtn toggleAllBtn openAllBtn" title="Toggle all">[toggle]</span>';
+        toggleAllBtn = '<span class="inspectorBtn toggleAllBtn openAllBtn" title="Expand all">[expand all]</span>';
     var str_content = [], str_header = [];
 
     $.each(nodeContent, function(idx, elem) {

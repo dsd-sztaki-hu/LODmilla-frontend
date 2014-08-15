@@ -257,11 +257,15 @@ addInspectorHandlers = function(){
         {
             $this.closest('.ui-tabs-panel').children("ul").slideDown("medium");
             $this.removeClass('openAllBtn');
+            $this.html('[collapse all]');
+            $this.prop('title', '[collapse all]');
         }
         else
         {
             $this.closest('.ui-tabs-panel').children("ul").slideUp("medium");
             $this.addClass('openAllBtn');
+            $this.html('[expand all]');
+            $this.prop('title', '[expand all]');
         }
     });
 };
@@ -405,12 +409,15 @@ addPaletteHandlers = function(){
         switch(radioVal)
         {
             case 'Grid':
+                Helper.showLoadScreen();
                 selectedType = Graph.LayoutEnum.GRID;
                 break;
             case 'Radial':
+                Helper.showLoadScreen();
                 selectedType = Graph.LayoutEnum.RADIAL;
                 break;
             case 'Spring':
+                Helper.showLoadScreen();
                 selectedType = Graph.LayoutEnum.SPRING;
                 break;
             default :

@@ -40,7 +40,7 @@ function applyLayout(layoutType, repaint)
 
 function initLayout(name, buffer, useVirtual, weight, virtualWeight)
 {
-    Helper.openFancybox();
+    Helper.showLoadScreen();
     console.time("Loading nodes to buffer");
     //loading nodes to buffer
     for (var index in Graph.nodes)
@@ -80,7 +80,7 @@ function finishLayout(name, repaint)
     updateNewPosition();
     decideZoom(Graph.zoomRatio);
     if (repaint) repaintNodes();
-    Helper.closeFancybox();
+    else Helper.closeLoadScreen();
 }
 
 function updateNewPosition()

@@ -449,7 +449,7 @@ var Sidemenu = new function() {
         self.layoutBox = $('<div id="layoutPalette" class="paletteItem opacityItem"></div>');
 
         self.layoutBox.append('<input type="checkbox" id="layoutUpdateCheckBox" class="sameLine" checked="true"/>' +
-            '<label class="sameLine">Update after insert</label></br>');
+            '<label class="sameLine">Rearrange after insert</label></br>');
         self.layoutBox.append('<input type="checkbox" class="sameLine" id="layoutGroupCheckBox"/>' +
             '<label class="sameLine">Group by type</label></br>');
 
