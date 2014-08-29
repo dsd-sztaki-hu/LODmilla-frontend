@@ -422,7 +422,7 @@ var Node = function(resource_id, label) {
                                     }
                                 }
                             });
-                            if(trueResouceURI)
+                            if(trueResourceUri)
                                 return false;
                         });
                     }

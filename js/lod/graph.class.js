@@ -303,7 +303,7 @@ var Graph = new function() {
             Helper.alertDialog(Profile.alertTexts.loadGraph.title, Profile.alertTexts.loadGraph.text);
         } else {
             Graph.clear();
-            Helper.showLoadScreen();
+            //Helper.showLoadScreen();
             if (jsonobject.graph.zoomRatio === undefined)
                 Graph.zoomRatio = 1;
             else
