@@ -214,7 +214,7 @@ function calculateSpringStep(buffer, min_distance, spring_strain, spring_length,
             }
         }
     }
-    var ret = 1 + (min_count - Math.log(max_count + 1)) / count;
+    var ret = 1 + (min_count * 2 - Math.log(max_count + 1)) / count;
     ret = ret * spring_gravitation;
     //if (ret > 40000)
         //return 40000;
