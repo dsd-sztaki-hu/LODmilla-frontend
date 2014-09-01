@@ -434,13 +434,28 @@ Node.prototype.vis_switchTab = function(targetTabName, property, target) {
             var list = $('#' + tabId);
             var targetObj = list.find('.property-value-normal[refProp="' + property + '"][refPropVal="' + target + '"]');
 
-            var targetObjList = targetObj.parent('ul');
-            targetObjList.filter(":hidden").prev('p').find('.conncollapsetoggle').click();
+			//because DOM sctructure of the ul/li lists is a bit different with literals and the in/out connections
+			if (targetTabName === 'literals'){
+				var targetObjList = targetObj.parent('ul');
+			}
+			else if (targetTabName === 'in' || targetTabName === 'out'){
+				var targetObjList = targetObj.parent('li').parent('ul');
+			}
+			
+			
+            // targetObjList.filter(":hidden").prev('p').find('.conncollapsetoggle').click();
+            //targetObjList.prev('p').find('.conncollapsetoggle').click();
+            // setTimeout(function(){
+				targetObjList.css('display', 'block');
+				targetObj.addClass('property-value-highlighted');
+			// }, 500);
+            
 
-            targetObj.addClass('property-value-highlighted');
-
-            panel.stop().animate({scrollTop: (targetObj.position().top - 40)}, 800);
-            panel.removeAttr('target');
+            //panel.stop().animate({scrollTop: (targetObj.position().top - 40)}, 800);
+            // setTimeout(function(){
+				panel.stop().animate({scrollTop: (targetObjList.position().top - 40)}, 800);
+				panel.removeAttr('target');
+			// }, 1000);
         }
     }
     // res box was closed
@@ -478,7 +493,7 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
         $.each(elem, function(type, item) {
 //            if (targetTabName && targetTabName !== '' && targetTabName === type && property && property !== '' && target && target !== '')
             if (targetTabName && targetTabName === type && property && target )
-                str_header.push('<li class="', 'type', '" property="', property, '" target="', target, '">');
+                str_header.push('<li class="', type, '" property="', property, '" target="', target, '">');
             else
                 str_header.push('<li class="', type, '">');
 
