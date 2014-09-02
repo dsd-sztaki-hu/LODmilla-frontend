@@ -129,4 +129,5 @@ var Helper = new function(){
              this.isLoadScreenOpen = false;
          }
      }
+
 };

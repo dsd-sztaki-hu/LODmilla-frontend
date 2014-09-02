@@ -737,16 +737,19 @@ addNodeHandlers = function(){
             else{
                 $(this).find('img').attr('src', "img/document-properties.png");
                 if ($(event.target).hasClass('resourceDetailsIcon')){
-                    node.vis_switchTab("literals", false, false);
+                    setInspector("literals", false, false);
+                    node.vis_openNode();
                 }
                 else if ($(event.target).hasClass('resourcePropertiesNum')){
-                    node.vis_switchTab("literals", false, false);
+                    setInspector("literals", false, false);
+                    node.vis_openNode();
                 }
                 else if ($(event.target).hasClass('resourceLinksNum')){
-                    node.vis_switchTab("out", false, false);
+                    setInspector("out", false, false);
+                    node.vis_openNode();
                 }
                 else{
-                    node.vis_openNode(false, false, false);
+                    node.vis_openNode();
                 }
             }
         }

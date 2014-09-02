@@ -114,6 +114,8 @@ $(document).ready(function() {
 
         Helper.loadScreen = document.getElementById('loadScreen');
         Helper.loadText = document.getElementById('loadScreenText');
+
+        resetInspector();
     });
 
 

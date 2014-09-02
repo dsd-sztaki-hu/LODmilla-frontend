@@ -355,29 +355,47 @@ Node.prototype.vis_refresh = function(highlight, aroundNode) {
     }
 };
 
-Node.prototype.vis_openNode = function(targetTabName, property, target) {
+Node.prototype.showInspector = function(callback){
     $('.node-open').removeClass('opened');
     $('.node-open').find('img').attr('src', "img/document-properties-deactivated.png");
     $(".resourceNodeBox").removeClass('opened');
-    
+
     $("[uri='" + this.resource_id + "'] .node-open").addClass('opened');
     $("[uri='" + this.resource_id + "'] .node-open").find('img').attr('src', "img/document-properties.png");
     $("[uri='" + this.resource_id + "']").addClass('opened');
 
     if (this.content == null || this.contentParent == null) {
-        // won't show, no idea, tested with setTimeout too
         Helper.showLoadScreen();
-        this.vis_showOpenedContent(targetTabName, property, target);
+        this.vis_generateInspectorContent(callback);
         Helper.closeLoadScreen();
     }
     else
     {
         this.contentParent.append(this.content);
-//        this.content.show();
         this.content.css('display', 'inherit');
-        changeActiveTab(targetTabName);
-//        this.content.dialog();
+        if (callback)
+            callback();
     }
+}
+
+Node.prototype.vis_openNode = function() {
+    console.time('details: ' + this.label);
+
+    var resBox = $('#nodeOpenedContent');
+    // if the sidemenu was opened
+    if (resBox && resBox.length !== 0) {
+        // res box of another node was opened, close it
+        if (resBox.attr('resourceuri') !== this.resource_id) {
+            var node = Graph.getNode(resBox.attr('resourceuri'));
+            if (node) {
+                node.vis_closeNode();
+            }
+            this.showInspector(vis_showPropertyCallback);
+        }
+    }
+    this.showInspector(vis_showPropertyCallback);
+
+    console.timeEnd('details: ' + this.label);
 };
 
 Node.prototype.vis_closeNode = function() {
@@ -388,7 +406,6 @@ Node.prototype.vis_closeNode = function() {
     var $dialog = $('.nodeDetailsDialog');
     this.contentParent = $dialog.parent();
     this.content = $dialog.detach();
-
 };
 
 Node.prototype.scrollToResult = function(tab, panel) {
@@ -412,62 +429,46 @@ Node.prototype.scrollToResult = function(tab, panel) {
     }
 };
 
-Node.prototype.vis_switchTab = function(targetTabName, property, target) {
-    console.time('details: ' + this.label);
-    var resBox = $('#nodeOpenedContent');
-    // res box was opened
-    if (resBox && resBox.length !== 0) {
-        // res box of another node was opened, close it, then open the result node's box
-        if (resBox.attr('resourceuri') !== this.resource_id) {
-            var node = Graph.getNode(resBox.attr('resourceuri'));
-            if (node){
-                node.vis_closeNode();
-            }
-            this.vis_openNode(targetTabName, property, target);
+function vis_showPropertyCallback() {
+    var targetTabName = $.jStorage.get("targetTabName", "");
+    var property = $.jStorage.get("property", "");
+    var target = $.jStorage.get("target", "");
+
+    var tabId = changeActiveTab(targetTabName);
+
+    var panel = $("#nodeOpenedContentTabs div#" + tabId);
+
+    var list = $('#' + tabId);
+    var targetObj = list.find('.property-value-normal[refProp="' + property + '"][refPropVal="' + target + '"]');
+    if (targetObj.length !== 0){
+        //because DOM sctructure of the ul/li lists is a bit different with literals and the in/out connections
+        if (targetTabName === 'literals'){
+            var targetObjList = targetObj.parent('ul');
         }
-        // result node's res box opened, switch tab and scroll there
-        else {
-            var tabId = changeActiveTab(targetTabName);
-
-            var panel = $("#nodeOpenedContentTabs div#" + tabId);
-
-            var list = $('#' + tabId);
-            var targetObj = list.find('.property-value-normal[refProp="' + property + '"][refPropVal="' + target + '"]');
-
-			//because DOM sctructure of the ul/li lists is a bit different with literals and the in/out connections
-			if (targetTabName === 'literals'){
-				var targetObjList = targetObj.parent('ul');
-			}
-			else if (targetTabName === 'in' || targetTabName === 'out'){
-				var targetObjList = targetObj.parent('li').parent('ul');
-			}
-			
-			
-            // targetObjList.filter(":hidden").prev('p').find('.conncollapsetoggle').click();
-            //targetObjList.prev('p').find('.conncollapsetoggle').click();
-            // setTimeout(function(){
-				targetObjList.css('display', 'block');
-				targetObj.addClass('property-value-highlighted');
-			// }, 500);
-            
-
-            //panel.stop().animate({scrollTop: (targetObj.position().top - 40)}, 800);
-            // setTimeout(function(){
-				panel.stop().animate({scrollTop: (targetObjList.position().top - 40)}, 800);
-				panel.removeAttr('target');
-			// }, 1000);
+        else if (targetTabName === 'in' || targetTabName === 'out'){
+            var targetObjList = targetObj.parent('li').parent('ul');
         }
+
+        // targetObjList.filter(":hidden").prev('p').find('.conncollapsetoggle').click();
+        //targetObjList.prev('p').find('.conncollapsetoggle').click();
+
+        targetObjList.css('display', 'block');
+        targetObj.addClass('property-value-highlighted');
+
+//        setTimeout(function(){
+        panel.stop().animate(
+            { scrollTop: (targetObj.position().top - 40)},
+            500
+        );
+        panel.removeAttr('target');
+//        }, 5000);
     }
-    // res box was closed
-    else {
-        this.vis_openNode(targetTabName, property, target);
-    }
-    console.timeEnd('details: ' + this.label);
 
 
-};
+}
 
-Node.prototype.vis_showOpenedContent = function(targetTabName, property, target) {
+
+Node.prototype.vis_generateInspectorContent = function(callback) {
     var self = this;
     if (!Graph.vis_nodeOpenedContent) {
         Graph.vis_nodeOpenedContent = {
@@ -491,11 +492,7 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
 
     $.each(nodeContent, function(idx, elem) {
         $.each(elem, function(type, item) {
-//            if (targetTabName && targetTabName !== '' && targetTabName === type && property && property !== '' && target && target !== '')
-            if (targetTabName && targetTabName === type && property && target )
-                str_header.push('<li class="', type, '" property="', property, '" target="', target, '">');
-            else
-                str_header.push('<li class="', type, '">');
+            str_header.push('<li class="', type, '">');
 
             var tabName;
             switch (type){
@@ -629,11 +626,11 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
     $nodeOpenedContent.append($nodeOpenedContentChildren);
 
 
-    var $conncollapse = $('.conncollapse').next("ul");
-    $conncollapse.css('display','none');
-    $conncollapse.next("ul").css('display','none');
-    var $nodeOpenedContentTabs = $("#nodeOpenedContentTabs");
-    $nodeOpenedContentTabs.tabs({
+    var conncollapse = $('.conncollapse').next("ul");
+    conncollapse.css('display','none');
+    conncollapse.next("ul").css('display','none');
+    var nodeOpenedContentTabs = $("#nodeOpenedContentTabs");
+    nodeOpenedContentTabs.tabs({
         heightStyle: "fill",
         create: function(event, ui) {
             self.scrollToResult(ui.tab, ui.panel);
@@ -653,13 +650,15 @@ Node.prototype.vis_showOpenedContent = function(targetTabName, property, target)
         $("#nodeOpenedContentTabs").tabs('refresh');
     });
 
-    changeActiveTab(targetTabName);
+
 
     $('div#nodeOpenedContent').parent().addClass('opacityItem').addClass('nodeDetailsDialog');
 //    $next.slideToggle("medium");
 //    $('.conncollapse').find('.conncollapsetoggle').empty().append('+');
 
     addInspectorHandlers();
+    if (callback)
+        callback();
 };
 
 

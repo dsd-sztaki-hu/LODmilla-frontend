@@ -326,7 +326,8 @@ var Sidemenu = new function() {
             select: function(event, ui) {
                 event.preventDefault();
                 var node = Graph.getNode(ui.item.value);
-                node.vis_switchTab(ui.item.type, ui.item.property, ui.item.target);
+                setInspector(ui.item.type, ui.item.property, ui.item.target);
+                node.vis_openNode();
             },
             focus: function(event, ui) {
                 event.preventDefault();

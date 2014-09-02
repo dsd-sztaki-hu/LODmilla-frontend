@@ -189,7 +189,7 @@ function nodeSizeToLabel()
                         node.vis_closeNode();
                     }
                     else{
-                        node.vis_openNode(false, false, false);
+                        node.vis_openNode();
                     }
                 }
             });
@@ -216,4 +216,16 @@ function changeActiveTab(targetTabName)
         return tabId;
     }
     return null;
+}
+
+function setInspector(targetTabName, property, target) {
+    $.jStorage.set("targetTabName", targetTabName);
+    $.jStorage.set("property", property);
+    $.jStorage.set("target", target);
+}
+
+function resetInspector(targetTabName, property, target) {
+    $.jStorage.deleteKey("targetTabName");
+    $.jStorage.deleteKey("property");
+    $.jStorage.deleteKey("target");
 }
