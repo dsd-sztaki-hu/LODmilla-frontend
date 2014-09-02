@@ -314,6 +314,13 @@ var Sidemenu = new function() {
         self.searchBox.append('<div class="clearSearchButton"><input type="button" value="Clear results" /></div>');
         self.searchBox.find('div.clearSearchButton input').button();
 
+        self.searchForm.find('div.searchInput input').keypress(function(e) {
+            if (e.keyCode === 13) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
         self.searchForm.find('div.searchInput input').autocomplete({
             minLength: Profile.searchMinLength,
             source: new Array(),
