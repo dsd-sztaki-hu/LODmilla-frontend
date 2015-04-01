@@ -332,6 +332,13 @@ Node.prototype.vis_showImageDefaultImage = function(nodeImageDiv, imgBox){
         imgBox = $('<div/>');
         imgBox.append(Helper.getImgSrc(Profile.nodeTypesDefaultImages.group));
         nodeImageDiv.empty().append(imgBox);
+    } else { // micsik added
+        nodeImageDiv.empty().append(self.type.replace(/_/g," "))
+            .css("font-weight", "bold")
+            .css("word-wrap","break-word")
+            .css("font-size", "100%")
+            .css("text-transform", "uppercase")
+            .css("padding-top", "7px"); 
     }
 };
        
@@ -514,6 +521,8 @@ Node.prototype.vis_generateInspectorContent = function(callback) {
 
             // literals, aka. description tab,  values in the right panel
             if (type === 'literals') {
+                str_content.push('<div style="margin-bottom: 8px">URI:<a target="_blank" href="'+self.resource_id+'"> ..'
+                +self.resource_id.slice(-40)+'</a></div>'); //.replace(/^.*\/\/[^\/]+/,'')
                 str_content.push(addNewPropertyBtn, toggleAllBtn);
                 $.each(item, function(connectionURI, connectionItems) {
                     propertyName = Profile.getPropertyLabel(connectionURI);
@@ -523,7 +532,8 @@ Node.prototype.vis_generateInspectorContent = function(callback) {
                     // 1 elem van ebbol a propertybol
                     if (connectionItems.length === 1) {
                         propValue = connectionItems[0];
-                        if (Profile.isPropertyExternalLink(connectionURI)){
+                        //if (Profile.isPropertyExternalLink(connectionURI)){
+                        if(Helper.isUrl(connectionURI)) {
 //                            propValue = '<a href="' + propValue + '" target="_blank">' + propValue.replace(/_/g , " ") + '</a>';
                             propValue = '<a href="' + propValue + '" target="_blank">' + propValue + '</a>';
                         }
@@ -539,7 +549,8 @@ Node.prototype.vis_generateInspectorContent = function(callback) {
                         str_content.push("<p class='conncollapse'><b class='conncollapsetoggle'", connectionURI, "'>", propertyName, " (", "<span class='propNum'>", connectionItems.length, "</span>", ")</b> ", addPropertyBtn , "</p><ul>");
                         $.each(connectionItems, function(connectionItemIndex, connectionItem) {
                             propValue = connectionItem;
-                            if (Profile.isPropertyExternalLink(connectionURI)){
+                            //if (Profile.isPropertyExternalLink(connectionURI)){
+                            if(Helper.isUrl(connectionURI)) {
 //                                propValue = '<a href="' + propValue + '" target="_blank">' + propValue.replace(/_/g , " ") + '</a>';
                                 propValue = '<a href="' + propValue + '" target="_blank">' + propValue + '</a>';
                             }

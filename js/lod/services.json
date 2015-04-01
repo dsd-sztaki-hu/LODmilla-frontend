@@ -51,6 +51,24 @@
         "graph": "http://dbpedia.org",
         "disabled": "false"
     },
+    "http://data.szepmuveszeti.hu/": {
+        "shortDescription": {
+            "en": "Szépművészeti"
+        },
+        "description": {
+            "en": "Szépművészeti"
+        },
+        "sparql": {
+            "resourceConnectionsLabels": "select distinct * where { { <{URI}> ?prop ?out. FILTER(!isLiteral(?out) || lang(?out)=\"\" || lang(?out)=\"en\") OPTIONAL { ?out rdfs:label ?label. FILTER(lang(?label)=\"en\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } UNION { ?in ?prop  <{URI}> OPTIONAL { ?in rdfs:label ?label. FILTER(lang(?label)=\"en\"||lang(?label)=\"\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } }"
+        },
+        "endpoint": "http://data.szepmuveszeti.hu/sparql",
+        "prefix": {
+            "default": "http://data.szepmuveszeti.hu/",
+            "resource": "http://data.szepmuveszeti.hu/id/resource/"
+        },
+        "graph": "http://data.szepmuveszeti.hu/",
+        "disabled": "false"
+    },    
     "http://europeana.ontotext.com/": {
         "shortDescription": {
             "en": "Europeana"

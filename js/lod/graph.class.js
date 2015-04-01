@@ -225,6 +225,7 @@ var Graph = new function() {
         else {
             if (jsonobject.graph.nodes !== undefined) {
                 Sidemenu.vis_remove_load_progressbar($('#findPathPalette'));
+                Graph.vis_removeAllHighlights();
                 var nodeList = [];
                 $.each(jsonobject.graph.nodes, function(index, node) {
                     if (!(Graph.getNode(node.resource_id)))

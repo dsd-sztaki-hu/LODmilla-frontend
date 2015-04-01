@@ -276,9 +276,44 @@ var Sidemenu = new function() {
                         }
                     });
                 }
+                else if (lodServer === 'szepmuveszeti') {
+                    searchTerm = request.term;
+                    sparqlURL = Profile.searchURLs[lodServer].replace('MPAD_SEARCH_TERM', searchTerm);
+                    $.jsonp({
+                        url: sparqlURL, //+'&format=application/sparql-results+json',
+                        cache: false,
+                        callbackParameter: 'callback',
+                        callback: 'mpadCB',
+                        success: function(json, textStatus, xOptions) {
+                        //success: function(data) {
+                            console.log("JSONP result", json);
+                            var results = json.results.bindings;
+                            for(var i=0; i<results.length; i++) {
+                                searchResults.push({
+                                    uri: results[i].object.value,
+                                    label: results[i].label.value
+                                });
+                            }
+                            response(
+                                $.map(searchResults, function(item) {
+                                    return {
+                                        label: item.label,
+                                        value: item.label,
+                                        uri: item.uri
+                                    };
+                                })
+                            );
+                        },
+                         error: function(jqXHR, textStatus, errorThrown) {
+                            console.log(jqXHR, textStatus, errorThrown);
+                            self.openResForm.find('div.resourceLabelInput input').removeClass('ui-autocomplete-loading');
+                            alert('DBpedia server error');
+                        }
+                    });
+                }
                 // other LOD server
                 else {
-
+                    console.log("autocomplete endpoint not configured for "+ lodServer);
                 }
             },
             select: function(event, ui) {

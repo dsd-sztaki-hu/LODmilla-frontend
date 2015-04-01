@@ -289,6 +289,10 @@ var Node = function(resource_id, label) {
                                             return false;
                                         }
                                     });
+                                    if (self.type === Profile.unloadedNodeType) {
+                                        self.type = Helper.getShortTypeFromURL(nodeTypeURI);
+                                        //console.log("type: ", self.type);
+                                    }
                                 }
                                 // in case of DBpedia, ontology and property check
                                 if (service.endpoint === 'http://dbpedia.org/sparql') {

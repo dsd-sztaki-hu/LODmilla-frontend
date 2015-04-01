@@ -103,6 +103,7 @@ addInspectorHandlers = function(){
         if (!(Graph.getNode(resource_id))){
             var undoActionLabel = 'action_resourceBox_addNewNodeConnection';
             var aroundNode = Graph.getAroundNode();
+            Graph.removeAllHighlights();
             Graph.addNode($(this).attr("refpropval"),false,false,false,true, undoActionLabel, aroundNode);
         }
         else

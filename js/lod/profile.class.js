@@ -130,14 +130,19 @@ var Profile = new function() {
 
         'europeana' : 'http://europeana.ontotext.com/sparql.xml?query='
             + encodeURIComponent("PREFIX luc: <http://www.ontotext.com/owlim/lucene#>\n" 
-                + 'select ?object ?label { ?proxy ore:proxyFor ?object; dc:title ?label. ?label luc: "MPAD_SEARCH_TERM" } LIMIT '+ this.addNewResourceSearchMaxHits.toString() )
+                + 'select ?object ?label WHERE { ?proxy ore:proxyFor ?object; dc:title ?label. ?label luc: "MPAD_SEARCH_TERM" } LIMIT '+ this.addNewResourceSearchMaxHits.toString() )
             + '&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql',
 
         'britishmuseum' : 'http://collection.britishmuseum.org/sparql.xml?query='
             + encodeURIComponent("PREFIX crm: <http://erlangen-crm.org/current/>\n"
                 + "PREFIX fts: <http://www.ontotext.com/owlim/fts#>\n"
-                + 'SELECT DISTINCT ?object ?label { ?object crm:P102_has_title ?title . ?title rdfs:label ?label . FILTER(REGEX(?label, "MPAD_SEARCH_TERM")) } LIMIT '+ this.addNewResourceSearchMaxHits.toString() )
-            + '&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql'
+                + 'SELECT DISTINCT ?object ?label WHERE { ?object crm:P102_has_title ?title . ?title rdfs:label ?label . FILTER(REGEX(?label, "MPAD_SEARCH_TERM")) } LIMIT '+ this.addNewResourceSearchMaxHits.toString() )
+            + '&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql',
+
+        'szepmuveszeti' : 'http://data.szepmuveszeti.hu/sparql?default-graph-uri=&should-sponge=&query='
+            + encodeURIComponent("PREFIX crm: <http://erlangen-crm.org/current/>\n"
+                + 'SELECT ?object ?label WHERE { ?object crm:P3_has_note ?label. FILTER(REGEX(?label, "MPAD_SEARCH_TERM", "i")) } LIMIT '+ this.addNewResourceSearchMaxHits.toString() )
+            +'&format=application%2Fsparql-results%2Bjson'
 
 //        'factforge' : 'http://factforge.net/sparql.xml?query='
 //            + encodeURIComponent('SELECT distinct ?object ?label WHERE { ?object rdfs:label ?label; FILTER(regex(?label, "MPAD_SEARCH_TERM", "i")) } LIMIT '
@@ -148,12 +153,13 @@ var Profile = new function() {
     // props to get the label for nodes, with ascending priority
     // DO NOT CHANGE THE ORDERING!!!
     this.labelURIs = {
-        '0': 'http://rdf.freebase.com/ns/type.object.name',
-        '1': 'http://xmlns.com/foaf/0.1/name',
-        '2': 'http://www.w3.org/2000/01/rdf-schema#label',
-        '3': 'http://purl.org/dc/elements/1.1/title',
-        '4': 'http://purl.org/dc/terms/title',
-        '5': 'http://www.w3.org/2004/02/skos/core#prefLabel'
+        '0': 'http://erlangen-crm.org/current/P3_has_note',
+        '1': 'http://rdf.freebase.com/ns/type.object.name',
+        '2': 'http://xmlns.com/foaf/0.1/name',
+        '3': 'http://www.w3.org/2000/01/rdf-schema#label',
+        '4': 'http://purl.org/dc/elements/1.1/title',
+        '5': 'http://purl.org/dc/terms/title',
+        '6': 'http://www.w3.org/2004/02/skos/core#prefLabel'
     };
     // wired property labels, somehow they dont get it automatically(?). Extend the list if needed :)
     this.labelsManual = {
