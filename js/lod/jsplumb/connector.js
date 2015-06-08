@@ -822,7 +822,7 @@ vis_jsPlumbInstance_connect_uri = function(uri1, uri2, connection) {
 
 Node.prototype.vis_delete = function() {
     $('#nodeOpenedContent[resourceUri="' + this.resource_id + '"]').remove();
-    //jsPlumbInstance.removeAllEndpoints($("[uri='" + this.resource_id + "']"));
+    jsPlumbInstance.removeAllEndpoints($("[uri='" + this.resource_id + "']"));
     $("[uri='" + this.resource_id + "']").detach();
 };
 
