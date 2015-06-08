@@ -841,7 +841,7 @@ Node.prototype.vis_remove_load_progressbar = function() {
 
 Graph.vis_clear = function() {
     jsPlumbInstance.detachEveryConnection();
-    //jsPlumbInstance.removeAllEndpoints();
+    jsPlumbInstance.removeAllEndpoints();
 };
 
 Graph.vis_engineInit = function() {
