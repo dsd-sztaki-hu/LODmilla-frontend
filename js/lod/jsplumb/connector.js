@@ -822,7 +822,7 @@ vis_jsPlumbInstance_connect_uri = function(uri1, uri2, connection) {
 
 Node.prototype.vis_delete = function() {
     $('#nodeOpenedContent[resourceUri="' + this.resource_id + '"]').remove();
-    jsPlumbInstance.removeAllEndpoints($("[uri='" + this.resource_id + "']"));
+    //jsPlumbInstance.removeAllEndpoints($("[uri='" + this.resource_id + "']"));
     $("[uri='" + this.resource_id + "']").detach();
 };
 
@@ -841,7 +841,7 @@ Node.prototype.vis_remove_load_progressbar = function() {
 
 Graph.vis_clear = function() {
     jsPlumbInstance.detachEveryConnection();
-    jsPlumbInstance.removeAllEndpoints();
+    //jsPlumbInstance.removeAllEndpoints();
 };
 
 Graph.vis_engineInit = function() {
@@ -1006,8 +1006,8 @@ Graph.vis_engineInit = function() {
         }
         else
         {
-            if (Graph.zoomRatio > 0.4001 - delta / 10) Graph.zoomRatio += 0.1000 * delta;
-            else if (Graph.zoomRatio > 0.4001) Graph.zoomRatio -= 0.1000;
+            if (Graph.zoomRatio > 0.4001 - delta / 10) Graph.zoomRatio += 0.0500 * delta;
+            else if (Graph.zoomRatio > 0.1501) Graph.zoomRatio -= 0.0500; //Graph.zoomRatio > 0.4001
             else return false;
         }
         zoom(Graph.zoomRatio, event.pageX, event.pageY);

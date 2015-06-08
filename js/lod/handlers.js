@@ -424,6 +424,10 @@ addPaletteHandlers = function(){
                 Helper.showLoadScreen();
                 selectedType = Graph.LayoutEnum.SPRING;
                 break;
+            case 'SpringXY':
+                Helper.showLoadScreen();
+                selectedType = Graph.LayoutEnum.SPRINGXY;
+                break;
             default :
                 selectedType = Graph.LayoutEnum.NONE;
         }

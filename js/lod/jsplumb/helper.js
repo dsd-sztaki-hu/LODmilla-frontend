@@ -35,6 +35,7 @@ function delayedRepaintNodes()
     {
         $node[i].append($child[i]);
     }
+    jsPlumbInstance.setSuspendDrawing(false, true);
     console.timeEnd('Repaint all');
     Helper.closeLoadScreen();
 }

@@ -460,6 +460,8 @@ var Sidemenu = new function() {
             '<label class="sameLine">Rearrange after insert</label></br>');
         self.layoutBox.append('<input type="checkbox" class="sameLine" id="layoutGroupCheckBox"/>' +
             '<label class="sameLine">Group by type</label></br>');
+        self.layoutBox.append('<input type="checkbox" class="sameLine" id="layoutCreateGroupsCheckBox" checked="true"/>' +
+        '<label class="sameLine">Create groups</label></br>');
 
         self.layoutBox.append('</br><fieldset>' +
             '<legend>Type</legend>' +
@@ -468,9 +470,10 @@ var Sidemenu = new function() {
             '<input class="sameLine" type="radio" name="ltype" value="None" checked="true"><label class="sameLine">None</label></input></br>' +
             '<input class="sameLine" type="radio" name="ltype" value="Grid"><label class="sameLine">Grid</label></input></br>' +
             '<input class="sameLine" type="radio" name="ltype" value="Radial"><label class="sameLine">Radial</label></input></br>' +
-            '<input class="sameLine" type="radio" name="ltype" value="Spring"><label class="sameLine">Spring</label></input>' +
-            '</form></fieldset></br>');
+            '<input class="sameLine" type="radio" name="ltype" value="Spring"><label class="sameLine">Spring</label></input></br>' +
 
+            '</form></fieldset></br>');
+        //'<input class="sameLine" type="radio" name="ltype" value="SpringXY"><label class="sameLine">SpringXY</label></input>' +
         self.layoutBox.append('<div id="layoutSpringSlider"></div><div id="layoutSpringSliderValue">Spring max time: 10 s</div>');
         self.layoutBox.find("#layoutSpringSlider").slider({
             value: 10,
