@@ -118,8 +118,10 @@ Buffer.prototype.addConnection = function(sourceID, targetID, label)
 {
     var targetIndex = this.getVertexIndexById(targetID);
     var sourceIndex = this.getVertexIndexById(sourceID);
-    if (targetIndex > -1) this.vertexes[sourceIndex].addTargetConnection(targetIndex, label);
-    if (sourceIndex > -1) this.vertexes[targetIndex].addSourceConnection(sourceIndex, label);
+    if (targetIndex > -1 && sourceIndex > -1) {
+        this.vertexes[sourceIndex].addTargetConnection(targetIndex, label);
+        this.vertexes[targetIndex].addSourceConnection(sourceIndex, label);
+    }
 }
 
 Buffer.prototype.clear = function()
