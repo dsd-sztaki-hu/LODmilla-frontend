@@ -25,6 +25,7 @@ var Graph = new function() {
         GRID : "Grid",
         RADIAL : "Radial",
         SPRING : "Spring",
+        SPRINGXY : "SpringXY",
         NONE : "None"
     }
 

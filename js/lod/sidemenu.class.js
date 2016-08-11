@@ -496,6 +496,8 @@ var Sidemenu = new function() {
             '<label class="sameLine">Rearrange after insert</label></br>');
         self.layoutBox.append('<input type="checkbox" class="sameLine" id="layoutGroupCheckBox"/>' +
             '<label class="sameLine">Group by type</label></br>');
+        self.layoutBox.append('<input type="checkbox" class="sameLine" id="layoutCreateGroupsCheckBox" checked="true"/>' +
+        '<label class="sameLine">Create groups</label></br>');
 
         self.layoutBox.append('</br><fieldset>' +
             '<legend>Type</legend>' +
@@ -504,9 +506,10 @@ var Sidemenu = new function() {
             '<input class="sameLine" type="radio" name="ltype" value="None" checked="true"><label class="sameLine">None</label></input></br>' +
             '<input class="sameLine" type="radio" name="ltype" value="Grid"><label class="sameLine">Grid</label></input></br>' +
             '<input class="sameLine" type="radio" name="ltype" value="Radial"><label class="sameLine">Radial</label></input></br>' +
-            '<input class="sameLine" type="radio" name="ltype" value="Spring"><label class="sameLine">Spring</label></input>' +
-            '</form></fieldset></br>');
+            '<input class="sameLine" type="radio" name="ltype" value="Spring"><label class="sameLine">Spring</label></input></br>' +
 
+            '</form></fieldset></br>');
+        //'<input class="sameLine" type="radio" name="ltype" value="SpringXY"><label class="sameLine">SpringXY</label></input>' +
         self.layoutBox.append('<div id="layoutSpringSlider"></div><div id="layoutSpringSliderValue">Spring max time: 10 s</div>');
         self.layoutBox.find("#layoutSpringSlider").slider({
             value: 10,
@@ -535,6 +538,10 @@ var Sidemenu = new function() {
         self.buttonMyEdits = $('<div class="buttonWrap"><button id="myEditsButton" title="My edits - inserted and deleted connections">My edits</button></div>');
         parent.append(self.buttonMyEdits);
 
+        // Select/Unselect all button
+        self.buttonSelectToggle = $('<div class="buttonWrap"><button id="selectToggleButton" title="Select/unselect all">Select/unselect nodes</button></div>');
+        parent.append(self.buttonSelectToggle);
+
         // CLEAR button
         self.buttonClear = $('<div class="buttonWrap"><button id="clearGraphButton" title="Hide all nodes">Hide all</button></div>');
         parent.append(self.buttonClear);
@@ -548,8 +555,8 @@ var Sidemenu = new function() {
         parent.append(self.buttonUndo);
 
         // EXPORT button
-        self.buttonExport = $('<div class="buttonWrap"><button id="exportButton" title="Export graph to Graphviz">Export</button></div>');
-        parent.append(self.buttonExport);
+//        self.buttonExport = $('<div class="buttonWrap"><button id="exportButton" title="Export graph to Graphviz">Export</button></div>');
+//        parent.append(self.buttonExport);
 
         // edit mode button
 //        self.buttonEdit = $('<div class="buttonWrap"><button id="editButton" title="Edit mode">Edit mode</button></div>')
@@ -563,15 +570,16 @@ var Sidemenu = new function() {
         self.logoWrap = $('<div id="logowrap"><div id="logo"><a href="http://www.sztaki.hu" target="_blank"><img src="img/SZTAKI_logo_2012_small_RGB.png" width="94" height="50" /></a></div></div>');
         parent.append(self.logoWrap);
 
-        $("#loadGraphButton, #saveGraphButton, #myEditsButton, #clearGraphButton, #deleteSelectedButton, #undoButton, #exportButton, #editButton").button();
+        $("#loadGraphButton, #saveGraphButton, #myEditsButton, #selectToggleButton, #clearGraphButton, #deleteSelectedButton, #undoButton, #exportButton, #editButton").button();
 
         self.buttonLoad.position({my: "left bottom", at: "left+10 bottom-10", of: window});
         self.buttonSave.position({my: "left bottom", at: "right bottom", of: self.buttonLoad});
         self.buttonMyEdits.position({my: "left bottom", at: "right bottom", of: self.buttonSave});
-        self.buttonClear.position({my: "left bottom", at: "right bottom", of: self.buttonMyEdits});
+        self.buttonSelectToggle.position({my: "left bottom", at: "right bottom", of: self.buttonMyEdits});
+        self.buttonClear.position({my: "left bottom", at: "right bottom", of: self.buttonSelectToggle});
         self.buttonDeleteSelected.position({my: "left bottom", at: "right bottom", of: self.buttonClear});
         self.buttonUndo.position({my: "left bottom", at: "right bottom", of: self.buttonDeleteSelected});
-        self.buttonExport.position({my: "left bottom", at: "right bottom", of: self.buttonUndo});
+//        self.buttonExport.position({my: "left bottom", at: "right bottom", of: self.buttonUndo});
 //        self.buttonEdit.position({my: "left bottom", at: "right bottom", of: self.buttonUndo});
         self.buttonHelp.position({my: "right bottom", at: "right-5 bottom-5", of: window});
         self.logoWrap.position({my: "left bottom", at: "left top", of: self.buttonLoad});
@@ -581,10 +589,11 @@ var Sidemenu = new function() {
             self.buttonLoad.position({my: "left bottom", at: "left+10 bottom-10", of: window});
             self.buttonSave.position({my: "left bottom", at: "right bottom", of: self.buttonLoad});
             self.buttonMyEdits.position({my: "left bottom", at: "right bottom", of: self.buttonSave});
-            self.buttonClear.position({my: "left bottom", at: "right bottom", of: self.buttonMyEdits});
+            self.buttonSelectToggle.position({my: "left bottom", at: "right bottom", of: self.buttonMyEdits});
+            self.buttonClear.position({my: "left bottom", at: "right bottom", of: self.buttonSelectToggle});
             self.buttonDeleteSelected.position({my: "left bottom", at: "right bottom", of: self.buttonClear});
             self.buttonUndo.position({my: "left bottom", at: "right bottom", of: self.buttonDeleteSelected});
-            self.buttonExport.position({my: "left bottom", at: "right bottom", of: self.buttonUndo});
+//            self.buttonExport.position({my: "left bottom", at: "right bottom", of: self.buttonUndo});
 //            self.buttonEdit.position({my: "left bottom", at: "right bottom", of: self.buttonUndo});
             self.buttonHelp.position({my: "right bottom", at: "right-5 bottom-5", of: window});
             self.logoWrap.position({my: "left bottom", at: "left top", of: self.buttonLoad});

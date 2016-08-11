@@ -7,6 +7,17 @@
  *
  */
 
+toggleSelectNodes = function(elem){
+    if ($(elem).hasClass('opened')) {
+        $(elem).removeClass('opened');
+        Graph.removeAllHighlights();
+    }
+    else {
+        $(elem).addClass('opened');
+        Graph.highlightAll();
+    }
+}
+
 inspector_addNewConnection = function(elem, type, title){
     var btn = $(elem);
     if (!btn.hasClass('disabled')){
@@ -304,14 +315,7 @@ addPaletteHandlers = function(){
     });
 
     $('body').on("click", '#main #paletteBox #selectPalette .node-highlight-all', function(event) {
-        if ($(this).hasClass('opened')) {
-            $(this).removeClass('opened');
-            Graph.removeAllHighlights();
-        }
-        else {
-            $(this).addClass('opened');
-            Graph.highlightAll();
-        }
+        toggleSelectNodes(this);
     });
 
 //    $('body').on("mouseenter", '#main #paletteBox #selectPalette .node-highlight-type-label form', function(event) {
@@ -420,6 +424,10 @@ addPaletteHandlers = function(){
             case 'Spring':
                 Helper.showLoadScreen();
                 selectedType = Graph.LayoutEnum.SPRING;
+                break;
+            case 'SpringXY':
+                Helper.showLoadScreen();
+                selectedType = Graph.LayoutEnum.SPRINGXY;
                 break;
             default :
                 selectedType = Graph.LayoutEnum.NONE;
@@ -600,6 +608,10 @@ addBottomMenuHandlers = function(){
                 $(this).remove();
             }
         });
+    });
+
+    $("body").on('click', '#main .buttonWrap #selectToggleButton', function(event) {
+        toggleSelectNodes(this);
     });
 
     $("body").on('click', '#main .buttonWrap #clearGraphButton', function(event) {

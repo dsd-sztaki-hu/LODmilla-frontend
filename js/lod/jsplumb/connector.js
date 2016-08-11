@@ -1017,8 +1017,8 @@ Graph.vis_engineInit = function() {
         }
         else
         {
-            if (Graph.zoomRatio > 0.4001 - delta / 10) Graph.zoomRatio += 0.1000 * delta;
-            else if (Graph.zoomRatio > 0.4001) Graph.zoomRatio -= 0.1000;
+            if (Graph.zoomRatio > 0.4001 - delta / 10) Graph.zoomRatio += 0.0500 * delta;
+            else if (Graph.zoomRatio > 0.1501) Graph.zoomRatio -= 0.0500; //Graph.zoomRatio > 0.4001
             else return false;
         }
         zoom(Graph.zoomRatio, event.pageX, event.pageY);
