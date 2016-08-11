@@ -123,7 +123,7 @@ var Sidemenu = new function() {
 
                 // search on dbpedia LOD
                 // TODO: success and complete functions to server_connectorba. DRY!
-                if (lodServer === 'dbpedia') {
+                if (lodServer === 'dbpedia' ) {
                     searchTerm = request.term;
                     sparqlURL = Profile.searchURLs[lodServer].replace('MPAD_SEARCH_TERM', searchTerm);
                     $.ajax({
@@ -166,7 +166,7 @@ var Sidemenu = new function() {
                         error: function(jqXHR, textStatus, errorThrown) {
                             console.log(jqXHR, textStatus, errorThrown);
                             self.openResForm.find('div.resourceLabelInput input').removeClass('ui-autocomplete-loading');
-                            alert('DBpedia server error');
+                            alert(lodServer + ' server error: '+errorThrown);
                         }
                     });
                 }
@@ -229,7 +229,8 @@ var Sidemenu = new function() {
                         }
                     });
                 }
-                else if (lodServer === 'britishmuseum' || lodServer === 'factforge' || lodServer === 'europeana') {
+                //TODO: convert this into server type field
+                else if (lodServer === 'britishmuseum' || lodServer === 'factforge' || lodServer === 'europeana'|| lodServer === 'civilkapocs' || lodServer === 'uni-obuda') {
                     searchTerm = request.term;
                     sparqlURL = Profile.searchURLs[lodServer].replace('MPAD_SEARCH_TERM', searchTerm);
                     $.ajax({
@@ -272,7 +273,7 @@ var Sidemenu = new function() {
                         error: function(jqXHR, textStatus, errorThrown) {
                             console.log(jqXHR, textStatus, errorThrown);
                             self.openResForm.find('div.resourceLabelInput input').removeClass('ui-autocomplete-loading');
-                            alert('DBpedia server error');
+                            alert(lodServer + ' server error');
                         }
                     });
                 }

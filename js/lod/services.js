@@ -1,4 +1,4 @@
-{
+var Lodmilla_services = {
     "http://lod.sztaki.hu/sztaki": {
         "shortDescription": {
             "en": "Sztaki"
@@ -36,7 +36,7 @@
     },
     "http://www.civilkapocs.hu": {
         "shortDescription": {
-            "en": "Civilkapocs
+            "en": "Civilkapocs"
         },
         "description": {
             "en": "Civilkapocs"
@@ -157,4 +157,4 @@
         "disabled": "true"
     }
     
-}
+};

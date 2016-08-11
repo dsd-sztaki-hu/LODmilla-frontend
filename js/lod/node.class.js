@@ -268,7 +268,9 @@ var Node = function(resource_id, label) {
                                 var endpointLabel = Helper.getEndpointLabelOrUriEnd(item, 'out');
 
                                 // store node type
-                                if (item.prop.value === Profile.commonURIs.propTypeURI) {
+                                if (item.prop.value === Profile.commonURIs.propTypeURI
+                                    && item.out.value && !item.out.value.match(/NamedIndividual/i)
+                                ) {
                                     // if changed once, dont change it again (duplicate types)
                                     var nodeTypeURI = decodeURIComponent(item.out.value);
                                     var nodeTypeLabel;

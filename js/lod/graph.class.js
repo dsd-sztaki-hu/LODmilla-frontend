@@ -39,7 +39,7 @@ var Graph = new function() {
         $(parent).append('<div id="graph"></div>');
         this.canvas = $('#graph');
         this.vis_engineInit();
-        console.log('initiated');
+        console.log('graph initiated');
     };
 
     this.addNodeType = function(typeURI, typeLabel) {

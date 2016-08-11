@@ -128,6 +128,11 @@ var Profile = new function() {
                 + this.addNewResourceSearchMaxHits.toString()) 
             +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
 
+        'civilkapocs': 'http://civilkapocs.hu:8890/sparql?default-graph-uri=&should-sponge=&query='
+            + encodeURIComponent('select ?object, ?label where { ?object rdfs:label ?label . '
+                + "FILTER(REGEX(?label, \"MPAD_SEARCH_TERM\", \"i\")) } limit " + this.addNewResourceSearchMaxHits.toString()) 
+            +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
+
         'europeana' : 'http://europeana.ontotext.com/sparql.xml?query='
             + encodeURIComponent("PREFIX luc: <http://www.ontotext.com/owlim/lucene#>\n" 
                 + 'select ?object ?label WHERE { ?proxy ore:proxyFor ?object; dc:title ?label. ?label luc: "MPAD_SEARCH_TERM" } LIMIT '+ this.addNewResourceSearchMaxHits.toString() )
@@ -142,7 +147,17 @@ var Profile = new function() {
         'szepmuveszeti' : 'http://data.szepmuveszeti.hu/sparql?default-graph-uri=&should-sponge=&query='
             + encodeURIComponent("PREFIX crm: <http://erlangen-crm.org/current/>\n"
                 + 'SELECT ?object ?label WHERE { ?object crm:P3_has_note ?label. FILTER(REGEX(?label, "MPAD_SEARCH_TERM", "i")) } LIMIT '+ this.addNewResourceSearchMaxHits.toString() )
-            +'&format=application%2Fsparql-results%2Bjson'
+            +'&format=application%2Fsparql-results%2Bjson',
+
+        'uni-obuda': 'http://lod.nik.uni-obuda.hu/sparql?default-graph-uri=&should-sponge=&query='
+            + encodeURIComponent('select ?object, ?label where { ?object rdfs:label ?label . '
+                + "FILTER(REGEX(?label, \"MPAD_SEARCH_TERM\", \"i\")) } limit " + this.addNewResourceSearchMaxHits.toString()) 
+            +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
+            // + encodeURIComponent('select ?object, ?label, max(?sc) as ?rank where { ?object rdfs:label ?label . '
+                // + "?label bif:contains \'\"MPAD_SEARCH_TERM\"\' option (score ?sc) . "
+                // + 'FILTER(lang(?label)=""). } group by ?object ?label order by desc (?rank) ?label limit '
+                // + this.addNewResourceSearchMaxHits.toString()) 
+            // +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
 
 //        'factforge' : 'http://factforge.net/sparql.xml?query='
 //            + encodeURIComponent('SELECT distinct ?object ?label WHERE { ?object rdfs:label ?label; FILTER(regex(?label, "MPAD_SEARCH_TERM", "i")) } LIMIT '
@@ -465,21 +480,42 @@ var Profile = new function() {
     };
 
     this.init = function() {
+        if(this.services.length > 0) {
+            console.log('services already loaded', this.services);
+            return;
+        }
         var self = this;
-        var jqxhr = $.ajax({
-            type: "GET",
-            dataType: "json",
-            url: "js/lod/services.json",
-            async: false,
-            data: {}
-        }).done(function(json) {
-            $.each(json, function(key, value) {
-                self.addService(key, value.shortDescription.en, value.description.en, value.endpoint, value.prefix, value.graph, value.sparql, value.disabled);
-            });
+        console.log('loading services');
+        $.each(Lodmilla_services, function(key, value) {
+            //console.log("add service", key, value);
+            self.addService(key, value.shortDescription.en, value.description.en, value.endpoint, value.prefix, value.graph, value.sparql, value.disabled);
         });
-//        .fail(function() { alert("error"); })
-//        .always(function() { alert("complete"); });
+        /*
+        // var jqxhr = $.ajax({
+            // type: "GET",
+            dataType: "json",
+            // url: "js/lod/services.json",
+            async: false,
+            data: {},
+       }).done(function(json) {
+            // success: function(json) {
+                // console.log("json", json);
+                // $.each(json, function(key, value) {
+                    // console.log("add service", key, value);
+                    // self.addService(key, value.shortDescription.en, value.description.en, value.endpoint, value.prefix, value.graph, value.sparql, value.disabled);
+                // });
+            // },
+            // error: function (ajaxContext) {
+                // console.log("error", ajaxContext);
+                // alert(ajaxContext.responseText)
+            // }
+        // });
+       .fail(function() { alert("error"); })
+       .always(function() { alert("complete"); });
+       */
     };
+    
+    //this.init();
 
 };
 

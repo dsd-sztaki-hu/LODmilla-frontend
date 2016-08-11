@@ -17,9 +17,12 @@ Profile.data_getService = function(resourceURI) {
             var resourcePrefix = resourceURI.split('//')[0] + '//' + resourcePath.split('/')[0];
 
             var isPrefixFound = false;
+            //console.log("value", value);
             for (var prefix in value.prefix){
-                if (value.prefix.hasOwnProperty(prefix)){
+                //console.log("prefix", prefix);
+                if (value.prefix[prefix]){
 //                    if (value.prefix[prefix] === resourcePrefix){
+                    //console.log("matching", prefix, value.prefix[prefix], resourcePrefix);
                     if (value.prefix[prefix].indexOf(resourcePrefix) !== -1){
                         isPrefixFound = true;
                     }
@@ -30,8 +33,8 @@ Profile.data_getService = function(resourceURI) {
             }
         });
     }
-    catch (e){ }
-
+    catch (e){ console.log("EXCEPTION", e); }
+    console.log("Using service", service);
     return service;
 };
 

@@ -1,6 +1,12 @@
 body {
     font-size: 12px;
-    background-image: url('../img/tileable-metal-texture-1mod.jpg');
+    /* background-image: url('../img/tileable-metal-texture-1mod.jpg'); */
+		/* background-color: #FFCC89;  ffffdd */
+		background-color: #FFFFFF;
+}
+
+.nodeDetailsDialog {
+    background-color: #f8f4f4;
 }
 
 .opacityItem {
@@ -12,7 +18,7 @@ body {
 }
     
 .resourceNodeBox, .connectionBox{
-    background-color:white;
+    background-color: #f8f4f4;
     color:black;
     font-family:helvetica;
 }
@@ -66,7 +72,8 @@ body {
 
 .resourceNodeBox{
     /*background-color: #fff6e7;*/
-    background-color: #d0d0d0;
+    /* background-color: #d0d0d0; */
+     background-color: #eeeeee;
 }
 .resourceNodeBox.nodetype_person,
 .resourceNodeBox.nodetype_agent {
