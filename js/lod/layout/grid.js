@@ -209,14 +209,23 @@ function gridLayoutGroup(buffer, min_distance)
 
 function gridLayoutGroupAdaptive(buffer, min_distance)
 {
-    var i,j ;
     var length = buffer.groups.length;
-    var gl, gx, gy, maxgl = 0, actg;
-    var rng = CustomRandom(23);
+
+    if (length == 1) {
+        return;
+    }
+
+    var rng = CustomRandom(23),
+        act,
+        i,j,
+        gl, gx, gy,
+        maxgl = 0, actg;
+
     //nxn matrix
-    var n = Math.sqrt(length);
-    var nx = Math.ceil(n);
-    var ny = Math.floor(n);
+    var n = Math.sqrt(length),
+        nx = Math.ceil(n),
+        ny = Math.floor(n);
+
     if (nx * ny < length) ny++;
 
     for (i = 0; i < length; i++)
@@ -226,12 +235,11 @@ function gridLayoutGroupAdaptive(buffer, min_distance)
         if (gl > maxgl) maxgl = gl;
     }
 
-    var ng = Math.sqrt(maxgl);
-    var ngx = Math.ceil(ng);
-    var ngy = Math.floor(ng);
-    if (ngx * ngy < ng) ngy++;
+    var ng = Math.sqrt(maxgl),
+        ngx = Math.ceil(ng),
+        ngy = Math.floor(ng);
 
-    var act;
+    if (ngx * ngy < ng) ngy++;
 
     var x = 0, y = 0;
     for (i = 0; i < length; i++)
@@ -364,7 +372,7 @@ function gridLayoutGroupAdaptive(buffer, min_distance)
     //setbufferpos
     var original;
     for (var index in buffer.vertexes) {
-        var act = buffer.vertexes[index];
+        act = buffer.vertexes[index];
         if (act.isVirtual == false) {
             original = Graph.getNode(act.id);
             act.left = original.left;
