@@ -719,7 +719,7 @@ Node.prototype.vis_repaintConnections = function() {
         }
     }
     */
-    console.timeEnd('a');
+    // console.timeEnd('a');
     // Iterate through the connections of all nodes in the graph to find
     // the not reflexive connections
     // DONE? .length property on undefined errors in console
@@ -1021,6 +1021,7 @@ Graph.vis_engineInit = function() {
             else if (Graph.zoomRatio > 0.1501) Graph.zoomRatio -= 0.0500; //Graph.zoomRatio > 0.4001
             else return false;
         }
+        Graph.zoomRatio = Math.min(2.0, Graph.zoomRatio);
         zoom(Graph.zoomRatio, event.pageX, event.pageY);
 
 

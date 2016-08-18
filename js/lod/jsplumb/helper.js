@@ -17,7 +17,7 @@ function delayedRepaintNodes()
     var $tnode;
     var i;
     // repaintEverything() nem működik megbízhatóan automatikusan kiszámolt anchorral, tudnak a hibáról
-    console.time('Repaint all');
+    // console.time('Repaint all');
     jsPlumbInstance.setSuspendDrawing(false, false);
     $res = $('.resourceNodeBox');
     $res.each(function() {
@@ -36,7 +36,7 @@ function delayedRepaintNodes()
         $node[i].append($child[i]);
     }
     jsPlumbInstance.setSuspendDrawing(false, true);
-    console.timeEnd('Repaint all');
+    // console.timeEnd('Repaint all');
     Helper.closeLoadScreen();
 }
 
@@ -102,6 +102,16 @@ function moveNodesExcept(event, selected, repaint)
 
 function zoom(ratio, x, y)
 {
+    var slider = $("#zoomSlider"),
+        sliderValue = $("#zoomSliderValue");
+
+    if (slider) {
+        slider.slider("value", ratio);
+    }
+    if (sliderValue) {
+        sliderValue.html("Zoom value: " + ratio);
+    }
+
     if (blockResetDrawing)
         decideZoom(ratio, x, y);
     else
@@ -138,7 +148,7 @@ function checkDrawing()
 
 function applyZoom(ratio, x, y)
 {
-    console.log('normal: ' + ratio);
+    // console.log('normal: ' + ratio);
     $('.resourceNodeBox').each(function() {
         var vis_node = $(this);
         var node = Graph.getNode(this.getAttribute('uri'));

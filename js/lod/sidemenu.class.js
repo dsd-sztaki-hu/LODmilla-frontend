@@ -91,7 +91,7 @@ var Sidemenu = new function() {
 
         // clear button
         self.openResForm.find('div.addResourceClearButton input').button();
-        
+
         // event for pressing enter in 2nd input aka adding resource from URI
         self.openResForm.find('div.resourceUriInput input').keypress(function(e) {
             if (e.keyCode === 13) {
@@ -554,6 +554,23 @@ var Sidemenu = new function() {
         self.buttonUndo = $('<div class="buttonWrap"><button id="undoButton" title="Undo last action">Undo</button></div>');
         parent.append(self.buttonUndo);
 
+        // ZOOM slider
+        self.zoomSlider = $('<div class="sliderWrap"><div id="zoomSlider"></div><div id="zoomSliderValue">Zoom value: 1.0</div></div>');
+        parent.append(self.zoomSlider);
+        self.zoomSlider.find("#zoomSlider").slider({
+            value: 1,
+            min: 0.1,
+            max: 2,
+            step: 0.1,
+            slide: function(event, ui) {
+                zoom(ui.value, 0,0)
+            }
+        });
+        self.zoomSlider.css({
+            width: 200,
+            position: 'fixed'
+        });
+
         // EXPORT button
 //        self.buttonExport = $('<div class="buttonWrap"><button id="exportButton" title="Export graph to Graphviz">Export</button></div>');
 //        parent.append(self.buttonExport);
@@ -581,6 +598,7 @@ var Sidemenu = new function() {
         self.buttonUndo.position({my: "left bottom", at: "right bottom", of: self.buttonDeleteSelected});
 //        self.buttonExport.position({my: "left bottom", at: "right bottom", of: self.buttonUndo});
 //        self.buttonEdit.position({my: "left bottom", at: "right bottom", of: self.buttonUndo});
+        self.zoomSlider.position({my: "left bottom", at: "right+5 bottom", of: self.buttonUndo});
         self.buttonHelp.position({my: "right bottom", at: "right-5 bottom-5", of: window});
         self.logoWrap.position({my: "left bottom", at: "left top", of: self.buttonLoad});
 
@@ -595,6 +613,7 @@ var Sidemenu = new function() {
             self.buttonUndo.position({my: "left bottom", at: "right bottom", of: self.buttonDeleteSelected});
 //            self.buttonExport.position({my: "left bottom", at: "right bottom", of: self.buttonUndo});
 //            self.buttonEdit.position({my: "left bottom", at: "right bottom", of: self.buttonUndo});
+            self.zoomSlider.position({my: "left bottom", at: "right+5 bottom", of: self.buttonUndo});
             self.buttonHelp.position({my: "right bottom", at: "right-5 bottom-5", of: window});
             self.logoWrap.position({my: "left bottom", at: "left top", of: self.buttonLoad});
         });

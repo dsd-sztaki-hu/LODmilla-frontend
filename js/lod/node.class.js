@@ -244,7 +244,7 @@ var Node = function(resource_id, label) {
 //            self.vis_repaintConnections();
         } else {
             console.log('loading: ' + this.resource_id);
-            console.time('load time');
+            // console.time('load time');
             // JSON comes from a known LOD - present in the Profile
             if (service && service !== "") {
                 self.endpoint.shortDescription = service.shortDescription;
@@ -591,7 +591,7 @@ var Node = function(resource_id, label) {
             self.type = Profile.defaultNodeType;     
 
         Sidemenu.refreshSearchDatabase();
-        console.timeEnd('load time');
+        // console.timeEnd('load time');
         self.vis_refresh(highlight, aroundNode);
                 
         var nodeList = [{resource_id:this.resource_id, action:'added',highlighted:highlight}];

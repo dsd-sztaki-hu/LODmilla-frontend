@@ -27,7 +27,7 @@ var Graph = new function() {
         SPRING : "Spring",
         SPRINGXY : "SpringXY",
         NONE : "None"
-    }
+    };
 
     this.layout = this.LayoutEnum.NONE;
 
@@ -40,7 +40,7 @@ var Graph = new function() {
         $(parent).append('<div id="graph"></div>');
         this.canvas = $('#graph');
         this.vis_engineInit();
-        console.log('graph initiated');
+        // console.log('graph initiated');
     };
 
     this.addNodeType = function(typeURI, typeLabel) {
