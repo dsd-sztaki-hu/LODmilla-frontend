@@ -399,28 +399,31 @@ Buffer.prototype.createGroups = function()
             }
         }
     }
-}
+};
 
 Buffer.prototype.createDistanceMap = function()
 {
     //path
-    var dijkstra = [];
-    var conn;
-    var vl = this.vertexes.length;
-    var i, j, v0;
+    var dijkstra = [],
+        vl = this.vertexes.length,
+        hasConnected = !!this.connected.length,
+        hasNeighBour = !!this.neighbours.length,
+        conn,
+        i, j, v0;
+
     for (i = 0; i < vl; i++)
     {
         dijkstra[i] = [];
         for (j = 0; j < vl; j++)
         {
-            conn = Math.abs(this.connected[i][j]);
+            conn = hasConnected ? Math.abs(this.connected[i][j]) : 0;
             if (conn != 0)
             {
                 dijkstra[i][j] = conn;
             }
             else
             {
-                if (this.neighbours[i][j])
+                if (hasNeighBour && this.neighbours[i][j])
                 {
                     dijkstra[i][j] = 1;
                 }
@@ -443,21 +446,23 @@ Buffer.prototype.createDistanceMap = function()
             //console.log(v0.label + ' - ' + buffer.vertexes[j].label + ': ' + shortestPathInfo.pathLengths[j])
         }
     }
-}
+};
 
 Buffer.prototype.createGroupDistanceMap = function()
 {
     //path
-    var dijkstra = [];
-    var conn;
-    var vl = this.groups.length;
-    var i, j, v0;
+    var dijkstra = [],
+        vl = this.groups.length,
+        hasConnected = !!this.groupsConnected.length,
+        conn,
+        i, j, v0;
+
     for (i = 0; i < vl; i++)
     {
         dijkstra[i] = [];
         for (j = 0; j < vl; j++)
         {
-            conn = Math.abs(this.groupsConnected[i][j]);
+            conn = hasConnected ? Math.abs(this.groupsConnected[i][j]) : 0;
             if (conn != 0)
             {
                 //dijkstra[i][j] = conn;
@@ -479,7 +484,7 @@ Buffer.prototype.createGroupDistanceMap = function()
             this.groupDistance[i][j] = shortestPathInfo.pathLengths[j];
         }
     }
-}
+};
 
 //base from Cameron McCormack <cam (at) mcc.id.au> Dijkstra's single source shortest path algorithm in JavaScript
 function shortestPath(edges, numVertices, startVertex) {
@@ -521,22 +526,26 @@ function shortestPath(edges, numVertices, startVertex) {
 
 Buffer.prototype.createConnectionCost = function()
 {
-    var conn;
-    var vl = this.vertexes.length;
-    var counter = 0;
+    var vl = this.vertexes.length,
+        hasConnected = !!this.connected.length,
+        hasNeighBour = !!this.neighbours.length,
+        counter = 0,
+        conn,
+        i, j;
+
     for (i = 0; i < vl; i++)
     {
         counter = 0;
         for (j = 0; j < vl; j++)
         {
-            conn = Math.abs(this.connected[i][j]);
+            conn = hasConnected ? Math.abs(this.connected[i][j]) : 0;
             if (conn != 0)
             {
                 counter++;
             }
             else
             {
-                if (this.neighbours[i][j])
+                if (hasNeighBour && this.neighbours[i][j])
                 {
                     counter++;
                 }
