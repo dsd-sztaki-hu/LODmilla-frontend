@@ -102,7 +102,7 @@ function finishLayout(name, repaint, buffer, createGroups)
         repaintNodes();
     }
     else Helper.closeLoadScreen();
-    measureLayout(buffer, createGroups);
+    // measureLayout(buffer, createGroups);
 }
 
 function measureLayout(buffer, createGroups)
