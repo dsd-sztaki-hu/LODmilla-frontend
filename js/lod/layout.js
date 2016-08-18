@@ -50,15 +50,15 @@ function applyLayout(layoutType, repaint)
 function initLayout(name, buffer, useVirtual, weight, virtualWeight, createGroups)
 {
     Helper.showLoadScreen();
-    console.time("Loading nodes to buffer");
+    // console.time("Loading nodes to buffer");
     //loading nodes to buffer
     for (var index in Graph.nodes)
     {
         var act = Graph.nodes[index];
         buffer.addVertex(act.resource_id, act.label, act.weight, false, act.left, act.top, act.type);
     }
-    console.timeEnd("Loading nodes to buffer");
-    console.time("Loading edges to buffer");
+    // console.timeEnd("Loading nodes to buffer");
+    // console.time("Loading edges to buffer");
     //loading edges to buffer
     var conns = jsPlumbInstance.getAllConnections();
     $.each(conns, function(conn_id, l_conn) {
@@ -71,30 +71,30 @@ function initLayout(name, buffer, useVirtual, weight, virtualWeight, createGroup
         });
     });
 
-    console.timeEnd("Loading edges to buffer");
+    // console.timeEnd("Loading edges to buffer");
     if (useVirtual) {
-        console.time("Loading virtual nodes to buffer");
+        // console.time("Loading virtual nodes to buffer");
         addVirtualTypeNodes(buffer, virtualWeight);
 //        addVirtualNodes(buffer, virtualWeight);
-        console.timeEnd("Loading virtual nodes to buffer");
+//         console.timeEnd("Loading virtual nodes to buffer");
     }
     buffer.createNeighboursMap();
     buffer.createConnectionMap();
     buffer.createDistanceMap();
     buffer.createConnectionCost();
     if (createGroups) {
-        console.time("Create groups");
+        // console.time("Create groups");
         buffer.createGroups();
         buffer.createGroupDistanceMap();
-        console.timeEnd("Create groups");
+        // console.timeEnd("Create groups");
     }
 
-    console.time(name + " layout");
+    // console.time(name + " layout");
 }
 
 function finishLayout(name, repaint, buffer, createGroups)
 {
-    console.timeEnd(name + " layout");
+    // console.timeEnd(name + " layout");
     updateNewPosition();
     decideZoom(Graph.zoomRatio);
     if (repaint)
@@ -116,7 +116,7 @@ function measureLayout(buffer, createGroups)
         c = c.length;
     var i, j, tmp, tmpx, tmpy, tl, sl, cl;
     if (vl == 0) return;
-    //arány és terület
+    //arï¿½ny ï¿½s terï¿½let
     var minLeft = v[0].left,
         minTop = v[0].top,
         maxLeft = 0,
@@ -143,7 +143,7 @@ function measureLayout(buffer, createGroups)
     console.log('Szelesseg: ' + dx.toFixed(0) + ' Magassag: ' + dy.toFixed(0));
     console.log('Aranya: ' + ratio);
 
-    //távolság és fokszám
+    //tï¿½volsï¿½g ï¿½s fokszï¿½m
     var minEdgeDeg = -1,
         maxEdgeDeg = 0,
         avgEdgeDeg = -1;
@@ -285,7 +285,7 @@ function measureLayout(buffer, createGroups)
     console.log(' Min: ' + minNoX.toFixed(0) + ', ' + minNoY.toFixed(0));
     console.log(' Atlag: ' + avgNoX.toFixed(0) + ', ' +  avgNoY.toFixed(0));
     console.log(' Max: ' + maxNoX.toFixed(0) + ', ' +  maxNoY.toFixed(0));
-    //pontszám élszám
+    //pontszï¿½m ï¿½lszï¿½m
     cl = 0;
     for (i = 0; i < vl; i++)
     {
@@ -295,7 +295,7 @@ function measureLayout(buffer, createGroups)
         }
     }
     console.log('Pontszam (|V|): ' + vl + ' Elszam (|E|): ' + cl);
-    // kör sugara
+    // kï¿½r sugara
     var centerX, centerY, R = 0;
     centerX = minLeft + dx / 2;
     centerY = minTop + dy / 2;
