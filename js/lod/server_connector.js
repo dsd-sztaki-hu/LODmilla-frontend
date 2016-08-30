@@ -41,7 +41,7 @@ Profile.data_getService = function(resourceURI) {
 Profile.data_makeSparql = function(service, sparqlTemplate, resourceURI) {
     var sparql = "";
 
-    var s = encodeURIComponent(service.sparqlTemplates[sparqlTemplate].replace(/\{URI\}/ig, encodeURI(resourceURI)));
+    var s = encodeURIComponent(service.sparqlTemplates[sparqlTemplate].replace(/\{URI\}/ig, resourceURI));
     sparql = service.endpoint + '?';
     sparql += 'output=json';
     sparql += '&format=application/json';
