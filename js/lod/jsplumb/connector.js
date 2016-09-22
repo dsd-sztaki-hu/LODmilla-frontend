@@ -360,6 +360,7 @@ Node.prototype.vis_refresh = function(highlight, aroundNode) {
             decideZoom(Graph.zoomRatio);
         repaintNodes();
     }
+    Helper.closeLoadScreen();
 };
 
 Node.prototype.showInspector = function(callback){
@@ -372,6 +373,7 @@ Node.prototype.showInspector = function(callback){
     $("[uri='" + this.resource_id + "']").addClass('opened');
 
     if (this.content == null || this.contentParent == null) {
+        // why is this needed?
         Helper.showLoadScreen();
         this.vis_generateInspectorContent(callback);
         Helper.closeLoadScreen();
@@ -533,7 +535,7 @@ Node.prototype.vis_generateInspectorContent = function(callback) {
                     if (connectionItems.length === 1) {
                         propValue = connectionItems[0];
                         //if (Profile.isPropertyExternalLink(connectionURI)){
-                        if(Helper.isUrl(connectionURI)) {
+                        if(Helper.isUrl(propValue)) {
 //                            propValue = '<a href="' + propValue + '" target="_blank">' + propValue.replace(/_/g , " ") + '</a>';
                             propValue = '<a href="' + propValue + '" target="_blank">' + propValue + '</a>';
                         }
@@ -550,7 +552,7 @@ Node.prototype.vis_generateInspectorContent = function(callback) {
                         $.each(connectionItems, function(connectionItemIndex, connectionItem) {
                             propValue = connectionItem;
                             //if (Profile.isPropertyExternalLink(connectionURI)){
-                            if(Helper.isUrl(connectionURI)) {
+                            if(Helper.isUrl(propValue)) {
 //                                propValue = '<a href="' + propValue + '" target="_blank">' + propValue.replace(/_/g , " ") + '</a>';
                                 propValue = '<a href="' + propValue + '" target="_blank">' + propValue + '</a>';
                             }

@@ -539,7 +539,7 @@ var Sidemenu = new function() {
         parent.append(self.buttonMyEdits);
 
         // Select/Unselect all button
-        self.buttonSelectToggle = $('<div class="buttonWrap"><button id="selectToggleButton" title="Select/unselect all">Select/unselect nodes</button></div>');
+        self.buttonSelectToggle = $('<div class="buttonWrap"><button id="selectToggleButton" title="Select/unselect all">(Un)select nodes</button></div>');
         parent.append(self.buttonSelectToggle);
 
         // CLEAR button
