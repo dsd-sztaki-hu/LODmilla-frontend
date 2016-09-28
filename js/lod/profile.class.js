@@ -121,6 +121,14 @@ var Profile = new function() {
     this.searchURLs = {
         'dbpedia': 'http://lookup.dbpedia.org/api/search.asmx/PrefixSearch?QueryClass=&MaxHits=' + this.addNewResourceSearchMaxHits.toString() + '&QueryString=MPAD_SEARCH_TERM',
 
+/*
+        'wikidata': 'http://query.wikidata.org/'
+            + encodeURIComponent('select ?object, ?label, max(?sc) as ?rank where { ?object rdfs:label ?label . '
+                + "?label bif:contains \'\"MPAD_SEARCH_TERM\"\' option (score ?sc) . "
+                + 'FILTER(lang(?label)=""). } group by ?object ?label order by desc (?rank) ?label limit '
+                + this.addNewResourceSearchMaxHits.toString()), 
+            //+'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
+*/            
         'sztaki': 'http://lod.sztaki.hu/sparql?default-graph-uri=&should-sponge=&query='
             + encodeURIComponent('select ?object, ?label, max(?sc) as ?rank where { ?object rdfs:label ?label . '
                 + "?label bif:contains \'\"MPAD_SEARCH_TERM\"\' option (score ?sc) . "
@@ -304,6 +312,7 @@ var Profile = new function() {
                 long = propValue;
             }
             retVal = 'http://maps.googleapis.com/maps/api/staticmap?size=800x600&maptype=roadmap&sensor=false&zoom=6&markers=color:blue%7Clabel:' + label + '%7C' + lat + ',' + long;
+            //retVal = 'http://staticmap.openstreetmap.de/maps/api/staticmap?size=800x600&maptype=roadmap&sensor=false&zoom=6&markers=color:blue%7Clabel:' + label + '%7C' + lat + ',' + long;
         }
 
         return retVal;

@@ -85,6 +85,40 @@ var Lodmilla_services = {
         "graph": "http://dbpedia.org",
         "disabled": "false"
     },
+    "http://wikidata.dbpedia.org": {
+        "shortDescription": {
+            "en": "DBpedia Wikidata"
+        },
+        "description": {
+            "en": "Wikidata is a free and open knowledge base that can be read and edited by both humans and machines."
+        },
+        "sparql": {
+            "resourceConnectionsLabels": "select distinct * where { { <{URI}> ?prop ?out. FILTER(!isLiteral(?out) || lang(?out)=\"\" || lang(?out)=\"en\") OPTIONAL { ?out rdfs:label ?label. FILTER(lang(?label)=\"en\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } UNION { ?in ?prop  <{URI}> OPTIONAL { ?in rdfs:label ?label. FILTER(lang(?label)=\"en\"||lang(?label)=\"\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } }"
+        },
+        "endpoint": "http://wikidata.dbpedia.org/sparql",
+        "prefix": {
+            "default": "http://wikidata.dbpedia.org/resource"
+        },
+        "graph": "http://wikidata.dbpedia.org",
+        "disabled": "false"
+    },
+    "http://wikidata.org": {
+        "shortDescription": {
+            "en": "Wikidata"
+        },
+        "description": {
+            "en": "Wikidata is a free and open knowledge base that can be read and edited by both humans and machines."
+        },
+        "sparql": {
+            "resourceConnectionsLabels": "select distinct * where { { <{URI}> ?prop ?out. FILTER(!isLiteral(?out) || lang(?out)=\"\" || lang(?out)=\"en\") OPTIONAL { ?out rdfs:label ?label. FILTER(lang(?label)=\"en\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } UNION { ?in ?prop  <{URI}> OPTIONAL { ?in rdfs:label ?label. FILTER(lang(?label)=\"en\"||lang(?label)=\"\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } }"
+        },
+        "endpoint": "http://query.wikidata.org/",
+        "prefix": {
+            "default": "http://www.wikidata.org/entity"
+        },
+        "graph": "http://wikidata.org",
+        "disabled": "false"
+    },
     "http://data.szepmuveszeti.hu/": {
         "shortDescription": {
             "en": "Szépművészeti"
