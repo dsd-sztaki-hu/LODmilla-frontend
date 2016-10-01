@@ -1,4 +1,21 @@
 var Lodmilla_services = {
+	    "http://www.w3.org/ns/prov-o": {
+	        "shortDescription": {
+	            "en": "prov-o"
+	        },
+	        "description": {
+	            "en": "prov-o"
+	        },
+	        "sparql": {            
+	        	"resourceConnectionsLabels": "select distinct * where { { <{URI}> ?prop ?out. FILTER(!isLiteral(?out) || lang(?out)=\"\" || lang(?out)=\"en\") OPTIONAL { ?out rdfs:label ?label. FILTER(lang(?label)=\"en\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } UNION { ?in ?prop  <{URI}> OPTIONAL { ?in rdfs:label ?label. FILTER(lang(?label)=\"en\"||lang(?label)=\"\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } }"
+	        },
+	        "endpoint": "http://localhost:8080/blazegraph/sparql",
+	        "prefix": {
+	            "default": "http://www.w3.org/ns/prov-o"
+	        },
+	        "graph": "http://www.w3.org/ns/prov-o",
+	        "disabled": "false"
+	    },
     "http://lod.sztaki.hu/sztaki": {
         "shortDescription": {
             "en": "Sztaki"
@@ -189,6 +206,5 @@ var Lodmilla_services = {
         },
         "graph": "http://factforge.net/",
         "disabled": "true"
-    }
-    
+    }    
 };
