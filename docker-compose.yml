@@ -1,0 +1,9 @@
+version: '2'
+services:
+  lodmilla:
+    image: httpd:latest
+    ports:
+     - "9999:80"
+    volumes:
+     - .:/usr/local/apache2/htdocs/lodmilla
+    restart: always
