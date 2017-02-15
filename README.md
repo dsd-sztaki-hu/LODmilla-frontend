@@ -14,7 +14,7 @@ Licensed as free software under the terms of the Apache v2.0 License: http://www
 
 We are searching contributors for writing plug-ins or improve the code.
 
-Please refer/cite to the authors when re-using this code:
+Please refer/cite the authors when re-using this code:
 
 http://eprints.sztaki.hu/8054/
 Micsik, András and Turbucz, Sándor and Tóth, Zoltán (2015) Exploring publication metadata graphs with the LODmilla browser and editor.
