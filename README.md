@@ -13,3 +13,13 @@ Graph visualization is done by jsPlumb.
 Licensed as free software under the terms of the Apache v2.0 License: http://www.apache.org/licenses/LICENSE-2.0.html
 
 We are searching contributors for writing plug-ins or improve the code.
+
+Please refer/cite to the authors when re-using this code:
+
+http://eprints.sztaki.hu/8054/
+Micsik, András and Turbucz, Sándor and Tóth, Zoltán (2015) Exploring publication metadata graphs with the LODmilla browser and editor.
+International Journal on Digital Libraries, 16 (x1). pp. 15-24. DOI:10.1007/s00799-014-0130-2
+
+http://eprints.sztaki.hu/8012/
+Micsik, András and Turbucz, Sándor and Györök, Attila (2014) LODmilla: a Linked Data Browser for All.
+In: Posters&Demos@SEMANTiCS 2014, 2014.09.04-2014.09.05, Leipzig, Germany.
