@@ -23,3 +23,11 @@ International Journal on Digital Libraries, 16 (x1). pp. 15-24. DOI:10.1007/s007
 http://eprints.sztaki.hu/8012/
 Micsik, András and Turbucz, Sándor and Györök, Attila (2014) LODmilla: a Linked Data Browser for All.
 In: Posters&Demos@SEMANTiCS 2014, 2014.09.04-2014.09.05, Leipzig, Germany.
+
+How to configure LODmilla for a new SPARQL endpoint?
+----------------------------------------------------
+
+LODmilla can use any LOD server with JSONP support, however with SPARQL endpoint configured, you will get better functionality.
+
+1. In js/lod/services.js add description for your SPARQL endpoint. You can copy and edit an existing endpoint which seems similar to yours. At this point, you will be able to open a URI by entering it in the box "Or enter a node URI".
+2. If you want autocomplete queries as well, you need to edit js/lod/profile.class.js as well, and your search URL to this.searchURLs. Again, use existing examples. After this, you will see your endpoint in the top dropdown list showing 'dbpedia'.
