@@ -1,4 +1,21 @@
 var Lodmilla_services = {
+    "http://courage.btk.mta.hu/courage": {
+        "shortDescription": {
+            "en": "COURAGE"
+        },
+        "description": {
+            "en": "COURAGE"
+        },
+        "sparql": {
+            "resourceConnectionsLabels": "select distinct * where { { <{URI}> ?prop ?out. FILTER(!isLiteral(?out) || lang(?out)=\"\" || lang(?out)=\"en\") OPTIONAL { ?out rdfs:label ?label. FILTER(lang(?label)=\"en\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } UNION { ?in ?prop  <{URI}> OPTIONAL { ?in rdfs:label ?label. FILTER(lang(?label)=\"en\"||lang(?label)=\"\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } }"
+        },
+        "endpoint": "http://courage.btk.mta.hu:3030/c2/sparql",
+        "prefix": {
+            "default": "http://courage.btk.mta.hu/courage/individual/"
+        },
+        "graph": "http://courage.btk.mta.hu/courage",
+        "disabled": "false"
+    },
     "http://lod.sztaki.hu/sztaki": {
         "shortDescription": {
             "en": "Sztaki"

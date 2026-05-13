@@ -129,6 +129,11 @@ var Profile = new function() {
                 + this.addNewResourceSearchMaxHits.toString()), 
             //+'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
 */            
+        'courage': 'http://courage.btk.mta.hu:3030/c2/sparql?'
+            + encodeURIComponent('select ?object, ?label where { ?object rdfs:label ?label . '
+                + ' FILTER(REGEX(?label, \"MPAD_SEARCH_TERM\", \"i\")) } limit ' + this.addNewResourceSearchMaxHits.toString()) 
+            +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
+            
         'sztaki': 'http://lod.sztaki.hu/sparql?default-graph-uri=&should-sponge=&query='
             + encodeURIComponent('select ?object, ?label, max(?sc) as ?rank where { ?object rdfs:label ?label . '
                 + "?label bif:contains \'\"MPAD_SEARCH_TERM\"\' option (score ?sc) . "
