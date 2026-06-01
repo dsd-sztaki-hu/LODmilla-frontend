@@ -119,7 +119,7 @@ var Profile = new function() {
     };
 
     this.searchURLs = {
-        'dbpedia': 'http://lookup.dbpedia.org/api/search.asmx/PrefixSearch?QueryClass=&MaxHits=' + this.addNewResourceSearchMaxHits.toString() + '&QueryString=MPAD_SEARCH_TERM',
+        // 'dbpedia': 'http://lookup.dbpedia.org/api/search.asmx/PrefixSearch?QueryClass=&MaxHits=' + this.addNewResourceSearchMaxHits.toString() + '&QueryString=MPAD_SEARCH_TERM',
 
 /*
         'wikidata': 'http://query.wikidata.org/'
@@ -129,9 +129,14 @@ var Profile = new function() {
                 + this.addNewResourceSearchMaxHits.toString()), 
             //+'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
 */            
-        'courage': 'http://courage.btk.mta.hu:3030/c2/sparql?'
-            + encodeURIComponent('select ?object, ?label where { ?object rdfs:label ?label . '
-                + ' FILTER(REGEX(?label, \"MPAD_SEARCH_TERM\", \"i\")) } limit ' + this.addNewResourceSearchMaxHits.toString()) 
+        'courage': 'https://q:retrievel@kg.dsd.sztaki.hu/courage/sparql?query='
+            + encodeURIComponent('select ?object ?label where { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . '
+                + ' FILTER(REGEX(?label, \"MPAD_SEARCH_TERM\", \"i\")) } limit ' + this.addNewResourceSearchMaxHits.toString())
+            +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
+            
+        'arp': 'https://q:retrievel@kg.dsd.sztaki.hu/arp/sparql?query='
+            + encodeURIComponent('select ?object ?label where { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . '
+                + ' FILTER(REGEX(?label, \"MPAD_SEARCH_TERM\", \"i\")) } limit ' + this.addNewResourceSearchMaxHits.toString())
             +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
             
         'sztaki': 'http://lod.sztaki.hu/sparql?default-graph-uri=&should-sponge=&query='
@@ -141,31 +146,32 @@ var Profile = new function() {
                 + this.addNewResourceSearchMaxHits.toString()) 
             +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
 
-        'civilkapocs': 'http://civilkapocs.hu:8890/sparql?default-graph-uri=&should-sponge=&query='
-            + encodeURIComponent('select ?object, ?label where { ?object rdfs:label ?label . '
-                + "FILTER(REGEX(?label, \"MPAD_SEARCH_TERM\", \"i\")) } limit " + this.addNewResourceSearchMaxHits.toString()) 
-            +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
+        // 'civilkapocs': 'http://civilkapocs.hu:8890/sparql?default-graph-uri=&should-sponge=&query='
+        //     + encodeURIComponent('select ?object, ?label where { ?object rdfs:label ?label . '
+        //         + "FILTER(REGEX(?label, \"MPAD_SEARCH_TERM\", \"i\")) } limit " + this.addNewResourceSearchMaxHits.toString()) 
+        //     +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
 
-        'europeana' : 'http://europeana.ontotext.com/sparql.xml?query='
-            + encodeURIComponent("PREFIX luc: <http://www.ontotext.com/owlim/lucene#>\n" 
-                + 'select ?object ?label WHERE { ?proxy ore:proxyFor ?object; dc:title ?label. ?label luc: "MPAD_SEARCH_TERM" } LIMIT '+ this.addNewResourceSearchMaxHits.toString() )
-            + '&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql',
+        // 'europeana' : 'http://europeana.ontotext.com/sparql.xml?query='
+        //     + encodeURIComponent("PREFIX luc: <http://www.ontotext.com/owlim/lucene#>\n" 
+        //         + 'select ?object ?label WHERE { ?proxy ore:proxyFor ?object; dc:title ?label. ?label luc: "MPAD_SEARCH_TERM" } LIMIT '+ this.addNewResourceSearchMaxHits.toString() )
+        //     + '&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql',
 
-        'britishmuseum' : 'http://collection.britishmuseum.org/sparql.xml?query='
-            + encodeURIComponent("PREFIX crm: <http://erlangen-crm.org/current/>\n"
-                + "PREFIX fts: <http://www.ontotext.com/owlim/fts#>\n"
-                + 'SELECT DISTINCT ?object ?label WHERE { ?object crm:P102_has_title ?title . ?title rdfs:label ?label . FILTER(REGEX(?label, "MPAD_SEARCH_TERM")) } LIMIT '+ this.addNewResourceSearchMaxHits.toString() )
-            + '&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql',
+        // 'britishmuseum' : 'http://collection.britishmuseum.org/sparql.xml?query='
+        //     + encodeURIComponent("PREFIX crm: <http://erlangen-crm.org/current/>\n"
+        //         + "PREFIX fts: <http://www.ontotext.com/owlim/fts#>\n"
+        //         + 'SELECT DISTINCT ?object ?label WHERE { ?object crm:P102_has_title ?title . ?title rdfs:label ?label . FILTER(REGEX(?label, "MPAD_SEARCH_TERM")) } LIMIT '+ this.addNewResourceSearchMaxHits.toString() )
+        //     + '&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql',
 
-        'szepmuveszeti' : 'http://data.szepmuveszeti.hu/sparql?default-graph-uri=&should-sponge=&query='
-            + encodeURIComponent("PREFIX crm: <http://erlangen-crm.org/current/>\n"
-                + 'SELECT ?object ?label WHERE { ?object crm:P3_has_note ?label. FILTER(REGEX(?label, "MPAD_SEARCH_TERM", "i")) } LIMIT '+ this.addNewResourceSearchMaxHits.toString() )
-            +'&format=application%2Fsparql-results%2Bjson',
+        // 'szepmuveszeti' : 'http://data.szepmuveszeti.hu/sparql?default-graph-uri=&should-sponge=&query='
+        //     + encodeURIComponent("PREFIX crm: <http://erlangen-crm.org/current/>\n"
+        //         + 'SELECT ?object ?label WHERE { ?object crm:P3_has_note ?label. FILTER(REGEX(?label, "MPAD_SEARCH_TERM", "i")) } LIMIT '+ this.addNewResourceSearchMaxHits.toString() )
+        //     +'&format=application%2Fsparql-results%2Bjson',
 
-        'uni-obuda': 'http://lod.nik.uni-obuda.hu/sparql?default-graph-uri=&should-sponge=&query='
-            + encodeURIComponent('select ?object, ?label where { ?object rdfs:label ?label . '
-                + "FILTER(REGEX(?label, \"MPAD_SEARCH_TERM\", \"i\")) } limit " + this.addNewResourceSearchMaxHits.toString()) 
-            +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
+        // 'uni-obuda': 'http://lod.nik.uni-obuda.hu/sparql?default-graph-uri=&should-sponge=&query='
+        //     + encodeURIComponent('select ?object, ?label where { ?object rdfs:label ?label . '
+        //         + "FILTER(REGEX(?label, \"MPAD_SEARCH_TERM\", \"i\")) } limit " + this.addNewResourceSearchMaxHits.toString()) 
+        //     +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
+        
             // + encodeURIComponent('select ?object, ?label, max(?sc) as ?rank where { ?object rdfs:label ?label . '
                 // + "?label bif:contains \'\"MPAD_SEARCH_TERM\"\' option (score ?sc) . "
                 // + 'FILTER(lang(?label)=""). } group by ?object ?label order by desc (?rank) ?label limit '
