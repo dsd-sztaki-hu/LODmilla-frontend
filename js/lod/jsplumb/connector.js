@@ -253,13 +253,13 @@ Node.prototype.vis_show = function(highlight, aroundNode) {
         // Node comes from a known LOD
         if (self.endpoint.shortDescription && self.endpoint.endpointURL) {
             endpointShortDescription = Helper.truncateString(self.endpoint.shortDescription, Profile.nodeLabelMaxLength);
-            endpointURL = self.endpoint.endpointURL;
+            endpointURL = self.resource_id; // self.endpoint.endpointURL;
         }
         // Node comes from a not known external LOD (not present in the Profile)
         // does not have an image
         else {
             endpointShortDescription = Helper.truncateString(Helper.getLodServerBaseUrl(self.resource_id), Profile.nodeEndpointLabelMaxLength);
-            endpointURL = Helper.getLodServerBaseUrl(self.resource_id);
+            endpointURL = self.resource_id;
         }
 
 
@@ -269,7 +269,7 @@ Node.prototype.vis_show = function(highlight, aroundNode) {
     // if still not loaded
     else {
         endpointShortDescription = Helper.truncateString(Helper.getLodServerBaseUrl(self.resource_id), Profile.nodeLabelMaxLength);
-        endpointURL = Helper.getLodServerBaseUrl(self.resource_id);
+        endpointURL = self.resource_id;
         
         imgBox = $('<a href="' + Profile.nodeTypesDefaultImages.noEndpoint + '"></a>');
         imgBox.append(Helper.getImgSrc(Profile.nodeTypesDefaultImages.noEndpoint));
@@ -315,7 +315,7 @@ Node.prototype.vis_showImageDefaultEndpoint = function(imgBox){
 Node.prototype.vis_showImageDefaultImage = function(nodeImageDiv, imgBox){
     var self = this;
     // predefined images, for some types
-    if (self.type === 'person' || self.type === 'agent') {
+    if (self.type === 'person' || self.type === 'agent' || self.type.startsWith('creator')) {
 //        imgBox = $('<a target="_blank" href="' + Profile.nodeTypesDefaultImages.person + '"></a>');
         imgBox = $('<div/>');
         imgBox.append(Helper.getImgSrc(Profile.nodeTypesDefaultImages.person));
@@ -333,7 +333,9 @@ Node.prototype.vis_showImageDefaultImage = function(nodeImageDiv, imgBox){
         imgBox.append(Helper.getImgSrc(Profile.nodeTypesDefaultImages.group));
         nodeImageDiv.empty().append(imgBox);
     } else { // micsik added
-        nodeImageDiv.empty().append(self.type.replace(/_/g," "))
+        console.log("type: " + self.type);
+        typeStr = Helper.getShortTypeFromURL(self.type); // self.type.replace(/_/g," ")
+        nodeImageDiv.empty().append(typeStr)
             .css("font-weight", "bold")
             .css("word-wrap","break-word")
             .css("font-size", "100%")
@@ -351,16 +353,21 @@ Node.prototype.vis_refresh = function(highlight, aroundNode) {
         if (this.loaded) loaded++;
         length++;
     });
-    Helper.showLoadScreen();
+    // TODO: if loaded < length wait 3 seconds and retry
     if (loaded == length) {
-        jsPlumbInstance.setSuspendDrawing(false, false);
-        if (Graph.layout != Graph.LayoutEnum.NONE && document.getElementById('layoutUpdateCheckBox').checked)
-            applyLayout(Graph.layout, false);
-        else
-            decideZoom(Graph.zoomRatio);
-        repaintNodes();
+        Helper.showLoadScreen();
+        try {
+            jsPlumbInstance.setSuspendDrawing(false, false);
+            if (Graph.layout != Graph.LayoutEnum.NONE && document.getElementById('layoutUpdateCheckBox').checked)
+                applyLayout(Graph.layout, false);
+            else
+                decideZoom(Graph.zoomRatio);
+            repaintNodes();
+        } catch(error) {
+            console.error(error);
+        }
+        Helper.closeLoadScreen();
     }
-    Helper.closeLoadScreen();
 };
 
 Node.prototype.showInspector = function(callback){
@@ -780,6 +787,7 @@ vis_jsPlumbInstance_connect_uri = function(uri1, uri2, connection) {
         });
 
     }
+    console.log('conn',uri1, uri2, 'foundbefore: ' + foundbefore);
     if (foundbefore) {
         return;
     }

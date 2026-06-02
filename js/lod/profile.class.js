@@ -119,22 +119,12 @@ var Profile = new function() {
     };
 
     this.searchURLs = {
-        // 'dbpedia': 'http://lookup.dbpedia.org/api/search.asmx/PrefixSearch?QueryClass=&MaxHits=' + this.addNewResourceSearchMaxHits.toString() + '&QueryString=MPAD_SEARCH_TERM',
-
-/*
-        'wikidata': 'http://query.wikidata.org/'
-            + encodeURIComponent('select ?object, ?label, max(?sc) as ?rank where { ?object rdfs:label ?label . '
-                + "?label bif:contains \'\"MPAD_SEARCH_TERM\"\' option (score ?sc) . "
-                + 'FILTER(lang(?label)=""). } group by ?object ?label order by desc (?rank) ?label limit '
-                + this.addNewResourceSearchMaxHits.toString()), 
-            //+'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
-*/            
-        'courage': 'https://q:retrievel@kg.dsd.sztaki.hu/courage/sparql?query='
+        'arp': 'https://q:retrievel@kg.dsd.sztaki.hu/arp/sparql?query='
             + encodeURIComponent('select ?object ?label where { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . '
                 + ' FILTER(REGEX(?label, \"MPAD_SEARCH_TERM\", \"i\")) } limit ' + this.addNewResourceSearchMaxHits.toString())
             +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
             
-        'arp': 'https://q:retrievel@kg.dsd.sztaki.hu/arp/sparql?query='
+        'courage': 'https://q:retrievel@kg.dsd.sztaki.hu/courage/sparql?query='
             + encodeURIComponent('select ?object ?label where { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . '
                 + ' FILTER(REGEX(?label, \"MPAD_SEARCH_TERM\", \"i\")) } limit ' + this.addNewResourceSearchMaxHits.toString())
             +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
@@ -146,6 +136,16 @@ var Profile = new function() {
                 + this.addNewResourceSearchMaxHits.toString()) 
             +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
 
+        'dbpedia': 'http://lookup.dbpedia.org/api/search.asmx/PrefixSearch?QueryClass=&MaxHits=' + this.addNewResourceSearchMaxHits.toString() + '&QueryString=MPAD_SEARCH_TERM',
+
+/*
+        'wikidata': 'http://query.wikidata.org/'
+            + encodeURIComponent('select ?object, ?label, max(?sc) as ?rank where { ?object rdfs:label ?label . '
+                + "?label bif:contains \'\"MPAD_SEARCH_TERM\"\' option (score ?sc) . "
+                + 'FILTER(lang(?label)=""). } group by ?object ?label order by desc (?rank) ?label limit '
+                + this.addNewResourceSearchMaxHits.toString()), 
+            //+'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
+*/            
         // 'civilkapocs': 'http://civilkapocs.hu:8890/sparql?default-graph-uri=&should-sponge=&query='
         //     + encodeURIComponent('select ?object, ?label where { ?object rdfs:label ?label . '
         //         + "FILTER(REGEX(?label, \"MPAD_SEARCH_TERM\", \"i\")) } limit " + this.addNewResourceSearchMaxHits.toString()) 

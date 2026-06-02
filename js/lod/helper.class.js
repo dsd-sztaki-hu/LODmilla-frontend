@@ -48,6 +48,7 @@ var Helper = new function(){
         while (node_uri.indexOf('#') > -1) {
             node_uri = node_uri.substring(node_uri.indexOf('#') + 1);
         }
+        console.log("short type: " + node_uri, " from: " + node_uri_orig);
         // TODO: ha nincs semmi az utolso / vagy # utan, akkor valamit adjon vissza, jelenleg akkor az egesz URLt
         if (!node_uri || node_uri === "")
             return node_uri_orig;

@@ -66,6 +66,7 @@ var Node = function(resource_id, label) {
             this.hasConnection[s] = true;
             var newConn = new Connection(targetURI, connectionLabel, direction, endpointLabel);
             this.connections.push(newConn);
+            console.log('connection added', targetURI, connectionLabel, direction, endpointLabel);
             return newConn;
         }
         return false;
@@ -161,25 +162,25 @@ var Node = function(resource_id, label) {
         var nodeImageURL = '';
         
         if (this.endpoint && this.endpoint.endpointURL === Profile.defaultEndpointURI) {
-            if (this.type === 'person') {
-                resourceId = this.resource_id.replace('http://lod.sztaki.hu/sztaki/auth/', '');
-                nodeImageURL = Profile.nodeTypesImagesURLs.sztaki.person.replace('{RESOURCE_ID}', resourceId);
-            }
-            else if (this.type === 'work') {
-                resourceId = this.resource_id.replace('http://lod.sztaki.hu/sztaki/item/', '');
-                nodeImageURL = Profile.nodeTypesImagesURLs.sztaki.work.replace('{RESOURCE_ID}', resourceId);
-            }
-            else if (this.type === 'group') {
+            // if (this.type === 'person') {
+                // resourceId = this.resource_id.replace('http://lod.sztaki.hu/sztaki/auth/', '');
+                // nodeImageURL = Profile.nodeTypesImagesURLs.sztaki.person.replace('{RESOURCE_ID}', resourceId);
+            // }
+            // else if (this.type === 'work') {
+                // resourceId = this.resource_id.replace('http://lod.sztaki.hu/sztaki/item/', '');
+                // nodeImageURL = Profile.nodeTypesImagesURLs.sztaki.work.replace('{RESOURCE_ID}', resourceId);
+            // }
+            // else if (this.type === 'group') {
 
-            }
-            else{
+            // }
+            // else{
                 if (this.images[Profile.commonURIs.propDepictionURI]) {
                     nodeImageURL = this.images[Profile.commonURIs.propDepictionURI][0];
                 }
                 else if (this.images[Profile.commonURIs.propThumbnailURI]) {
                     nodeImageURL = this.images[Profile.commonURIs.propThumbnailURI][0];
                 }
-            }
+            // }
         }
         else{
             if (this.images[Profile.commonURIs.propDepictionURI]) {
@@ -321,6 +322,7 @@ var Node = function(resource_id, label) {
                         }
                     } else if (item.in) {
                         if (item.in.type === 'uri') {
+                            console.log('item.in.value', item.in.value, item.prop.value);
                             if (decodeURI(item.in.value) === decodeURI(self.resource_id)){
                                 selfTargetConnectionFound = true;
                             }

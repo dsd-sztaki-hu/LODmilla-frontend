@@ -511,7 +511,8 @@ function shortestPath(edges, numVertices, startVertex) {
         done[closest] = true;
         for (var j = 0; j < numVertices; j++) {
             if (!done[j]) {
-                var possiblyCloserDistance = pathLengths[closest] + edges[closest][j];
+                var edgeClosest = edges[closest] ? edges[closest][j] : 0;
+                var possiblyCloserDistance = pathLengths[closest] + edgeClosest;
                 if (possiblyCloserDistance < pathLengths[j]) {
                     pathLengths[j] = possiblyCloserDistance;
                     predecessors[j] = closest;

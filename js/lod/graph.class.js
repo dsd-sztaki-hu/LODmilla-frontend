@@ -434,6 +434,7 @@ var Graph = new function() {
     };
 
     this.insertConnection = function(sourceNodeURI, connectionURI, targetNodeURI, type){
+        console.log("insert connection: " + sourceNodeURI + " - " + connectionURI + " - " + targetNodeURI);
         this.insertedConnectionsList[md5(sourceNodeURI + connectionURI + targetNodeURI)] = {
             'sourceNodeURI': sourceNodeURI,
             'connectionURI': connectionURI,
