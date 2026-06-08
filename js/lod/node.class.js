@@ -66,7 +66,7 @@ var Node = function(resource_id, label) {
             this.hasConnection[s] = true;
             var newConn = new Connection(targetURI, connectionLabel, direction, endpointLabel);
             this.connections.push(newConn);
-            console.log('connection added', targetURI, connectionLabel, direction, endpointLabel);
+            // console.log('connection added', targetURI, connectionLabel, direction, endpointLabel);
             return newConn;
         }
         return false;

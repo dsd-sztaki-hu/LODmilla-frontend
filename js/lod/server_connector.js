@@ -17,12 +17,12 @@ Profile.data_getService = function(resourceURI) {
             var resourcePrefix = resourceURI.split('//')[0] + '//' + resourcePath.split('/')[0];
 
             var isPrefixFound = false;
-            //console.log("value", value);
+            //console.log("resourcePath", resourcePath, "resourcePrefix", resourcePrefix);
             for (var prefix in value.prefix){
-                //console.log("prefix", prefix);
+                console.log("prefix", prefix);
                 if (value.prefix[prefix]){
 //                    if (value.prefix[prefix] === resourcePrefix){
-                    //console.log("matching", prefix, value.prefix[prefix], resourcePrefix);
+                    // console.log("matching", value.prefix[prefix], "and",resourcePrefix);
                     if (value.prefix[prefix].indexOf(resourcePrefix) !== -1){
                         isPrefixFound = true;
                     }
@@ -30,6 +30,8 @@ Profile.data_getService = function(resourceURI) {
             }
             if (value.disabled !== 'true' && isPrefixFound) {
                 service = value;
+                console.log("service found", service);
+                return false;
             }
         });
     }
