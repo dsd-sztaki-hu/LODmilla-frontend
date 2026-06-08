@@ -89,8 +89,8 @@ Node.prototype.vis_show = function(highlight, aroundNode) {
     }
     var nodeHighlightBtn = $('<div class="node-button node-highlight" title="Highlight node"></div>'),
         nodeHideBtn = '<div class="node-button node-hide" title="Hide node"></div>',
-        nodeDeleteBtn = '<div class="node-button node-delete" title="Delete all connections of node"></div>',
-        nodeConnectionSource = '<div title="Drag to make new connection" class="node-connection-source id="'+ this.resource_id +'"></div>',
+        nodeDeleteBtn = Lodmilla_editAllowed ? '<div class="node-button node-delete" title="Delete all connections of node"></div>' : '',
+        nodeConnectionSource = Lodmilla_editAllowed ? '<div title="Drag to make new connection" class="node-connection-source id="'+ this.resource_id +'"></div>' : '',
 //        nodeConnectionSource = '<div class="node-connection-source"></div>',
         nodeOpenBtn = '<div class="node-button node-open"><span class="resourcePropertiesNum" title="Properties - show details">'+litLen+'</span><img class="resourceDetailsIcon" src="img/document-properties-deactivated.png" title="Show details" /><span class="resourceLinksNum" title="Links - show details">'+connLen+'</span></div>',
     
@@ -497,12 +497,12 @@ Node.prototype.vis_generateInspectorContent = function(callback) {
     var nodeContent = this.getContent();
 
     var tabcounter = 0,
-        deletePropertyBtn = '<span class="inspectorBtn deletePropertyBtn" title="Delete property">[x]</span>',
-        deleteConnectionBtn = '<span class="inspectorBtn deleteConnectionBtn" title="Delete connection">[x]</span>',
-        addPropertyBtn = '<span class="inspectorBtn addPropertyBtn" title="Add property">[add]</span>',
-        addConnectionBtn = '<span class="inspectorBtn addConnectionBtn" title="Add connection">[add]</span>',
-        addNewConnectionBtn = '<span class="inspectorBtn addNewConnectionBtn" title="Add new connection type">[add]</span>',
-        addNewPropertyBtn = '<span class="inspectorBtn addNewPropertyBtn" title="Add new property type">[add]</span>',
+        deletePropertyBtn = Lodmilla_editAllowed ? '<span class="inspectorBtn deletePropertyBtn" title="Delete property">[x]</span>' : '',
+        deleteConnectionBtn = Lodmilla_editAllowed ? '<span class="inspectorBtn deleteConnectionBtn" title="Delete connection">[x]</span>' : '',
+        addPropertyBtn = Lodmilla_editAllowed ? '<span class="inspectorBtn addPropertyBtn" title="Add property">[add]</span>' : '',
+        addConnectionBtn = Lodmilla_editAllowed ? '<span class="inspectorBtn addConnectionBtn" title="Add connection">[add]</span>' : '',
+        addNewConnectionBtn = Lodmilla_editAllowed ? '<span class="inspectorBtn addNewConnectionBtn" title="Add new connection type">[add]</span>' : '',
+        addNewPropertyBtn = Lodmilla_editAllowed ? '<span class="inspectorBtn addNewPropertyBtn" title="Add new property type">[add]</span>' : '',
         toggleAllBtn = '<span class="inspectorBtn toggleAllBtn openAllBtn" title="Expand all">[expand all]</span>';
     var str_content = [], str_header = [];
 
@@ -547,7 +547,8 @@ Node.prototype.vis_generateInspectorContent = function(callback) {
                             propValue = '<a href="' + propValue + '" target="_blank">' + propValue + '</a>';
                         }
                         else if (Profile.getPropertyIfGeo(connectionURI, propValue, item, self.label)){
-                            propValue = propValue + '<a href="' + Profile.getPropertyIfGeo(connectionURI, propValue, item, self.label) + '" target="_blank"><img src="' + Profile.getPropertyIfGeo(connectionURI, propValue, item, self.label) + '"></a>';
+                            propValue = propValue + '<a href="' + Profile.getPropertyIfGeo(connectionURI, propValue, item, self.label) + '" target="_blank">'+MAP+'</a>';
+                            // propValue = propValue + '<a href="' + Profile.getPropertyIfGeo(connectionURI, propValue, item, self.label) + '" target="_blank"><img src="' + Profile.getPropertyIfGeo(connectionURI, propValue, item, self.label) + '"></a>';
                         }
 
                         str_content.push("<p class='conncollapse'><b class='conncollapsetoggle' title='", connectionURI, "'>", propertyName, " (", "<span class='propNum'>1</span>", ")</b> ", addPropertyBtn, "</p>");

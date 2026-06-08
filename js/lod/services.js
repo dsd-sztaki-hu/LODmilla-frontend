@@ -1,3 +1,5 @@
+var Lodmilla_editAllowed = false;
+
 var Lodmilla_services = {
     "http://courage.btk.mta.hu/courage": {
         "shortDescription": {
@@ -7,7 +9,7 @@ var Lodmilla_services = {
             "en": "COURAGE"
         },
         "sparql": {   
-            "resourceConnectionsLabels": "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n select distinct * where { { <{URI}> ?prop ?out. FILTER(!isLiteral(?out) || lang(?out)=\"\" || lang(?out)=\"en\") OPTIONAL { ?out rdfs:label ?label. FILTER(lang(?label)=\"en\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } }"
+            "resourceConnectionsLabels": "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n select distinct * where { { <{URI}> ?prop ?out. OPTIONAL { ?out rdfs:label ?label. FILTER(lang(?label)=\"en\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\") } } UNION { ?in ?prop  <{URI}> OPTIONAL { ?in rdfs:label ?label. FILTER(lang(?label)=\"en\"||lang(?label)=\"\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } }"
         },
         "endpoint": "https://q:retrievel@kg.dsd.sztaki.hu/courage/sparql",
         "prefix": {
@@ -28,7 +30,15 @@ var Lodmilla_services = {
         },
         "endpoint": "https://q:retrievel@kg.dsd.sztaki.hu/arp/sparql",
         "prefix": {
-            "default": "http://arptudasgraf.dsd.sztaki.hu/kg/"
+            "default": "http://arptudasgraf.dsd.sztaki.hu/kg/",
+            "document": "https://hdl.handle.net/",
+            "institute": "https://ror.org/",
+            "other": "https://w3id.org/arp/",
+            "kdk": "https://openarchive.tk.mta.hu/",
+            "doi": "https://doi.org/",
+            "orcid": "https://orcid.org/",
+            "repo": "https://search.researchdata.hu/",
+            "repo2": "https://repo.researchdata.hu/"
         },
         "graph": "https://search.researchdata.hu/",
         "disabled": "false"

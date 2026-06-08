@@ -139,7 +139,7 @@ addInspectorHandlers = function(){
                     var resourceURI = $('div#nodeOpenedContent').attr('resourceuri'),
                         propURI = $(this).parent('form').parent('li').parent('ul').prev('p').find('b').attr('title'),
                         literal = $(this).val();
-                    var delBtn = '<span class="inspectorBtn deletePropertyBtn" title="Delete property">[x]</span>';
+                    var delBtn = Lodmilla_editAllowed ? '<span class="inspectorBtn deletePropertyBtn" title="Delete property">[x]</span>' : '';
 
                     $(this).parent('form').parent('li').attr({
                         refprop: propURI,
@@ -206,7 +206,7 @@ addInspectorHandlers = function(){
                     else{
                         var hashedID = md5(sourceNodeURI_hash + connectionURI_hash + targetNodeURI_hash);
 
-                        var delBtn = '<span class="inspectorBtn deleteConnectionBtn" title="Delete connection">[x]</span>';
+                        var delBtn = Lodmilla_editAllowed ? '<span class="inspectorBtn deleteConnectionBtn" title="Delete connection">[x]</span>' : '';
 
                         var numElem = $(this).parent('form').parent('li').parent('ul').prev('p').find('span.propNum');
                         numElem.html(parseInt(numElem.html())+1);

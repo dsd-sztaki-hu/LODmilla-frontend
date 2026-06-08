@@ -246,8 +246,9 @@ var Profile = new function() {
     this.unloadedNodeType = 'unloaded';
 
     this.nodeTypes = {
-        'person': ['http://xmlns.com/foaf/0.1/Person', 'http://dbpedia.org/ontology/Person', 'http://schema.org/Person'],
+        'person': ['http://xmlns.com/foaf/0.1/Person', 'http://dbpedia.org/ontology/Person', 'http://schema.org/Person', 'http://arptudasgraf.dsd.sztaki.hu/kg/dc_terms_creator_Class', 'http://cultural-opposition.eu/rdf/courage.owl#Person'],
         'group': ['http://xmlns.com/foaf/0.1/Group'],
+        'organisation': ['https://dataverse.org/schema/citation/Author','http://xmlns.com/foaf/0.1/Organization', 'http://dbpedia.org/ontology/Organisation', 'http://schema.org/Organization'],
         'work': ['http://dbpedia.org/ontology/Work', 'http://schema.org/CreativeWork'],
         'agent': ['http://xmlns.com/foaf/0.1/Agent']
     };
@@ -322,7 +323,8 @@ var Profile = new function() {
                 }
                 long = propValue;
             }
-            retVal = 'http://maps.googleapis.com/maps/api/staticmap?size=800x600&maptype=roadmap&sensor=false&zoom=6&markers=color:blue%7Clabel:' + label + '%7C' + lat + ',' + long;
+            retVal = 'https://www.google.com/maps/place/' + lat + ',' + long;
+            // retVal = 'http://maps.googleapis.com/maps/api/staticmap?size=800x600&maptype=roadmap&sensor=false&zoom=6&markers=color:blue%7Clabel:' + label + '%7C' + lat + ',' + long;
             //retVal = 'http://staticmap.openstreetmap.de/maps/api/staticmap?size=800x600&maptype=roadmap&sensor=false&zoom=6&markers=color:blue%7Clabel:' + label + '%7C' + lat + ',' + long;
         }
 
@@ -366,7 +368,7 @@ var Profile = new function() {
             // External link
             retval.push('<a title="', targetNodeURI,
                 '" class="property-value-normal" href="', targetNodeURI,
-                '" target="_blank">', label.replace(/_/g, " "), '</a>'
+                '" target="_blank">', label.replace(/[#\/](.*?)$/, "$1"), '</a>'
             );
         }
         else

@@ -54,12 +54,15 @@ Profile.data_makeSparql = function(service, sparqlTemplate, resourceURI) {
 Profile.data_getConnectionsLabels = function(resourceURI, object, callbackFunc, highlight, undoActionLabel) {
     var service = this.data_getService(resourceURI);
     var url = '';
-
+    console.log("service", service);
+    console.log("object", object);
     if (service && service !== '') {
         url = this.data_makeSparql(service, 'resourceConnectionsLabels', resourceURI);
+        console.log("url", url);
     }
     else {
         url = this.serverProxyUrl + 'lod_resource_proxy.jsp?url=' + encodeURIComponent(resourceURI);
+        console.log("url", url);
     }
     $.jsonp({
         url: url,
@@ -68,9 +71,12 @@ Profile.data_getConnectionsLabels = function(resourceURI, object, callbackFunc, 
         beforeSend: function() {
         },
         success: function(json) {
+            console.log("SUCCESS: json", json);
+            console.log("callbackFunc", callbackFunc);
             object[callbackFunc].call(object, json, service, highlight, undoActionLabel);
         },
         error: function(jqXHR, textStatus, errorThrown) {
+            console.log("ERROR:", textStatus, errorThrown);
             object[callbackFunc].call(object, false, false, highlight, undoActionLabel);
         }
     });
