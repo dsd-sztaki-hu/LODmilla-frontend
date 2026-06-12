@@ -11,7 +11,7 @@ var Lodmilla_services = {
         "sparql": {   
             "resourceConnectionsLabels": "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n select distinct * where { { <{URI}> ?prop ?out. OPTIONAL { ?out rdfs:label ?label. FILTER(lang(?label)=\"en\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\") } } UNION { ?in ?prop  <{URI}> OPTIONAL { ?in rdfs:label ?label. FILTER(lang(?label)=\"en\"||lang(?label)=\"\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } }"
         },
-        "endpoint": "https://q:retrievel@kg.dsd.sztaki.hu/courage/sparql",
+        "endpoint": "https://kg.dsd.sztaki.hu/courage/sparql",
         "prefix": {
             "default": "http://courage.btk.mta.hu/courage/individual/"
         },
@@ -28,7 +28,7 @@ var Lodmilla_services = {
         "sparql": {   
             "resourceConnectionsLabels": "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n select distinct * where { { <{URI}> ?prop ?out. OPTIONAL { ?out rdfs:label ?label. FILTER(lang(?label)=\"en\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\") } } UNION { ?in ?prop  <{URI}> OPTIONAL { ?in rdfs:label ?label. FILTER(lang(?label)=\"en\"||lang(?label)=\"\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } }"
         },
-        "endpoint": "https://q:retrievel@kg.dsd.sztaki.hu/arp/sparql",
+        "endpoint": "https://kg.dsd.sztaki.hu/arp/sparql",
         "prefix": {
             "default": "http://arptudasgraf.dsd.sztaki.hu/kg/",
             "document": "https://hdl.handle.net/",
