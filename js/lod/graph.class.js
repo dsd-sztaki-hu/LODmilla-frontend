@@ -12,6 +12,9 @@ var Graph = new function() {
 
     this.deletedConnectionsList = {};
     this.insertedConnectionsList = {};
+    this.visibleConnections = {};
+    this.modelConnectionsByTarget = {};
+    this.modelConnectionKeys = {};
 
     this.canvas = null;
 
@@ -173,6 +176,7 @@ var Graph = new function() {
         $.each(node.typeUris, function(uri, label){
              self.removeNodeType(uri);
         });
+        this.unregisterModelConnectionsForNode(resource_id);
         delete this.nodes[resource_id];
         node.vis_delete();
     };
@@ -193,6 +197,9 @@ var Graph = new function() {
         var parent = $('#graph').parent()[0];
         this.vis_clear();
         this.nodes = {};
+        this.visibleConnections = {};
+        this.modelConnectionsByTarget = {};
+        this.modelConnectionKeys = {};
         this.canvas.remove();
         this.init($(parent));
     };
@@ -462,17 +469,77 @@ var Graph = new function() {
         }
     };
 
-    this.getVisibleConnection = function(sourceNodeURI, connectionURI, targetNodeURI){
-        var connections = jsPlumbInstance.getAllConnections();
-        var connection;
-        for (var i= 0; i < connections.length; i++){
-            var conn = connections[i];
-            if (conn.getParameter('sourceNodeURI') === sourceNodeURI && conn.getParameter('connectionURI') === connectionURI && conn.getParameter('targetNodeURI') === targetNodeURI){
-                connection = conn;
-                break;
-            }
+    this.getConnectionKey = function(sourceNodeURI, connectionURI, targetNodeURI) {
+        return sourceNodeURI + "\n" + connectionURI + "\n" + targetNodeURI;
+    };
+
+    this.registerModelConnection = function(ownerNodeURI, connection) {
+        if (connection.direction !== 'out')
+            return;
+
+        var targetNodeURI = decodeURIComponent(connection.target);
+        var key = this.getConnectionKey(ownerNodeURI, connection.connectionUri, targetNodeURI);
+        if (this.modelConnectionKeys[key])
+            return;
+
+        if (!this.modelConnectionsByTarget[targetNodeURI])
+            this.modelConnectionsByTarget[targetNodeURI] = [];
+        this.modelConnectionsByTarget[targetNodeURI].push({
+            sourceNodeURI: ownerNodeURI,
+            connection: connection,
+            key: key
+        });
+        this.modelConnectionKeys[key] = true;
+    };
+
+    this.unregisterModelConnectionsForNode = function(resource_id) {
+        this.modelConnectionsByTarget = {};
+        this.modelConnectionKeys = {};
+
+        var self = this;
+        $.each(this.nodes, function(nodeURI, node) {
+            if (nodeURI === resource_id)
+                return;
+            $.each(node.connections, function(index, connection) {
+                self.registerModelConnection(nodeURI, connection);
+            });
+        });
+    };
+
+    this.getModelConnectionsTo = function(targetNodeURI) {
+        return this.modelConnectionsByTarget[targetNodeURI] || [];
+    };
+
+    this.registerVisibleConnection = function(connection) {
+        var sourceNodeURI = connection.getParameter('sourceNodeURI');
+        var connectionURI = connection.getParameter('connectionURI');
+        var targetNodeURI = connection.getParameter('targetNodeURI');
+        if (sourceNodeURI && connectionURI && targetNodeURI) {
+            this.unregisterVisibleConnection(connection);
+            var key = this.getConnectionKey(sourceNodeURI, connectionURI, targetNodeURI);
+            this.visibleConnections[key] = connection;
+            connection.lodmillaConnectionKey = key;
         }
-        return connection;
+    };
+
+    this.unregisterVisibleConnection = function(connection) {
+        if (!connection || !connection.lodmillaConnectionKey)
+            return;
+        delete this.visibleConnections[connection.lodmillaConnectionKey];
+        connection.lodmillaConnectionKey = null;
+    };
+
+    this.rekeyVisibleConnection = function(connection, sourceNodeURI, connectionURI, targetNodeURI) {
+        this.unregisterVisibleConnection(connection);
+        connection.setParameter('sourceNodeURI', sourceNodeURI);
+        connection.setParameter('connectionURI', connectionURI);
+        connection.setParameter('targetNodeURI', targetNodeURI);
+        this.registerVisibleConnection(connection);
+    };
+
+    this.getVisibleConnection = function(sourceNodeURI, connectionURI, targetNodeURI){
+        var key = this.getConnectionKey(sourceNodeURI, connectionURI, targetNodeURI);
+        return this.visibleConnections[key] || false;
     };
 
     this.isAnyConnection = function(sourceNodeURI, connectionURI, targetNodeURI){

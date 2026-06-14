@@ -198,7 +198,7 @@ Node.prototype.vis_show = function(highlight, aroundNode) {
             
     }
 
-    var graphitem = $("[uri='" + this.resource_id + "']");
+    var graphitem = $("[uri='" + this.resource_id + "']").attr('id', md5(this.resource_id));
     graphitem.zIndex(100);
     graphitem.css({top: this.top, left: this.left});
     graphitem[0].onmouseup = moveNode;
@@ -688,18 +688,10 @@ Node.prototype.vis_repaintConnections = function() {
     var self = this;
 
     var connection, target;
-    var $res = $(".resourceNodeBox");
-    var lookup = [];
-    var uri;
-    $res.each( function()
-        {
-            lookup[this.getAttribute('uri')] = true;
-        }
-    );
     for (var i = 0; i < length; i++) {
         connection = this.connections[i];
         target = decodeURIComponent(connection.target);
-        if (lookup[target] !== undefined) {
+        if (Graph.getNode(target)) {
             var localsource = self.resource_id;
             var localtarget = target;
             if (connection.direction == 'in') {
@@ -730,68 +722,34 @@ Node.prototype.vis_repaintConnections = function() {
     }
     */
     // console.timeEnd('a');
-    // Iterate through the connections of all nodes in the graph to find
-    // the not reflexive connections
-    // DONE? .length property on undefined errors in console
-    $.each(Graph.nodes, function(index, node) {
-        $.each(node.connections, function(nodeconnid, nodeconn) {
-            if (nodeconn.target === self.resource_id && nodeconn.direction === 'out') {
-                var foundbefore = false;
-                var localconns = jsPlumbInstance.getConnections({source: $("[uri='" + node.resource_id + "']"), target: $("[uri='" + self.resource_id + "']")});
-                if (localconns.length) {
-
-                    $.each(localconns, function(conn_id, l_conn) {
-//                        if(l_conn.overlays){
-                            $.each(l_conn.getOverlays(), function(overlay_id, overlay) {
-                                if (overlay.type === 'Label') {
-                                    if (overlay.getLabel() === nodeconn.getConnectionLabelShort()) {
-                                        //console.log('already placed connection');
-                                        foundbefore = true;
-                                        return false;
-                                    }
-                                }
-                            });
-//                        }
-                    });
-
-                }
-
-                if (!foundbefore) {
-                    vis_jsPlumbInstance_connect_uri(node.resource_id, self.resource_id, nodeconn);
-                }
-            }
-        });
+    // Add outgoing connections that were discovered before this target node
+    // became visible.
+    $.each(Graph.getModelConnectionsTo(self.resource_id), function(index, modelConnection) {
+        if (!Graph.getVisibleConnection(
+            modelConnection.sourceNodeURI,
+            modelConnection.connection.connectionUri,
+            self.resource_id
+        )) {
+            vis_jsPlumbInstance_connect_uri(
+                modelConnection.sourceNodeURI,
+                self.resource_id,
+                modelConnection.connection
+            );
+        }
     });
 };
 
 //basic creating
 vis_jsPlumbInstance_connect_uri = function(uri1, uri2, connection) {
+    var existingConnection = Graph.getVisibleConnection(uri1, connection.connectionUri, uri2);
+    if (existingConnection)
+        return existingConnection;
+
     var labelShort = connection.getConnectionLabelShort();
-    var sourceNode = $("[uri='" + uri1 + "']").attr('id', md5(uri1));
-    var targetNode = $("[uri='" + uri2 + "']").attr('id', md5(uri2));
-
-    var localconns = jsPlumbInstance.getConnections({source: sourceNode, target: targetNode});
-    var foundbefore = false;
-    // DONE? .length property of undefined errors in console
-    if (localconns.length) {
-        $.each(localconns, function(conn_id, l_conn) {
-//            if(l_conn.overlays){
-                $.each(l_conn.getOverlays(), function(overlay_id, overlay) {
-                    if (overlay.type === 'Label') {
-                        if (overlay.getLabel() === labelShort) {
-                            foundbefore = true;
-                            return false;
-                        }
-                    }
-                });
-//            }
-        });
-
-    }
-    console.log('conn',uri1, uri2, 'foundbefore: ' + foundbefore);
-    if (foundbefore) {
-        return;
-    }
+    var sourceNode = document.getElementById(md5(uri1));
+    var targetNode = document.getElementById(md5(uri2));
+    if (!sourceNode || !targetNode)
+        return false;
 
     var aConnection = jsPlumbInstance.connect({
         source: sourceNode,
@@ -826,19 +784,8 @@ vis_jsPlumbInstance_connect_uri = function(uri1, uri2, connection) {
 //            foldback:0.2
 //            id:"myArrow"
     }]);
+    Graph.registerVisibleConnection(aConnection);
 
-
-    // kapcsolat labeljet hoverre kiemeli
-    $('.connectionBox.label').hover(
-            function() {
-                $(this).css('border-color', '#f00');
-                $(this).css('z-index', '101');
-            },
-            function() {
-                $(this).css('border-color', '#000');
-                $(this).css('z-index', '100');
-            }
-    );
 };
 
 
@@ -864,6 +811,7 @@ Node.prototype.vis_remove_load_progressbar = function() {
 Graph.vis_clear = function() {
     jsPlumbInstance.detachEveryConnection();
     jsPlumbInstance.removeAllEndpoints();
+    Graph.visibleConnections = {};
 };
 
 Graph.vis_engineInit = function() {
@@ -873,6 +821,15 @@ Graph.vis_engineInit = function() {
     });
 
     window.scrollTo((Profile.graphSize - $(window).width()) / 2, (Profile.graphSize - $(window).height()) / 2);
+
+    Graph.canvas.on('mouseenter', '.connectionBox.label', function() {
+        $(this).css('border-color', '#f00');
+        $(this).css('z-index', '101');
+    });
+    Graph.canvas.on('mouseleave', '.connectionBox.label', function() {
+        $(this).css('border-color', '#000');
+        $(this).css('z-index', '100');
+    });
 
 //prevent link opening with CTRL
     Graph.canvas[0].onclick = function(event) {

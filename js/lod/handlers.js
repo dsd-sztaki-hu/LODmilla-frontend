@@ -819,10 +819,12 @@ addCanvasHandlers = function(){
                 component.connection.setParameter('sourceNodeURI', sourceNodeURI);
                 component.connection.setParameter('connectionURI', connectionURI);
                 component.connection.setParameter('targetNodeURI', targetNodeURI);
+                Graph.registerVisibleConnection(component.connection);
             }
             // ha egy masik nodebol athuzott, mar meglevo connectionrol van szo
             else{
                 connectionURI =  component.connection.getParameter('connectionURI');
+                Graph.rekeyVisibleConnection(component.connection, sourceNodeURI, connectionURI, targetNodeURI);
 
                 Graph.deleteConnection(originalSourceNodeURI, connectionURI, originalTargetNodeURI, "nodeConnection");
                 if ((originalSourceNodeURI === sourceNodeURI) && (originalTargetNodeURI !== targetNodeURI)){
@@ -838,6 +840,7 @@ addCanvasHandlers = function(){
 
     // event dragging a connection from a node to an other node
     jsPlumbInstance.bind("connectionMoved", function(component, originalEvent) {
+        Graph.unregisterVisibleConnection(component.connection);
         var originalSourceNodeURI = $('#graph #' + component.originalSourceId).attr('uri'),
             originalTargetNodeURI =  $('#graph #' + component.originalTargetId).attr('uri');
 //            newSourceNodeURI = $('#graph #' + component.newSourceId).attr('uri'),
@@ -845,6 +848,10 @@ addCanvasHandlers = function(){
         component.connection.setParameter('originalSourceNodeURI', originalSourceNodeURI);
         component.connection.setParameter('originalTargetNodeURI', originalTargetNodeURI);
 //        return false;
+    });
+
+    jsPlumbInstance.bind("connectionDetached", function(component) {
+        Graph.unregisterVisibleConnection(component.connection || component);
     });
 
 
@@ -868,7 +875,7 @@ addCanvasHandlers = function(){
             }
             else{
                 connectionURI = newURI;
-                conn.setParameter('connectionURI', connectionURI);
+                Graph.rekeyVisibleConnection(conn, sourceNodeURI, connectionURI, targetNodeURI);
                 conn.setParameter('connectionLabel', Helper.getShortTypeFromURL(connectionURI));
 
                 $.each(conn.getOverlays(), function(overlay_id, overlay) {
