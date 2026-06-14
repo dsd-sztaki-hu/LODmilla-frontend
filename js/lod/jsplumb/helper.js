@@ -3,41 +3,53 @@
  */
 
 var resetDrawingCounter = 0, blockResetDrawing = false;
+var repaintNodesTimer = null;
+var repaintNodesDelay = 50;
 
 function repaintNodes()
 {
     Helper.showLoadScreen();
-    setTimeout(delayedRepaintNodes, 10);
+    if (repaintNodesTimer !== null)
+        clearTimeout(repaintNodesTimer);
+
+    repaintNodesTimer = setTimeout(function() {
+        repaintNodesTimer = null;
+        delayedRepaintNodes();
+    }, repaintNodesDelay);
 }
 
 function delayedRepaintNodes()
 {
-    var $res;
-    var $node = [], $child = [], length = 0;
-    var $tnode;
-    var i;
-    // repaintEverything() nem működik megbízhatóan automatikusan kiszámolt anchorral, tudnak a hibáról
-    // console.time('Repaint all');
-    jsPlumbInstance.setSuspendDrawing(false, false);
-    $res = $('.resourceNodeBox');
-    $res.each(function() {
-        $tnode = $(this);
-        $node.push($tnode);
-        $child.push($tnode.children().detach());
-        length++;
-    });
+    Helper.showLoadScreen();
+    try {
+        var $res;
+        var $node = [], $child = [], length = 0;
+        var $tnode;
+        var i;
+        // repaintEverything() nem működik megbízhatóan automatikusan kiszámolt anchorral, tudnak a hibáról
+        // console.time('Repaint all');
+        jsPlumbInstance.setSuspendDrawing(false, false);
+        $res = $('.resourceNodeBox');
+        $res.each(function() {
+            $tnode = $(this);
+            $node.push($tnode);
+            $child.push($tnode.children().detach());
+            length++;
+        });
 
-    i = 0;
-    $res.each(function() {
-        jsPlumbInstance.repaint(this);
-    });
-    for (i = 0; i < length; i++)
-    {
-        $node[i].append($child[i]);
+        i = 0;
+        $res.each(function() {
+            jsPlumbInstance.repaint(this);
+        });
+        for (i = 0; i < length; i++)
+        {
+            $node[i].append($child[i]);
+        }
+        jsPlumbInstance.setSuspendDrawing(false, true);
+        // console.timeEnd('Repaint all');
+    } finally {
+        Helper.closeLoadScreen();
     }
-    jsPlumbInstance.setSuspendDrawing(false, true);
-    // console.timeEnd('Repaint all');
-    Helper.closeLoadScreen();
 }
 
 function refreshNodeModelPosition(node, dx, dy)
