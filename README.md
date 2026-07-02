@@ -29,5 +29,6 @@ How to configure LODmilla for a new SPARQL endpoint?
 
 LODmilla can use any LOD server with JSONP support, however with SPARQL endpoint configured, you will get better functionality.
 
-1. In js/lod/services.js add description for your SPARQL endpoint. You can copy and edit an existing endpoint which seems similar to yours. At this point, you will be able to open a URI by entering it in the box "Or enter a node URI".
-2. If you want autocomplete queries as well, you need to edit js/lod/profile.class.js as well, and your search URL to this.searchURLs. Again, use existing examples. After this, you will see your endpoint in the top dropdown list showing 'dbpedia'.
+1. Copy `js/lod/config.sample.js` to `js/lod/config.js`.
+2. In `js/lod/config.js`, add or edit the service description under `services`. You can copy and edit an existing endpoint which seems similar to yours. At this point, you will be able to open a URI by entering it in the box "Or enter a node URI".
+3. If you want autocomplete queries as well, add or edit the search URL under `searchURLs`. After this, you will see your endpoint in the top dropdown list showing 'dbpedia'.

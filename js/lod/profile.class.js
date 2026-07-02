@@ -11,6 +11,7 @@
  * Class:Profile
  */
 var Profile = new function() {
+    var config = window.LodmillaConfig || {};
 
     this.graphSize = 5000;
 
@@ -23,11 +24,11 @@ var Profile = new function() {
     this.sidemenuWidth = 200;
     this.buttonsHeight = 50;
     
-    this.serverProxyUrl = 'http://munkapad.sztaki.hu/lodback/';
+    this.serverProxyUrl = config.serverProxyUrl || '';
 
-    this.defaultEndpointURI = "http://lod.sztaki.hu/sparql";
-    this.defaultEndpointLabel = "n/a";
-    this.defaultResourceURIprefix = "http://lod.sztaki.hu/edited/";
+    this.defaultEndpointURI = config.defaultEndpointURI || "";
+    this.defaultEndpointLabel = config.defaultEndpointLabel || "";
+    this.defaultResourceURIprefix = config.defaultResourceURIprefix || "";
 
 
     this.defaultConnectionURI = "[EMPTY]";
@@ -118,71 +119,7 @@ var Profile = new function() {
         }
     };
 
-    this.searchURLs = {
-        'arp': 'https://q:retrievel@kg.dsd.sztaki.hu/arp/sparql?query='
-            + encodeURIComponent('select ?object ?label where { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . '
-                + ' FILTER(REGEX(?label, \"MPAD_SEARCH_TERM\", \"i\")) } limit ' + this.addNewResourceSearchMaxHits.toString())
-            +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
-            
-        'courage': 'https://q:retrievel@kg.dsd.sztaki.hu/courage/sparql?query='
-            + encodeURIComponent('select ?object ?label where { ?object <http://www.w3.org/2000/01/rdf-schema#label> ?label . '
-                + ' FILTER(REGEX(?label, \"MPAD_SEARCH_TERM\", \"i\")) } limit ' + this.addNewResourceSearchMaxHits.toString())
-            +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
-            
-        'sztaki': 'http://lod.sztaki.hu/sparql?default-graph-uri=&should-sponge=&query='
-            + encodeURIComponent('select ?object, ?label, max(?sc) as ?rank where { ?object rdfs:label ?label . '
-                + "?label bif:contains \'\"MPAD_SEARCH_TERM\"\' option (score ?sc) . "
-                + 'FILTER(lang(?label)=""). } group by ?object ?label order by desc (?rank) ?label limit '
-                + this.addNewResourceSearchMaxHits.toString()) 
-            +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
-
-        'dbpedia': 'http://lookup.dbpedia.org/api/search.asmx/PrefixSearch?QueryClass=&MaxHits=' + this.addNewResourceSearchMaxHits.toString() + '&QueryString=MPAD_SEARCH_TERM',
-
-/*
-        'wikidata': 'http://query.wikidata.org/'
-            + encodeURIComponent('select ?object, ?label, max(?sc) as ?rank where { ?object rdfs:label ?label . '
-                + "?label bif:contains \'\"MPAD_SEARCH_TERM\"\' option (score ?sc) . "
-                + 'FILTER(lang(?label)=""). } group by ?object ?label order by desc (?rank) ?label limit '
-                + this.addNewResourceSearchMaxHits.toString()), 
-            //+'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
-*/            
-        // 'civilkapocs': 'http://civilkapocs.hu:8890/sparql?default-graph-uri=&should-sponge=&query='
-        //     + encodeURIComponent('select ?object, ?label where { ?object rdfs:label ?label . '
-        //         + "FILTER(REGEX(?label, \"MPAD_SEARCH_TERM\", \"i\")) } limit " + this.addNewResourceSearchMaxHits.toString()) 
-        //     +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
-
-        // 'europeana' : 'http://europeana.ontotext.com/sparql.xml?query='
-        //     + encodeURIComponent("PREFIX luc: <http://www.ontotext.com/owlim/lucene#>\n" 
-        //         + 'select ?object ?label WHERE { ?proxy ore:proxyFor ?object; dc:title ?label. ?label luc: "MPAD_SEARCH_TERM" } LIMIT '+ this.addNewResourceSearchMaxHits.toString() )
-        //     + '&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql',
-
-        // 'britishmuseum' : 'http://collection.britishmuseum.org/sparql.xml?query='
-        //     + encodeURIComponent("PREFIX crm: <http://erlangen-crm.org/current/>\n"
-        //         + "PREFIX fts: <http://www.ontotext.com/owlim/fts#>\n"
-        //         + 'SELECT DISTINCT ?object ?label WHERE { ?object crm:P102_has_title ?title . ?title rdfs:label ?label . FILTER(REGEX(?label, "MPAD_SEARCH_TERM")) } LIMIT '+ this.addNewResourceSearchMaxHits.toString() )
-        //     + '&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql',
-
-        // 'szepmuveszeti' : 'http://data.szepmuveszeti.hu/sparql?default-graph-uri=&should-sponge=&query='
-        //     + encodeURIComponent("PREFIX crm: <http://erlangen-crm.org/current/>\n"
-        //         + 'SELECT ?object ?label WHERE { ?object crm:P3_has_note ?label. FILTER(REGEX(?label, "MPAD_SEARCH_TERM", "i")) } LIMIT '+ this.addNewResourceSearchMaxHits.toString() )
-        //     +'&format=application%2Fsparql-results%2Bjson',
-
-        // 'uni-obuda': 'http://lod.nik.uni-obuda.hu/sparql?default-graph-uri=&should-sponge=&query='
-        //     + encodeURIComponent('select ?object, ?label where { ?object rdfs:label ?label . '
-        //         + "FILTER(REGEX(?label, \"MPAD_SEARCH_TERM\", \"i\")) } limit " + this.addNewResourceSearchMaxHits.toString()) 
-        //     +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
-        
-            // + encodeURIComponent('select ?object, ?label, max(?sc) as ?rank where { ?object rdfs:label ?label . '
-                // + "?label bif:contains \'\"MPAD_SEARCH_TERM\"\' option (score ?sc) . "
-                // + 'FILTER(lang(?label)=""). } group by ?object ?label order by desc (?rank) ?label limit '
-                // + this.addNewResourceSearchMaxHits.toString()) 
-            // +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
-
-//        'factforge' : 'http://factforge.net/sparql.xml?query='
-//            + encodeURIComponent('SELECT distinct ?object ?label WHERE { ?object rdfs:label ?label; FILTER(regex(?label, "MPAD_SEARCH_TERM", "i")) } LIMIT '
-//                + this.addNewResourceSearchMaxHits.toString() )
-//            + '&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql',
-    }
+    this.searchURLs = config.searchURLs || {};
 
     // props to get the label for nodes, with ascending priority
     // DO NOT CHANGE THE ORDERING!!!
