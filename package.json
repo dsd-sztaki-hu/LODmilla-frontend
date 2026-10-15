@@ -1,0 +1,16 @@
+{
+  "name": "lodmilla-frontend",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Maintenance tooling for the static LODmilla frontend",
+  "scripts": {
+    "vendor": "node scripts/vendor-dependencies.js",
+    "vendor:check": "node scripts/vendor-dependencies.js --check"
+  },
+  "dependencies": {
+    "jquery": "https://github.com/jquery/jquery/archive/refs/tags/1.9.0.tar.gz"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

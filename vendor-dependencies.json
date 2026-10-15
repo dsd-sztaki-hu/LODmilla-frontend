@@ -1,0 +1,10 @@
+{
+  "assets": [
+    {
+      "package": "jquery",
+      "version": "1.9.0",
+      "source": "jquery.min.js",
+      "destination": "js/jquery-1.9.0-min.js"
+    }
+  ]
+}

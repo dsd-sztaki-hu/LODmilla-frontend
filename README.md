@@ -3,6 +3,11 @@ LODmilla-frontend
 
 LODmilla - a graph-based Linked Open Data browser
 
+The application is deployed as a static directory. Node.js is used only to pin
+and refresh committed third-party browser assets; deployment does not require a
+JavaScript build. See [DEVELOPMENT.md](DEVELOPMENT.md) for the dependency update
+workflow.
+
 Demo: http://munkapad.sztaki.hu/lodmilla/
 Presentation: http://lcpd2013.research-infrastructures.eu/slides/lodmilla.pdf
 
