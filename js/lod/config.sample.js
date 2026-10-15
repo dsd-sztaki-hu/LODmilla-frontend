@@ -8,7 +8,7 @@
     window.LodmillaConfig = {
         editAllowed: false,
         serverProxyUrl: 'http://munkapad.sztaki.hu/lodback/',
-        defaultEndpointURI: 'http://lod.sztaki.hu/sparql',
+        defaultEndpointURI: 'https://lod.sztaki.hu/sparql',
         defaultEndpointLabel: 'n/a',
         defaultResourceURIprefix: 'http://lod.sztaki.hu/edited/',
         searchURLs: {
@@ -22,7 +22,7 @@
                     + ' FILTER(REGEX(?label, "MPAD_SEARCH_TERM", "i")) } limit ' + addNewResourceSearchMaxHits.toString())
                 +'&format=application%2Fsparql-results%2Bxml&save=display&fname=',
 
-            'sztaki': 'http://lod.sztaki.hu/sparql?default-graph-uri=&should-sponge=&query='
+            'sztaki': 'https://lod.sztaki.hu/sparql?default-graph-uri=&should-sponge=&query='
                 + encodeURIComponent('select ?object, ?label, max(?sc) as ?rank where { ?object rdfs:label ?label . '
                     + "?label bif:contains '\"MPAD_SEARCH_TERM\"' option (score ?sc) . "
                     + 'FILTER(lang(?label)=""). } group by ?object ?label order by desc (?rank) ?label limit '
@@ -84,7 +84,7 @@
         "sparql": {
             "resourceConnectionsLabels": "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nselect distinct * where { { <{URI}> ?prop ?out. FILTER(!isLiteral(?out) || lang(?out)=\"\" || lang(?out)=\"en\") OPTIONAL { ?out rdfs:label ?label. FILTER(lang(?label)=\"en\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } UNION { ?in ?prop  <{URI}> OPTIONAL { ?in rdfs:label ?label. FILTER(lang(?label)=\"en\"||lang(?label)=\"\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } }"
         },
-        "endpoint": "http://lod.sztaki.hu/sparql",
+        "endpoint": "https://lod.sztaki.hu/sparql",
         "prefix": {
             "author": "http://lod.sztaki.hu/sztaki/auth",
             "item": "http://lod.sztaki.hu/sztaki/item"
@@ -102,7 +102,7 @@
         "sparql": {
             "resourceConnectionsLabels": "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nselect distinct * where { { <{URI}> ?prop ?out. FILTER(!isLiteral(?out) || lang(?out)=\"\" || lang(?out)=\"en\") OPTIONAL { ?out rdfs:label ?label. FILTER(lang(?label)=\"en\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } UNION { ?in ?prop  <{URI}> OPTIONAL { ?in rdfs:label ?label. FILTER(lang(?label)=\"en\"||lang(?label)=\"\") } OPTIONAL { ?prop rdfs:label ?proplabel. FILTER(lang(?proplabel)=\"en\"||lang(?proplabel)=\"\"||lang(?proplabel)=\"en-us\") } } }"
         },
-        "endpoint": "http://lod.sztaki.hu/sparql",
+        "endpoint": "https://lod.sztaki.hu/sparql",
         "prefix": {
             "default": "http://lod.sztaki.hu/data"
         },
