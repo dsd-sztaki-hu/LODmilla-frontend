@@ -42,11 +42,10 @@ npm run vendor:check
 The script also checks the installed package version against the vendor
 manifest. It fails instead of copying from an unexpected version.
 
-## Current legacy dependency
+## Current jQuery dependency
 
-jQuery 1.9.0 predates its publication as a normal npm package. Until the planned
-jQuery upgrade, `package.json` installs the official jQuery 1.9.0 source archive
-and the lockfile pins that archive. After moving to an npm-published jQuery
-release, the dependency should be changed to a normal semantic version such as
-`"jquery": "3.7.1"` or the selected later release; Dependabot can then propose
-regular version updates.
+jQuery is installed from its normal npm package and pinned in both
+`package.json` and `package-lock.json`. Dependabot can therefore identify the
+installed version and propose regular version or security updates. Updating the
+package alone does not change the static application: run `npm run vendor` and
+commit the resulting browser asset as described above.

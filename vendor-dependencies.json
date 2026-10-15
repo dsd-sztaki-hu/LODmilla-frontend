@@ -2,9 +2,9 @@
   "assets": [
     {
       "package": "jquery",
-      "version": "1.9.0",
-      "source": "jquery.min.js",
-      "destination": "js/jquery-1.9.0-min.js"
+      "version": "1.12.4",
+      "source": "dist/jquery.min.js",
+      "destination": "js/jquery-1.12.4.min.js"
     }
   ]
 }
