@@ -7,7 +7,7 @@
  *
  */
 
-$(document).ready(function() {
+$(function() {
     jsPlumb.ready(function() {
 
         jsPlumbInstance = jsPlumb.getInstance({
@@ -87,7 +87,7 @@ $(document).ready(function() {
 
 
         $("#footerWrapper").position({my: "right bottom", at: "right-50 bottom-8", of: window});
-        $(window).resize(function() {
+        $(window).on('resize', function() {
             $("#footerWrapper").position({my: "right bottom", at: "right-50 bottom-8", of: window});
         });
 

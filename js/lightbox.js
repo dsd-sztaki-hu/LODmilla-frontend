@@ -19,7 +19,7 @@ var LodmillaLightbox = (function($) {
             image.attr("alt", title);
         }
         overlay.append(closeButton, image).appendTo("body");
-        closeButton.focus();
+        closeButton.trigger("focus");
         overlay.on("click", function(event) {
             if (event.target === overlay[0] || $(event.target).hasClass("lodmilla-lightbox-close")) {
                 close();

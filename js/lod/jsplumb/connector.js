@@ -432,7 +432,7 @@ Node.prototype.scrollToResult = function(tab, panel) {
             var targetObj = panel.find('.property-value-normal[refProp="' + property + '"][refPropVal="' + target + '"]');
 
             var targetObjList = targetObj.parent('ul');
-            targetObjList.filter(":hidden").prev('p').find('.conncollapsetoggle').click();
+            targetObjList.filter(":hidden").prev('p').find('.conncollapsetoggle').trigger('click');
 
             targetObj.addClass('property-value-highlighted');
 
@@ -662,7 +662,7 @@ Node.prototype.vis_generateInspectorContent = function(callback) {
     });
 
 
-    $(window).resize(function() {
+    $(window).on('resize', function() {
         $('#nodeOpenedContent').dialog('option',{
             position: {my: "left", at: "right top", of: window},
             height: $(window).height()-50,

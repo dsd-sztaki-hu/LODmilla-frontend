@@ -44,7 +44,7 @@ var Sidemenu = new function() {
         self.addNewResForm.append('<div class="addNewResourceAddButton"><input type="button" value="Add" /></div>');
         self.addNewResBox.append(self.addNewResForm);
 
-        self.addNewResForm.find('select').change(function() {
+        self.addNewResForm.find('select').on('change', function() {
             var typeURI = $(this).find('option:selected').attr('value');
             if (typeURI){
                 self.addNewResForm.find('div.typeUriInput input').val(typeURI);
@@ -71,13 +71,13 @@ var Sidemenu = new function() {
         self.openResForm.append('<div class="addResourceOpenButton"><input type="submit" value="Open" /></div>');
         self.openResBox.append(self.openResForm);
 
-        self.openResForm.find('select').change(function() {
+        self.openResForm.find('select').on('change', function() {
             self.openResForm.find('div.resourceLabelInput input').removeClass('ui-autocomplete-loading');
             var lodServer = $(this).find('option:selected').attr('value');
             var searchInput = self.openResForm.find('div.resourceLabelInput input');
             if (lodServer) {
                 self.openResForm.find('div.resourceLabelInput').removeClass('searchInputInactive');
-                searchInput.val('').removeAttr('readonly').focus();
+                searchInput.val('').removeAttr('readonly').trigger('focus');
             }
             else {
                 self.openResForm.find('div.resourceLabelInput').addClass('searchInputInactive');
@@ -93,7 +93,7 @@ var Sidemenu = new function() {
         self.openResForm.find('div.addResourceClearButton input').button();
 
         // event for pressing enter in 2nd input aka adding resource from URI
-        self.openResForm.find('div.resourceUriInput input').keypress(function(e) {
+        self.openResForm.find('div.resourceUriInput input').on('keypress', function(e) {
             if (e.keyCode === 13) {
                 e.preventDefault();
                 var newURI = $(this).val();
@@ -321,7 +321,7 @@ var Sidemenu = new function() {
             select: function(event, ui) {
                 self.openResForm.find('div.resourceLabelInput input').val(ui.item.label);
                 self.openResForm.find('div.resourceUriInput input').val(ui.item.uri);
-                self.openResForm.submit();
+                self.openResForm.trigger('submit');
             // "Nothing selected, input was " + this.value;
             },
             close: function(event, ui) {
@@ -334,7 +334,7 @@ var Sidemenu = new function() {
         self.selectBox.append('<span class="node-highlight-all"></span><span class="node-highlight-type-label"></span>');
         self.selectBox.find('span.node-highlight-type-label').append('<form><select name="nodeType"></select></form>');
 
-        self.selectBox.find('select').change(function(){
+        self.selectBox.find('select').on('change', function(){
             var selectedTypeUri = $('#paletteBox #selectPalette .node-highlight-type-label form select option').filter(":selected").val();
             var selNodes = Graph.getNodesByType(selectedTypeUri);
             for (var i=0; i<selNodes.length; i++){
@@ -351,7 +351,7 @@ var Sidemenu = new function() {
         self.searchBox.append('<div class="clearSearchButton"><input type="button" value="Clear results" /></div>');
         self.searchBox.find('div.clearSearchButton input').button();
 
-        self.searchForm.find('div.searchInput input').keypress(function(e) {
+        self.searchForm.find('div.searchInput input').on('keypress', function(e) {
             if (e.keyCode === 13) {
                 e.preventDefault();
                 return false;
@@ -605,7 +605,7 @@ var Sidemenu = new function() {
         self.logoWrap.position({my: "left bottom", at: "left top", of: self.buttonLoad});
 
         // window resize - fix the position of the buttom 3 buttons 
-        $(window).resize(function() {
+        $(window).on('resize', function() {
             self.buttonLoad.position({my: "left bottom", at: "left+10 bottom-10", of: window});
             self.buttonSave.position({my: "left bottom", at: "right bottom", of: self.buttonLoad});
             self.buttonMyEdits.position({my: "left bottom", at: "right bottom", of: self.buttonSave});
@@ -647,10 +647,10 @@ var Sidemenu = new function() {
             },
             activate: function(event, ui) {
                 if (ui.newPanel.attr('id') === 'addResourcePalette'){
-                    self.openResForm.find('div.resourceLabelInput input').focus();
+                    self.openResForm.find('div.resourceLabelInput input').trigger('focus');
                 }
                 else if (ui.newPanel.attr('id') === 'addNewResourcePalette'){
-                    self.addNewResForm.find('div.resourceLabelInput input').focus();
+                    self.addNewResForm.find('div.resourceLabelInput input').trigger('focus');
                     var select = self.addNewResForm.find('select');
                     select.empty();
 
@@ -665,7 +665,7 @@ var Sidemenu = new function() {
                     select.prepend('<option value="" title="-Select a type-">-Select a type-</option>');
                 }
                 else if (ui.newPanel.attr('id') === 'searchPalette'){
-                    self.searchForm.find('div.searchInput input').focus();
+                    self.searchForm.find('div.searchInput input').trigger('focus');
                 }
                 else if (ui.newPanel.attr('id') === 'selectPalette'){
                     var select = self.selectBox.find('form select');
@@ -763,7 +763,7 @@ var Sidemenu = new function() {
 
     this.graphNameAutoComplete = function(json, response) {
         if (json.error !== undefined) {
-            $("#loadgraphclosebtn").click();
+            $("#loadgraphclosebtn").trigger('click');
             Helper.alertDialog(Profile.alertTexts.loadGraph.title, Profile.alertTexts.loadGraph.text);
         } else {
 

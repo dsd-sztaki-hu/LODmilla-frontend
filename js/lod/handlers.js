@@ -130,10 +130,10 @@ addInspectorHandlers = function(){
 
             var addPropForm = '<form><input type="text"/></form>';
             var propList = $(this).parent('p').next('ul');
-            propList.filter(":hidden").prev('p').find('.conncollapsetoggle').click();
-            propList.prepend('<li>'+addPropForm+'</li>').find('input').focus();
+            propList.filter(":hidden").prev('p').find('.conncollapsetoggle').trigger('click');
+            propList.prepend('<li>'+addPropForm+'</li>').find('input').trigger('focus');
 
-            propList.find('form input').keypress(function(e) {
+            propList.find('form input').on('keypress', function(e) {
                 if (e.keyCode === 13) {
                     e.preventDefault();
                     var resourceURI = $('div#nodeOpenedContent').attr('resourceuri'),
@@ -175,10 +175,10 @@ addInspectorHandlers = function(){
 
             var addPropForm = '<form><input type="text"/></form>';
             var propList = $(this).parent('p').next('ul');
-            propList.filter(":hidden").prev('p').find('.conncollapsetoggle').click();
-            propList.prepend('<li>'+addPropForm+'</li>').find('input').focus();
+            propList.filter(":hidden").prev('p').find('.conncollapsetoggle').trigger('click');
+            propList.prepend('<li>'+addPropForm+'</li>').find('input').trigger('focus');
 
-            propList.find('form input').keypress(function(e) {
+            propList.find('form input').on('keypress', function(e) {
                 if (e.keyCode === 13) {
                     e.preventDefault();
 
@@ -288,7 +288,7 @@ addPaletteHandlers = function(){
         thisForm.find('div.resourceLabelInput input').val('');
         thisForm.find('div.resourceUriInput input').val('');
         thisForm.find('div.resourceLabelInput input').removeClass('ui-autocomplete-loading');
-        thisForm.find('div.resourceLabelInput input').focus();
+        thisForm.find('div.resourceLabelInput input').trigger('focus');
     });
 
     $('body').on("click", '#main #paletteBox #addNewResourcePalette form div.addNewResourceAddButton input', function(event) {
@@ -301,7 +301,7 @@ addPaletteHandlers = function(){
             uriPrefix = thisForm.find('.uriPrefixInput input').val(),
             thumbnailURL = thisForm.find('.thumbnailUrlInput input').val();
         if (nodeLabel && typeSel && typeUri){
-            thisForm.find('div.resourceLabelInput input').val('').focus();
+            thisForm.find('div.resourceLabelInput input').val('').trigger('focus');
             if (!uriPrefix || uriPrefix === 'undefined'){
                 uriPrefix = Profile.defaultResourceURIprefix;
             }
@@ -442,7 +442,7 @@ addBottomMenuHandlers = function(){
 
         var allFields = $([]).add($('#user_name')).add($('#graphid')).add($('#graph_name'));
 
-        $("#graphid").keyup(function() {
+        $("#graphid").on('keyup', function() {
             if ($("#graphid").val().length === 0) {
                 $("#user_name").removeAttr('disabled');
                 $("[for=user_name]").fadeTo(100, 1);
@@ -470,7 +470,7 @@ addBottomMenuHandlers = function(){
             close: function() {
 //                    console.log("close");
             }
-        }).focus(function() {
+        }).on('focus', function() {
                 $(this).autocomplete("search", "");
             });
 
