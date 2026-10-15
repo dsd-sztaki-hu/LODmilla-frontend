@@ -2,9 +2,9 @@
   "assets": [
     {
       "package": "jquery",
-      "version": "3.7.1",
+      "version": "4.0.0",
       "source": "dist/jquery.min.js",
-      "destination": "js/jquery-3.7.1.min.js"
+      "destination": "js/jquery-4.0.0.min.js"
     },
     {
       "package": "jquery-ui",

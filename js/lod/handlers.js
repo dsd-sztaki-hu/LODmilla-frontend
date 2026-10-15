@@ -292,15 +292,18 @@ addPaletteHandlers = function(){
     });
 
     $('body').on("click", '#main #paletteBox #addNewResourcePalette form div.addNewResourceAddButton input', function(event) {
-        var thisForm = $(this).parent('div').parent('form');
+        event.preventDefault();
+        var thisForm = $('#addNewResForm'),
+            selectedType = thisForm.find('select option:selected'),
+            selectedTypeUri = selectedType.val();
         var nodeLabel = thisForm.find('.resourceLabelInput input').val(),
-            typeSel = thisForm.find('select option:selected').html(),
-            typeUri = thisForm.find('.typeUriInput input').val(),
+            typeUri = thisForm.find('.typeUriInput input').val() || selectedTypeUri,
+            typeSel = selectedTypeUri ? selectedType.text() : typeUri,
 //                endpointUri = thisForm.find('.endpointUriInput input').val(),
             endpointUri = false,
             uriPrefix = thisForm.find('.uriPrefixInput input').val(),
             thumbnailURL = thisForm.find('.thumbnailUrlInput input').val();
-        if (nodeLabel && typeSel && typeUri){
+        if (nodeLabel && typeUri){
             thisForm.find('div.resourceLabelInput input').val('').trigger('focus');
             if (!uriPrefix || uriPrefix === 'undefined'){
                 uriPrefix = Profile.defaultResourceURIprefix;

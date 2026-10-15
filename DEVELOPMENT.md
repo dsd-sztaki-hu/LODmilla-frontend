@@ -50,6 +50,6 @@ installed version and propose regular version or security updates. Updating the
 package alone does not change the static application: run `npm run vendor` and
 commit the resulting browser asset as described above.
 
-jQuery 3.7.1 runs without jQuery Migrate. Deprecated APIs reported during the
+jQuery 4.0.0 runs without jQuery Migrate. Deprecated APIs reported during the
 migration have been replaced rather than retaining the compatibility layer in
 production.
