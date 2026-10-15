@@ -182,7 +182,7 @@ function nodeSizeToNormal()
         vis_node.find('.node-button').css('visibility', 'visible');
         vis_node.find('.node-connection-source').css('visibility', 'visible');
         vis_node.find('.resourceLabel').css('font-size', '12px').css('position', 'relative').css('top','0px')
-            .css('max-height','30px').css('cursor','auto').unbind('click');
+            .css('max-height','30px').css('cursor','auto').off('click');
         vis_node.find('.nodeImage').css('visibility', 'visible');
         vis_node.css('padding', '0.5em').css('padding-top', '2em').css('padding-bottom', '1.5em');
         vis_node.removeClass('labelSizeNode');
@@ -242,13 +242,13 @@ function changeActiveTab(targetTabName)
 }
 
 function setInspector(targetTabName, property, target) {
-    $.jStorage.set("targetTabName", targetTabName);
-    $.jStorage.set("property", property);
-    $.jStorage.set("target", target);
+    LodmillaStorage.set("targetTabName", targetTabName);
+    LodmillaStorage.set("property", property);
+    LodmillaStorage.set("target", target);
 }
 
 function resetInspector(targetTabName, property, target) {
-    $.jStorage.deleteKey("targetTabName");
-    $.jStorage.deleteKey("property");
-    $.jStorage.deleteKey("target");
+    LodmillaStorage.remove("targetTabName");
+    LodmillaStorage.remove("property");
+    LodmillaStorage.remove("target");
 }

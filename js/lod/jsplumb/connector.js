@@ -199,7 +199,7 @@ Node.prototype.vis_show = function(highlight, aroundNode) {
     }
 
     var graphitem = $("[uri='" + this.resource_id + "']").attr('id', md5(this.resource_id));
-    graphitem.zIndex(100);
+    graphitem.css('z-index', 100);
     graphitem.css({top: this.top, left: this.left});
     graphitem[0].onmouseup = moveNode;
 
@@ -305,7 +305,7 @@ Node.prototype.vis_showImageOwnImage = function(nodeImageDiv, imgBox){
 
 Node.prototype.vis_showImageDefaultEndpoint = function(imgBox){
     var self = this;
-    $("<img />").attr('src', self.nodeImageURL).load(function() {
+    $("<img />").attr('src', self.nodeImageURL).on('load', function() {
         var imgBox2 = $('<a class="fancybox" rel="galery1" target="_blank" href="' + self.nodeImageURL + '"></a>');
         imgBox2.append(Helper.getImgSrc(self.nodeImageURL));
         imgBox.empty().attr('href', self.nodeImageURL).append(imgBox2);
@@ -446,9 +446,9 @@ Node.prototype.scrollToResult = function(tab, panel) {
 };
 
 function vis_showPropertyCallback() {
-    var targetTabName = $.jStorage.get("targetTabName", "");
-    var property = $.jStorage.get("property", "");
-    var target = $.jStorage.get("target", "");
+    var targetTabName = LodmillaStorage.get("targetTabName", "");
+    var property = LodmillaStorage.get("property", "");
+    var target = LodmillaStorage.get("target", "");
 
     var tabId = changeActiveTab(targetTabName);
 
@@ -836,7 +836,7 @@ Graph.vis_engineInit = function() {
         if (event.ctrlKey || event.altKey || Graph.zoomRatio < 0.701)
         {
             event.preventDefault();
-            if ($(event.target).is('.fancybox')) fancyBoxOpen = false;
+            if ($(event.target).closest('.fancybox').length) fancyBoxOpen = false;
             return;
         }
         else
@@ -977,7 +977,9 @@ Graph.vis_engineInit = function() {
 
     };
     /* zoom */
-    Graph.canvas.bind('mousewheel', function(event, delta) {
+    Graph.canvas.on('wheel', function(event) {
+        var originalEvent = event.originalEvent || event;
+        var delta = originalEvent.deltaY < 0 ? 1 : -1;
 //        console.log(delta);
         if (delta > 0)
         {
@@ -1002,7 +1004,7 @@ Graph.vis_highlight = function(selector, edgehl) {
     $(selector).find('.node-highlight').addClass("opened");
     
     // if every nodes are highlighted, highlight the main star on the left palette
-    if ($('.resourceNodeBox').size() === $('.resourceNodeBox.highlighted').size())
+    if ($('.resourceNodeBox').length === $('.resourceNodeBox.highlighted').length)
         $("#selectPalette .node-highlight-all").addClass("opened");
     
     if (edgehl === 0) {
@@ -1035,7 +1037,7 @@ Graph.vis_removeHighlight = function(selector) {
     $.each(toHighlight, function(){
         self.highlight(this, 2);
     });
-    if ($('.resourceNodeBox.highlighted').size() === 0)
+    if ($('.resourceNodeBox.highlighted').length === 0)
         $("#selectPalette .node-highlight-all").removeClass("opened");
 };
 

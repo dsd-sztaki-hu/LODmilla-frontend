@@ -433,6 +433,12 @@ a:hover {
 /* Misc visuals
 ----------------------------------*/
 
+/* Preserve the typography used by the previous jQuery UI theme. */
+.ui-widget {
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 1.1em;
+}
+
 /* Corner radius */
 .ui-corner-all,
 .ui-corner-top,
@@ -492,6 +498,12 @@ a:hover {
 
 .ui-tabs-nav .ui-state-active {
     background-color: #fff;
+}
+
+#nodeOpenedContentTabs .ui-tabs-nav li.ui-tabs-active .ui-tabs-anchor,
+#nodeOpenedContentTabs .ui-tabs-nav li.ui-tabs-active .ui-tabs-anchor:link,
+#nodeOpenedContentTabs .ui-tabs-nav li.ui-tabs-active .ui-tabs-anchor:visited {
+    color: #222;
 }
 
 

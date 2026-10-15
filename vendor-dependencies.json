@@ -5,6 +5,18 @@
       "version": "1.12.4",
       "source": "dist/jquery.min.js",
       "destination": "js/jquery-1.12.4.min.js"
+    },
+    {
+      "package": "jquery-ui",
+      "version": "1.14.2",
+      "source": "dist/jquery-ui.min.js",
+      "destination": "js/jquery-ui-1.14.2.min.js"
+    },
+    {
+      "package": "jquery-ui",
+      "version": "1.14.2",
+      "source": "themes/base",
+      "destination": "css/jquery-ui"
     }
   ]
 }

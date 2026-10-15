@@ -214,10 +214,7 @@ var Graph = new function() {
         $.each(this.nodes, function(index, node) {
             s_nodes[index] = node.serialize_0();
         });
-        /*return $.toJSON({
-         nodes: s_nodes
-         });*/
-        return $.toJSON({
+        return JSON.stringify({
             nodes: s_nodes,
             scrollX: window.scrollX,
             scrollY: window.scrollY,

@@ -19,6 +19,31 @@ function hash(contents) {
   return crypto.createHash("sha256").update(normalized).digest("hex");
 }
 
+function filesBelow(directory, prefix = "") {
+  return fs.readdirSync(directory, { withFileTypes: true })
+    .flatMap((entry) => {
+      const relative = path.join(prefix, entry.name);
+      return entry.isDirectory()
+        ? filesBelow(path.join(directory, entry.name), relative)
+        : [relative];
+    })
+    .sort();
+}
+
+function directoriesMatch(source, destination) {
+  if (!fs.existsSync(destination) || !fs.statSync(destination).isDirectory()) {
+    return false;
+  }
+  const sourceFiles = filesBelow(source);
+  const destinationFiles = filesBelow(destination);
+  return sourceFiles.length === destinationFiles.length &&
+    sourceFiles.every((relative, index) =>
+      relative === destinationFiles[index] &&
+      hash(fs.readFileSync(path.join(source, relative))) ===
+        hash(fs.readFileSync(path.join(destination, relative)))
+    );
+}
+
 for (const asset of manifest.assets) {
   const packageRoot = path.join(root, "node_modules", asset.package);
   const packageJsonPath = path.join(packageRoot, "package.json");
@@ -40,11 +65,11 @@ for (const asset of manifest.assets) {
     continue;
   }
 
-  const source = fs.readFileSync(sourcePath);
-  const destination = fs.existsSync(destinationPath)
-    ? fs.readFileSync(destinationPath)
-    : null;
-  const matches = destination !== null && hash(source) === hash(destination);
+  const sourceIsDirectory = fs.statSync(sourcePath).isDirectory();
+  const matches = sourceIsDirectory
+    ? directoriesMatch(sourcePath, destinationPath)
+    : fs.existsSync(destinationPath) &&
+      hash(fs.readFileSync(sourcePath)) === hash(fs.readFileSync(destinationPath));
 
   if (checkOnly) {
     if (!matches) {
@@ -62,7 +87,12 @@ for (const asset of manifest.assets) {
   }
 
   fs.mkdirSync(path.dirname(destinationPath), { recursive: true });
-  fs.copyFileSync(sourcePath, destinationPath);
+  if (sourceIsDirectory) {
+    fs.rmSync(destinationPath, { recursive: true, force: true });
+    fs.cpSync(sourcePath, destinationPath, { recursive: true });
+  } else {
+    fs.copyFileSync(sourcePath, destinationPath);
+  }
   console.log(`Updated ${asset.destination} from ${asset.package}@${installed.version}.`);
 }
 

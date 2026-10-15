@@ -104,7 +104,7 @@ var Sidemenu = new function() {
         });
 
         // event for submitting, aka clicking on a found resource
-        self.openResForm.bind('submit', function(e) {
+        self.openResForm.on('submit', function(e) {
             e.preventDefault();
             var newURI = $(this).find('div.resourceUriInput input').val();
             var undoActionLabel = 'action_sidemenu_openNode';
@@ -581,7 +581,8 @@ var Sidemenu = new function() {
 //        parent.append(self.buttonEdit);
 
         // HELP button
-        self.buttonHelp = $('<a href="help.html" id="helpButton" title="Help" target="_blank" width="32" height="32"><img src="img/system-help-3.png" width="32" height="32" /></button>').zIndex(1500);
+        self.buttonHelp = $('<a href="help.html" id="helpButton" title="Help" target="_blank" width="32" height="32"><img src="img/system-help-3.png" width="32" height="32" /></a>')
+            .css('z-index', 1500);
         parent.append(self.buttonHelp);
 
         // logo

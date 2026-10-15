@@ -105,9 +105,8 @@ $(document).ready(function() {
             Graph.logUndoAction(undoActionLabel, nodeList);
         }
 
-        $(".fancybox").fancybox({
-            'type':'image',
-            beforeLoad: function() {
+        LodmillaLightbox.init({
+            canOpen: function() {
                 return fancyBoxOpen;
             }
         });

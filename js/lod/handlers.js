@@ -333,7 +333,7 @@ addPaletteHandlers = function(){
     $('body').on("click", '#main #paletteBox #remoteSearchPalette div.remoteSearchButton input', function(event) {
         if ($(this).attr('loading') !== 'true') {
             var nodesHighlighted = $('.resourceNodeBox.highlighted');
-            if (nodesHighlighted.size() === 0) {
+            if (nodesHighlighted.length === 0) {
                 Helper.alertDialog(Profile.alertTexts.searchRemoteSelected.title, Profile.alertTexts.searchRemoteSelected.text);
             } else if ($('#remoteSearchPalette input').val().trim() === "") {
                 Helper.alertDialog(Profile.alertTexts.searchRemoteSearchText.title, Profile.alertTexts.searchRemoteSearchText.text);
@@ -359,7 +359,7 @@ addPaletteHandlers = function(){
     $('body').on("click", '#main #paletteBox #searchConnectionPalette div.searchConnectionButton input', function(event) {
         if ($(this).attr('loading') !== 'true') {
             var nodesHighlighted = $('.resourceNodeBox.highlighted');
-            if (nodesHighlighted.size() === 0) {
+            if (nodesHighlighted.length === 0) {
                 Helper.alertDialog(Profile.alertTexts.searchConnectionSelected.title, Profile.alertTexts.searchConnectionSelected.text);
             } else if ($('#searchConnectionPalette input').val().trim() === "") {
                 Helper.alertDialog(Profile.alertTexts.searchConnectionSearchText.title, Profile.alertTexts.searchConnectionSearchText.text);
@@ -385,7 +385,7 @@ addPaletteHandlers = function(){
     $('body').on("click", '#main #paletteBox #findPathPalette div.findPathButton input', function(event) {
         if ($(this).attr('loading') !== 'true') {
             var nodesHighlighted = $('.resourceNodeBox.highlighted');
-            if (nodesHighlighted.size() !== 2) {
+            if (nodesHighlighted.length !== 2) {
                 Helper.alertDialog(Profile.alertTexts.findPathNodesSelected.title, Profile.alertTexts.findPathNodesSelected.text);
             }
             else {
@@ -857,7 +857,7 @@ addCanvasHandlers = function(){
 
 
     // event submitting the new connection dragndrop window
-    $("#addNewConnectionDialogForm").bind('submit', function(e) {
+    $("#addNewConnectionDialogForm").on('submit', function(e) {
         e.preventDefault();
         var newURI = $(this).find('form select option').filter(":selected").val();
 

@@ -1,0 +1,30 @@
+#lodmilla-lightbox {
+    align-items: center;
+    background: rgba(0, 0, 0, 0.8);
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 10000;
+}
+
+.lodmilla-lightbox-image {
+    max-height: 90vh;
+    max-width: 90vw;
+    object-fit: contain;
+}
+
+.lodmilla-lightbox-close {
+    background: transparent;
+    border: 0;
+    color: #fff;
+    cursor: pointer;
+    font-size: 36px;
+    line-height: 1;
+    position: absolute;
+    right: 20px;
+    top: 12px;
+}
